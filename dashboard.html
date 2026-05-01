@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facility Location IT — App multipagina</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Leaflet 1.9.4 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Chart.js 4.x -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+:root{
+  --bg-0:#0d1117; --bg-1:#161b22; --bg-2:#21262d; --bg-3:#2d333b;
+  --txt:#e6edf3; --txt-dim:#8b949e;
+  --accent:#3aa0ff; --accent-2:#f78166;
+  --good:#3fb950; --warn:#d29922; --bad:#f85149;
+  --plant:#b30000; --plant-new:#ff7a00; --port:#ff9900; --province:#3aa0ff;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  background:var(--bg-0); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;
+}
+/* ======================= NAVBAR ======================= */
+.app-nav{
+  display:flex;align-items:center;
+  background:linear-gradient(90deg,#1f6feb,#0969da);
+  padding:0 24px; height:50px;
+  border-bottom:1px solid var(--bg-3);
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+  position:sticky; top:0; z-index:1000;
+}
+.app-nav .brand{font-weight:600;font-size:15px;color:#fff;margin-right:24px;}
+.app-nav .brand span{color:#cfe5ff;font-weight:400;font-size:12px;margin-left:6px;}
+.app-nav .tabs{display:flex;gap:4px;flex:1;}
+.app-nav .tab{
+  padding:8px 16px;color:#cfe5ff;cursor:pointer;border-radius:6px 6px 0 0;
+  font-size:13px;letter-spacing:0.3px;border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+.app-nav .tab:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.app-nav .tab.active{background:var(--bg-0);color:#fff;border-bottom-color:var(--accent);}
+#status-msg{color:#fff;font-size:12px;opacity:.85;}
+
+/* ======================= PAGES ======================= */
+.page{display:none;}
+.page.active{display:block;}
+.full-h{height:calc(100vh - 50px);}
+
+/* ======================= HOME ======================= */
+.home-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;
+  padding:32px;height:100%;
+}
+.home-card{
+  background:var(--bg-1);
+  border:1px solid var(--bg-3);
+  border-radius:12px;
+  padding:40px;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  position:relative; overflow:hidden;
+}
+.home-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 0%, rgba(58,160,255,0.18), transparent 60%);
+  pointer-events:none;
+}
+.home-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--accent);
+  box-shadow:0 12px 32px rgba(58,160,255,0.25), 0 0 0 1px var(--accent);
+}
+.home-card.brown:hover{
+  border-color:var(--accent-2);
+  box-shadow:0 12px 32px rgba(247,129,102,0.25), 0 0 0 1px var(--accent-2);
+}
+.home-card .icon{font-size:64px;margin-bottom:16px;}
+.home-card h2{font-size:22px;margin:0 0 8px;color:#fff;}
+.home-card p{color:var(--txt-dim);font-size:14px;line-height:1.6;margin:0 0 16px;}
+.home-card ul{color:var(--txt-dim);font-size:13px;line-height:1.8;padding-left:18px;margin:0;}
+.home-card .cta{
+  margin-top:auto;color:var(--accent);font-weight:600;font-size:13px;
+  letter-spacing:0.3px;
+}
+.home-card.brown .cta{color:var(--accent-2);}
+
+/* ======================= LAYOUT MAPPA + PANNELLO ======================= */
+.scenario-layout{
+  display:grid;grid-template-columns:1fr 380px;height:100%;
+}
+.scenario-layout .map{height:100%;background:#0a0e14;}
+.control-panel{
+  background:var(--bg-1);
+  border-left:1px solid var(--bg-3);
+  overflow-y:auto;
+  padding:16px;
+}
+.panel-section{
+  background:var(--bg-2);
+  border:1px solid var(--bg-3);
+  border-radius:8px;
+  padding:12px;margin-bottom:12px;
+}
+.panel-section h6{
+  color:var(--txt-dim);text-transform:uppercase;
+  font-size:11px;letter-spacing:1px;
+  margin:0 0 10px;font-weight:600;
+}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.kpi{background:var(--bg-3);border-radius:6px;padding:8px 10px;}
+.kpi.full{grid-column:span 2;background:linear-gradient(135deg,#1f6feb33,#0969da22);border:1px solid #1f6feb55;}
+.kpi .label{color:var(--txt-dim);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;}
+.kpi .value{color:var(--txt);font-size:16px;font-weight:600;margin-top:2px;}
+.kpi .delta{font-size:10px;margin-top:2px;}
+.kpi .delta.up{color:var(--bad);}
+.kpi .delta.down{color:var(--good);}
+.kpi.full .value{font-size:22px;color:#79c0ff;}
+.form-range{accent-color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);}
+.btn-primary:hover{background:#1f87e6;border-color:#1f87e6;}
+.btn-secondary{background:var(--bg-3);border-color:var(--bg-3);color:var(--txt);}
+.btn-secondary:hover{background:#3d444d;border-color:#3d444d;}
+.btn-warning{background:var(--accent-2);border-color:var(--accent-2);color:#fff;}
+.btn-warning:hover{background:#e36b46;border-color:#e36b46;color:#fff;}
+.slider-row{display:flex;align-items:center;gap:8px;}
+.slider-row label{flex:0 0 auto;color:var(--txt-dim);font-size:12px;min-width:120px;}
+.slider-row .form-range{flex:1;}
+.slider-row .val{flex:0 0 50px;text-align:right;color:#79c0ff;font-weight:600;font-family:monospace;}
+.charts-row{display:grid;grid-template-columns:1fr;gap:8px;}
+.chart-box{
+  background:var(--bg-2);border:1px solid var(--bg-3);
+  border-radius:6px;padding:8px;height:160px;position:relative;
+}
+.chart-title{
+  color:var(--txt-dim);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;
+  position:absolute;top:4px;left:8px;z-index:1;
+}
+/* Plant list (Brownfield) */
+.plant-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-3);border-radius:4px;padding:6px 8px;margin-bottom:4px;
+  font-size:12px;
+}
+.plant-row .name{flex:1;}
+.plant-row .badge-state{font-size:10px;padding:2px 6px;border-radius:10px;}
+.plant-row .badge-state.on{background:var(--good);color:#000;}
+.plant-row .badge-state.off{background:var(--bg-1);color:var(--txt-dim);}
+.plant-row .lock{opacity:.7;}
+.plant-row button{font-size:10px;padding:2px 6px;}
+/* Leaflet styles */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip{
+  background:var(--bg-2);color:var(--txt);border:1px solid var(--bg-3);
+}
+.leaflet-popup-content{font-size:12px;line-height:1.4;}
+.leaflet-popup-content b{color:#79c0ff;}
+.leaflet-control-attribution{background:rgba(13,17,23,0.8) !important;color:#999 !important;}
+.leaflet-control-attribution a{color:#79c0ff !important;}
+.plant-icon{
+  width:28px;height:28px;background:var(--plant);border:2px solid #fff;border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#fff;font-weight:bold;cursor:grab;
+}
+.plant-icon.new{background:var(--plant-new);}
+.plant-icon.fixed{background:var(--plant);cursor:default;}
+.plant-icon.disabled{background:#555;opacity:.5;}
+.plant-icon.selected{border-color:var(--accent);box-shadow:0 0 0 4px rgba(58,160,255,0.4),0 2px 6px rgba(0,0,0,0.6);}
+.plant-icon:active{cursor:grabbing;}
+.port-icon{
+  width:22px;height:22px;background:var(--port);border:2px solid #fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#fff;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,0.6);
+}
+.legend{
+  background:var(--bg-2);border:1px solid var(--bg-3);
+  padding:8px 10px;border-radius:6px;font-size:11px;line-height:1.6;color:var(--txt);
+}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:middle;border-radius:2px;}
+
+/* ======================= DATA PAGE ======================= */
+.data-wrap{
+  padding:24px;max-width:1400px;margin:0 auto;
+  height:100%;overflow-y:auto;
+}
+.data-section{
+  background:var(--bg-1);border:1px solid var(--bg-3);
+  border-radius:8px;padding:16px;margin-bottom:16px;
+}
+.data-section h3{
+  font-size:14px;margin:0 0 12px;color:#fff;
+  border-bottom:1px solid var(--bg-3);padding-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.data-section .toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;
+}
+.data-table{
+  width:100%;font-size:12px;border-collapse:collapse;
+  background:var(--bg-2);
+}
+.data-table th{
+  background:var(--bg-3);color:var(--txt-dim);
+  text-transform:uppercase;font-size:10px;letter-spacing:0.5px;
+  padding:8px;text-align:left;position:sticky;top:0;z-index:1;
+}
+.data-table td{padding:6px 8px;border-bottom:1px solid var(--bg-3);}
+.data-table tr:hover td{background:var(--bg-3);}
+.data-table input[type=number]{
+  width:100px;background:var(--bg-1);border:1px solid var(--bg-3);
+  color:var(--txt);padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px;
+}
+.data-table input[type=text]{
+  width:160px;background:var(--bg-1);border:1px solid var(--bg-3);
+  color:var(--txt);padding:2px 6px;border-radius:3px;font-size:11px;
+}
+.data-table tr.total td{
+  background:var(--bg-3);font-weight:600;color:#79c0ff;
+  border-top:2px solid var(--accent);
+}
+.scroll-table{max-height:400px;overflow-y:auto;border:1px solid var(--bg-3);border-radius:4px;}
+
+/* ======================= GUIDA PAGE ======================= */
+.guide-wrap{
+  padding:32px;max-width:900px;margin:0 auto;
+  height:100%;overflow-y:auto;
+}
+.guide-wrap h1{font-size:24px;border-bottom:1px solid var(--bg-3);padding-bottom:12px;}
+.guide-wrap h2{font-size:18px;color:#79c0ff;margin-top:32px;}
+.guide-wrap h3{font-size:14px;color:var(--accent-2);margin-top:20px;}
+.guide-wrap p,.guide-wrap li{line-height:1.7;color:var(--txt-dim);}
+.guide-wrap code{background:var(--bg-2);padding:2px 6px;border-radius:3px;color:#79c0ff;font-size:13px;}
+.guide-wrap .formula{
+  background:var(--bg-2);border-left:3px solid var(--accent);
+  padding:10px 16px;font-family:monospace;font-size:12px;color:#cfe5ff;
+  margin:8px 0;border-radius:0 4px 4px 0;
+}
+.guide-wrap .gloss-row{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:6px 0;border-bottom:1px solid var(--bg-3);}
+.guide-wrap .gloss-row b{color:var(--accent);}
+
+/* Scrollbar dark */
+.control-panel::-webkit-scrollbar,.scroll-table::-webkit-scrollbar,.data-wrap::-webkit-scrollbar,.guide-wrap::-webkit-scrollbar{width:8px;}
+.control-panel::-webkit-scrollbar-track,.scroll-table::-webkit-scrollbar-track,.data-wrap::-webkit-scrollbar-track,.guide-wrap::-webkit-scrollbar-track{background:var(--bg-1);}
+.control-panel::-webkit-scrollbar-thumb,.scroll-table::-webkit-scrollbar-thumb,.data-wrap::-webkit-scrollbar-thumb,.guide-wrap::-webkit-scrollbar-thumb{background:#3d444d;border-radius:4px;}
+</style>
+</head>
+<body>
+
+<!-- =========================== NAVBAR =========================== -->
+<nav class="app-nav">
+  <div class="brand">📦 Facility Location IT <span>Modello multipagina</span></div>
+  <div class="tabs">
+    <div class="tab active" data-page="home">🏠 Home</div>
+    <div class="tab" data-page="greenfield">🏗️ Greenfield</div>
+    <div class="tab" data-page="brownfield">🏭 Brownfield</div>
+    <div class="tab" data-page="data">📊 Dati &amp; Input</div>
+    <div class="tab" data-page="guide">📘 Guida</div>
+  </div>
+  <small id="status-msg">Pronto.</small>
+</nav>
+
+<!-- =========================== HOME =========================== -->
+<section id="page-home" class="page active full-h">
+  <div class="home-wrap">
+    <div class="home-card" data-go="greenfield">
+      <div class="icon">🏗️</div>
+      <h2>Progetta una nuova rete</h2>
+      <p>Posiziona fino a 10 stabilimenti ex-novo sul territorio italiano. Ottimizza con K‑Means++, regola la domanda, analizza i costi.</p>
+      <ul>
+        <li>Default: 3 stab (Milano · Roma · Napoli)</li>
+        <li>Marker trascinabili con vincolo terraferma</li>
+        <li>Toggle € assoluti / €/ton</li>
+      </ul>
+      <div class="cta">Apri Greenfield →</div>
+    </div>
+    <div class="home-card brown" data-go="brownfield">
+      <div class="icon">🏭</div>
+      <h2>Espandi la rete Veronesi</h2>
+      <p>Parti dalla configurazione attuale dei 7 stabilimenti Veronesi. Aggiungi, rimuovi o sposta sedi. Confronta ogni scenario con la baseline AS‑IS.</p>
+      <ul>
+        <li>7 stab. fissi (lucchetto 🔒)</li>
+        <li>Fino a 2 nuovi stab. trascinabili</li>
+        <li>KPI con delta vs baseline</li>
+      </ul>
+      <div class="cta">Apri Brownfield →</div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== GREENFIELD =========================== -->
+<section id="page-greenfield" class="page full-h">
+  <div class="scenario-layout">
+    <div class="map" id="map-gf"></div>
+    <aside class="control-panel">
+      <div class="panel-section">
+        <h6>KPI in tempo reale</h6>
+        <div class="kpi-grid" id="gf-kpis">
+          <div class="kpi full">
+            <div class="label">Costo Totale</div>
+            <div class="value" id="gf-kpi-total">— €</div>
+            <div class="sub" id="gf-kpi-unit" style="color:var(--txt-dim);font-size:10px;">— €/ton medio</div>
+          </div>
+          <div class="kpi"><div class="label">Approvvigionamento</div><div class="value" id="gf-kpi-app">—</div></div>
+          <div class="kpi"><div class="label">Produzione</div><div class="value" id="gf-kpi-prod">—</div></div>
+          <div class="kpi"><div class="label">Distribuzione</div><div class="value" id="gf-kpi-distr">—</div></div>
+          <div class="kpi"><div class="label">Volume rete (ton)</div><div class="value" id="gf-kpi-vol">—</div></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Parametri</h6>
+        <div class="slider-row mb-2">
+          <label for="gf-sld-n">N° stabilimenti</label>
+          <input type="range" class="form-range" id="gf-sld-n" min="1" max="10" step="1" value="3">
+          <span class="val" id="gf-sld-n-val">3</span>
+        </div>
+        <div class="slider-row mb-3">
+          <label for="gf-sld-d">Fattore domanda</label>
+          <input type="range" class="form-range" id="gf-sld-d" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="gf-sld-d-val">1.0</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="gf-btn-opt" class="btn btn-primary btn-sm">🎯 Ottimizza posizioni (K‑Means++)</button>
+          <button id="gf-btn-reset" class="btn btn-secondary btn-sm">↺ Reset default (Milano · Roma · Napoli)</button>
+        </div>
+        <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="gf-tgl-unit">
+          <label class="form-check-label small text-muted" for="gf-tgl-unit">Mostra valori unitari (€/ton)</label>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Analisi grafica</h6>
+        <div class="charts-row">
+          <div class="chart-box"><div class="chart-title">Costi per stabilimento (barre impilate)</div><canvas id="gf-chart-stack"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="gf-chart-pie"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Curva costo unitario produzione (€/ton vs ton)</div><canvas id="gf-chart-line"></canvas></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Legenda</h6>
+        <div class="legend">
+          <div><i style="background:var(--province);border-radius:50%;"></i>Provincia (raggio ∝ domanda)</div>
+          <div><i style="background:var(--port);border-radius:50%;"></i>Porto di approvvigionamento</div>
+          <div><i style="background:var(--plant);"></i>Stabilimento (trascina per spostare)</div>
+          <div class="text-muted mt-1" style="font-size:10px;">Click su uno stabilimento → evidenzia province assegnate e porto.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- =========================== BROWNFIELD =========================== -->
+<section id="page-brownfield" class="page full-h">
+  <div class="scenario-layout">
+    <div class="map" id="map-bf"></div>
+    <aside class="control-panel">
+      <div class="panel-section">
+        <h6>Scenario corrente vs Baseline AS‑IS</h6>
+        <div class="kpi-grid" id="bf-kpis">
+          <div class="kpi full">
+            <div class="label">Costo Totale (scenario)</div>
+            <div class="value" id="bf-kpi-total">— €</div>
+            <div class="delta" id="bf-kpi-total-delta">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Approvvigionamento</div>
+            <div class="value" id="bf-kpi-app">—</div>
+            <div class="delta" id="bf-kpi-app-delta">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Produzione</div>
+            <div class="value" id="bf-kpi-prod">—</div>
+            <div class="delta" id="bf-kpi-prod-delta">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Distribuzione</div>
+            <div class="value" id="bf-kpi-distr">—</div>
+            <div class="delta" id="bf-kpi-distr-delta">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">€/ton medio</div>
+            <div class="value" id="bf-kpi-unit">—</div>
+            <div class="delta" id="bf-kpi-unit-delta">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Parametri</h6>
+        <div class="slider-row mb-3">
+          <label for="bf-sld-d">Fattore domanda</label>
+          <input type="range" class="form-range" id="bf-sld-d" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="bf-sld-d-val">1.0</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="bf-btn-add" class="btn btn-warning btn-sm">➕ Aggiungi stabilimento (greedy)</button>
+          <button id="bf-btn-reset" class="btn btn-secondary btn-sm">↺ Ripristina 7 Veronesi</button>
+        </div>
+        <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="bf-tgl-unit">
+          <label class="form-check-label small text-muted" for="bf-tgl-unit">Mostra valori unitari (€/ton)</label>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Stabilimenti (max 9)</h6>
+        <div id="bf-plant-list"></div>
+      </div>
+      <div class="panel-section">
+        <h6>Analisi grafica</h6>
+        <div class="charts-row">
+          <div class="chart-box"><div class="chart-title">Scenario vs Baseline (per voce)</div><canvas id="bf-chart-bar"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Ripartizione % (scenario)</div><canvas id="bf-chart-pie"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Curva costo unitario produzione</div><canvas id="bf-chart-line"></canvas></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Legenda</h6>
+        <div class="legend">
+          <div><i style="background:var(--plant);"></i>Stab. Veronesi 🔒 (fisso)</div>
+          <div><i style="background:var(--plant-new);"></i>Nuovo stabilimento (trascinabile)</div>
+          <div><i style="background:#555;"></i>Stab. disattivato</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- =========================== DATI & INPUT =========================== -->
+<section id="page-data" class="page full-h">
+  <div class="data-wrap">
+
+    <div class="data-section">
+      <h3>📍 4.1 — Domanda provinciale (108 province)</h3>
+      <div class="toolbar">
+        <div class="slider-row" style="min-width:340px;">
+          <label for="dp-scale">Scala lineare</label>
+          <input type="range" class="form-range" id="dp-scale" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="dp-scale-val">1.0×</span>
+        </div>
+        <div class="form-check form-switch ms-3">
+          <input class="form-check-input" type="checkbox" role="switch" id="dp-mode">
+          <label class="form-check-label small text-muted" for="dp-mode">Modifica in % (relativo all'originale)</label>
+        </div>
+        <button id="dp-reset" class="btn btn-secondary btn-sm ms-auto">↺ Ripristina default</button>
+      </div>
+      <div class="scroll-table">
+        <table class="data-table" id="dp-table">
+          <thead>
+            <tr><th>#</th><th>Provincia</th><th>Lat</th><th>Lon</th><th>Domanda</th></tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr class="total"><td colspan="4">TOTALE</td><td id="dp-total"></td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="data-section">
+      <h3>⚓ 4.2 — Porti di approvvigionamento</h3>
+      <div class="toolbar">
+        <button id="po-add" class="btn btn-primary btn-sm">+ Aggiungi porto</button>
+        <button id="po-reset" class="btn btn-secondary btn-sm ms-auto">↺ Ripristina 5 default</button>
+      </div>
+      <table class="data-table" id="po-table">
+        <thead>
+          <tr><th>#</th><th>Nome</th><th>Lat</th><th>Lon</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="data-section">
+      <h3>📈 4.3 — Tabella costi di produzione</h3>
+      <div class="toolbar">
+        <button id="pt-add" class="btn btn-primary btn-sm">+ Aggiungi scaglione</button>
+        <button id="pt-reset" class="btn btn-secondary btn-sm ms-auto">↺ Ripristina default</button>
+      </div>
+      <div class="scroll-table">
+        <table class="data-table" id="pt-table">
+          <thead>
+            <tr><th>#</th><th>Tonnellate (FLOOR)</th><th>€/ton</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="data-section">
+      <h3>💾 4.4 — Esporta / Importa</h3>
+      <div class="toolbar">
+        <button id="json-export" class="btn btn-primary btn-sm">📥 Esporta dati (JSON)</button>
+        <input type="file" id="json-import-file" accept=".json" style="display:none;">
+        <button id="json-import" class="btn btn-secondary btn-sm">📤 Importa dati (JSON)</button>
+        <span class="small text-muted ms-2">Le modifiche si propagano automaticamente alle pagine Greenfield e Brownfield.</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =========================== GUIDA =========================== -->
+<section id="page-guide" class="page full-h">
+  <div class="guide-wrap">
+    <h1>Modello di Localizzazione Impianti — Guida all'uso</h1>
+
+    <h2>1. Cos'è</h2>
+    <p>Questa applicazione risolve un classico <b>Facility Location Problem</b> applicato alla rete mangimistica italiana.
+    Date 108 province con la loro domanda annua di mangime e 5 porti di approvvigionamento materia prima, l'utente posiziona N stabilimenti
+    sul territorio (1–10) e l'app calcola in tempo reale il <b>Total Landed Cost</b> della rete (approvvigionamento + produzione + distribuzione)
+    e lo distribuisce per stabilimento.</p>
+
+    <h2>2. Come funziona il modello</h2>
+
+    <h3>Distanza Haversine (raggio Terra = 6371 km)</h3>
+    <div class="formula">d = 2 · 6371 · asin(√(sin²(Δlat/2) + cos(lat1)·cos(lat2)·sin²(Δlon/2)))</div>
+
+    <h3>Assegnazione province → stabilimento più vicino</h3>
+    <p>Ogni provincia è servita dallo stabilimento con distanza Haversine minima. In caso di parità, vince il primo per ordine di indice.</p>
+
+    <h3>Costo distribuzione</h3>
+    <p>Per ogni provincia <code>p</code> con domanda <code>D_p</code> e distanza <code>k</code> km:</p>
+    <div class="formula">u_distr = 5 €/ton  se k ≤ 30
+u_distr = 5 + (k − 30) · 0.10  se k &gt; 30
+costo_distr_provincia = D_p · u_distr</div>
+
+    <h3>Costo approvvigionamento (5 porti)</h3>
+    <p>Ogni stabilimento si rifornisce dal porto più vicino. Per stabilimento <code>s</code> con tonnellaggio <code>T_s</code> e distanza
+    <code>k</code> dal porto più vicino:</p>
+    <div class="formula">u_app = 5 €/ton  se k ≤ 30
+u_app = 5 + (k − 30) · 0.05  se k &gt; 30
+costo_app_stab = T_s · u_app</div>
+
+    <h3>Costo produzione</h3>
+    <p>Il volume <code>T_s</code> dello stabilimento viene arrotondato per difetto a 10.000 ton (FLOOR) e si recupera il
+    <code>€/ton</code> dalla tabella scaglioni (VLOOKUP approssimato).
+    La curva parte da 100 €/ton (volumi nulli) e scende fino a 10 €/ton oltre i 350.000 ton.</p>
+
+    <h3>Fattore di domanda (0.5 – 2.0)</h3>
+    <p>Moltiplica uniformemente la domanda di tutte le province prima dei calcoli. È il singolo parametro per esplorare scenari di crescita / contrazione.</p>
+
+    <h2>3. Come usare le pagine</h2>
+    <h3>🏗️ Greenfield</h3>
+    <p>Per progettare una nuova rete da zero. Trascina i marker fabbrica per spostarli (vincolo terraferma a 80 km), usa K‑Means++ pesato sulla domanda
+    per trovare automaticamente le posizioni che minimizzano la distanza media pesata.</p>
+
+    <h3>🏭 Brownfield</h3>
+    <p>Per simulare modifiche alla rete reale Veronesi (7 stabilimenti). Puoi disattivare singolarmente uno qualunque dei 7 e/o aggiungere fino a 2 nuovi
+    siti, posizionati inizialmente con ricerca greedy che minimizza il costo totale. Tutti i KPI mostrano sia il valore corrente che il delta vs la baseline AS‑IS
+    (7 Veronesi attivi, stesso fattore di domanda).</p>
+
+    <h3>📊 Dati &amp; Input</h3>
+    <p>Per modificare i dati di partenza: domanda per provincia (slider o cella per cella, in % o in ton), porti, tabella scaglioni di produzione. Le modifiche si propagano in tempo reale alle pagine Greenfield e Brownfield. Dati importabili/esportabili in JSON.</p>
+
+    <h2>4. Glossario</h2>
+    <div class="gloss-row"><b>KPI</b><span>Key Performance Indicator. Le 6 metriche di rete: costo totale, App, Prod, Distr, volume ton, €/ton medio.</span></div>
+    <div class="gloss-row"><b>ton</b><span>Tonnellate metriche per anno (1 ton = 1.000 kg).</span></div>
+    <div class="gloss-row"><b>€/ton</b><span>Costo unitario per tonnellata. Si ottiene dividendo il costo totale (o di una voce) per il volume servito.</span></div>
+    <div class="gloss-row"><b>Baseline</b><span>Configurazione di riferimento. Nel Brownfield = 7 Veronesi tutti attivi al fattore di domanda corrente.</span></div>
+    <div class="gloss-row"><b>K‑Means</b><span>Algoritmo di clustering. K‑Means++ pesato sulla domanda inizializza i centroidi con probabilità proporzionale a D²·domanda; poi itera assegnazione e aggiornamento centroide (media pesata) fino a convergenza o 100 iterazioni.</span></div>
+    <div class="gloss-row"><b>Snap‑to‑land</b><span>Vincolo terraferma. Se uno stabilimento finisce a oltre 80 km dalla provincia servita più vicina, viene riposizionato sul centroide di quella provincia (evita posizionamenti in mare).</span></div>
+
+    <h2>5. Dati di partenza</h2>
+    <p>Il dataset province con domanda proviene dal modello Veronesi (file <code>dati_province.md</code>). La <b>domanda totale di rete è ≈ 3.05 Mton/anno</b> (esclusi 0 isole). Le 14 province di Sicilia e Sardegna sono presenti con domanda 0 perché non servite. I 5 porti (Venezia, Ravenna, Savona, Napoli, Bari) e la tabella scaglioni costo produzione sono come descritti in <code>logica_calcolo.md</code>.</p>
+  </div>
+</section>
+
+<!-- =========================== JAVASCRIPT =========================== -->
+<script>
+'use strict';
+
+/* ====================================================================
+   APP DATA — STATE GLOBALE CONDIVISO
+   window.appData è letto/scritto da tutte le pagine.
+   ==================================================================== */
+
+// Province "originali" (immutable copy per il reset)
+const PROVINCES_ORIG = [
+  ["Torino",45.0667,7.7000,75768.60],["Vercelli",45.0033,8.4167,17436.61],
+  ["Novara",45.4500,8.6333,14744.79],["Cuneo",44.4000,7.5500,163327.72],
+  ["Asti",44.8833,8.2000,10560.84],["Alessandria",44.9167,8.6167,11979.29],
+  ["Biella",45.5667,8.0500,5837.79],["Verbano-Cusio-Ossola",45.9333,8.5500,2.28],
+  ["Valle d'Aosta",45.7333,7.3167,230.41],["Varese",45.0083,8.8167,1697.29],
+  ["Como",45.8000,9.0833,519.22],["Sondrio",46.1833,9.8833,11919.61],
+  ["Milano",45.4667,9.1833,8031.05],["Monza e Brianza",46.0333,9.4333,114.60],
+  ["Bergamo",45.7000,9.6670,119237.47],["Brescia",45.5333,10.2000,248390.32],
+  ["Pavia",45.1833,9.1667,65650.45],["Cremona",45.1333,10.0333,187045.38],
+  ["Mantova",45.1500,10.7833,176947.04],["Lecco",45.8500,9.3833,2424.61],
+  ["Lodi",45.3167,9.5000,49637.83],["Bolzano",46.0050,11.3333,1800.33],
+  ["Trento",46.0667,11.1333,18097.19],["Verona",45.4500,11.0000,753750.03],
+  ["Vicenza",45.5500,11.5500,160654.86],["Belluno",46.1333,12.2167,4053.91],
+  ["Treviso",45.0067,12.2500,74679.77],["Venezia",45.4333,12.3500,13918.88],
+  ["Padova",45.4000,11.8833,127512.73],["Rovigo",45.0667,11.8000,46245.51],
+  ["Udine",46.0667,13.2333,60664.36],["Gorizia",45.9500,13.6333,397.22],
+  ["Trieste",45.6500,13.7667,94.20],["Pordenone",45.9500,12.6500,124429.32],
+  ["Genova",44.4167,8.9167,2360.73],["Imperia",43.8833,8.0167,306.55],
+  ["La Spezia",44.1167,9.8333,1244.88],["Savona",44.3167,8.4667,189.03],
+  ["Piacenza",45.0500,9.6833,25217.89],["Parma",44.8000,10.3500,31143.42],
+  ["Reggio Emilia",44.7000,10.6333,18126.97],["Modena",44.6500,10.9167,35899.05],
+  ["Bologna",44.0050,11.3500,4531.12],["Ferrara",44.0083,11.6333,15466.75],
+  ["Ravenna",44.4167,12.2000,22822.93],["Forlì-Cesena",44.2167,12.0500,18736.26],
+  ["Rimini",44.0667,12.5667,836.87],["Firenze",43.7667,11.2500,504.44],
+  ["Massa-Carrara",44.0033,10.0833,472.38],["Lucca",43.8500,10.5167,1594.06],
+  ["Pistoia",43.9333,10.9167,832.42],["Prato",43.8833,11.0000,101.77],
+  ["Siena",43.3167,11.3000,755.05],["Arezzo",43.4667,11.8833,2901.34],
+  ["Grosseto",42.7667,11.1167,6078.59],["Livorno",43.5500,10.3167,197.20],
+  ["Pisa",43.7167,10.4000,7736.09],["Perugia",43.1167,12.4000,17800.60],
+  ["Terni",42.5667,12.6667,1821.89],["Ancona",43.6167,13.5167,1824.03],
+  ["Ascoli Piceno",42.8500,13.5667,1416.73],["Fermo",43.2500,14.2000,3355.51],
+  ["Macerata",43.3000,13.4500,841.85],["Pesaro e Urbino",43.9000,12.9167,1753.46],
+  ["Roma",41.9000,12.4833,2824.75],["Frosinone",41.6333,13.3667,1065.69],
+  ["Latina",41.4667,12.8833,2287.06],["Rieti",42.3667,12.8667,1582.57],
+  ["Viterbo",42.5500,12.1167,5014.78],["L'Aquila",42.3500,13.4000,1408.39],
+  ["Chieti",42.3500,14.0017,4494.64],["Pescara",42.4500,14.2167,1046.73],
+  ["Teramo",42.0067,13.7167,2010.30],["Campobasso",41.5667,14.6500,69543.34],
+  ["Isernia",41.6000,14.2333,12028.19],["Napoli",40.3500,14.2500,1765.64],
+  ["Avellino",40.9167,14.7833,7980.04],["Benevento",41.1333,14.7667,38129.85],
+  ["Caserta",41.0667,14.3167,1840.92],["Salerno",40.6833,14.7667,8583.72],
+  ["Bari",41.1167,16.8833,25982.88],["Barletta-Andria-Trani",41.3667,16.4167,120.68],
+  ["Brindisi",40.6500,17.9333,982.77],["Foggia",41.4667,15.5500,33417.69],
+  ["Lecce",40.3500,18.1833,2432.15],["Taranto",40.4667,17.2333,14315.95],
+  ["Matera",40.6833,16.6000,1383.57],["Potenza",40.6333,15.8167,4168.11],
+  ["Cosenza",39.2833,16.2500,4106.66],["Crotone",39.0833,17.1333,3181.92],
+  ["Catanzaro",38.9000,16.5833,731.29],["Vibo Valentia",38.0067,16.1000,306.00],
+  ["Reggio di Calabria",38.1000,15.6500,2345.03],
+  ["Palermo",38.1167,13.3500,0],["Messina",38.1833,15.5667,0],
+  ["Catania",37.5000,15.0833,0],["Siracusa",37.0667,15.2833,0],
+  ["Ragusa",36.9333,14.7333,0],["Caltanissetta",37.4833,14.0667,0],
+  ["Agrigento",37.3000,13.6000,0],["Trapani",38.0167,12.5333,0],
+  ["Enna",37.5667,14.2667,0],["Sassari",40.7167,8.5667,0],
+  ["Nuoro",40.3167,9.2667,0],["Cagliari",39.2167,9.1167,0],
+  ["Oristano",39.9000,8.6000,0],["Sud Sardegna",39.1667,8.9833,0]
+].map(r => ({name:r[0], lat:r[1], lon:r[2], demand:r[3], _orig:r[3]}));
+
+const PORTS_ORIG = [
+  {name:"Venezia",lat:45.4791,lon:12.2403},
+  {name:"Ravenna",lat:44.4650,lon:12.2389},
+  {name:"Savona", lat:44.3057,lon: 8.4849},
+  {name:"Napoli", lat:40.8366,lon:14.2979},
+  {name:"Bari",   lat:41.1329,lon:16.8474}
+];
+
+const PROD_TABLE_ORIG = [
+  [0,100],[10000,70],[20000,55],[30000,45],[40000,38],[50000,33],
+  [60000,30],[70000,28],[80000,26],[90000,25],[100000,24],[110000,23],
+  [120000,22],[130000,21],[140000,20.5],[150000,20],[160000,19.5],[170000,19],
+  [180000,18.5],[190000,18],[200000,17.5],[210000,17],[220000,16.5],[230000,16],
+  [240000,15.5],[250000,15],[260000,14.5],[270000,14],[280000,13.5],[290000,13],
+  [300000,12.5],[310000,12],[320000,11.5],[330000,11],[340000,10.5],[350000,10]
+];
+
+// 7 stabilimenti reali Veronesi (fixed=true, non trascinabili)
+const VERONESI = [
+  {name:"Quinto (VR)",       lat:45.4895369, lon:11.0193326, fixed:true},
+  {name:"San Pietro (VI)",   lat:45.6017674, lon:11.6596853, fixed:true},
+  {name:"Putignano (BA)",    lat:40.8385,    lon:17.1119,    fixed:true},
+  {name:"Acquanegra (CR)",   lat:45.170236,  lon: 9.894104,  fixed:true},
+  {name:"San Polo (RE)",     lat:44.885,     lon:10.353,     fixed:true},
+  {name:"Ospedaletto (PD)",  lat:45.224198,  lon:11.599675,  fixed:true},
+  {name:"Fossano (CN)",      lat:44.564499,  lon: 7.709014,  fixed:true}
+];
+
+const DEFAULT_PLANTS_GF = [
+  {name:"Stab 1 — Milano", lat:45.4667, lon: 9.1833},
+  {name:"Stab 2 — Roma",   lat:41.9000, lon:12.4833},
+  {name:"Stab 3 — Napoli", lat:40.8500, lon:14.2667}
+];
+
+// State globale: deep-clonato dalle copie ORIG
+window.appData = {
+  provinces: JSON.parse(JSON.stringify(PROVINCES_ORIG)),
+  ports:     JSON.parse(JSON.stringify(PORTS_ORIG)),
+  prodTable: JSON.parse(JSON.stringify(PROD_TABLE_ORIG)),
+  veronesi:  JSON.parse(JSON.stringify(VERONESI))
+};
+
+const LAND_SNAP_KM = 80;
+
+/* ====================================================================
+   ENGINE — funzioni di calcolo condivise tra le pagine
+   Sempre lette da window.appData per propagare modifiche dalla pagina Dati.
+   ==================================================================== */
+const Engine = {
+  haversine(lat1, lon1, lat2, lon2){
+    const R = 6371;
+    const T = x => x * Math.PI / 180;
+    const dLat = T(lat2 - lat1), dLon = T(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2
+            + Math.cos(T(lat1)) * Math.cos(T(lat2)) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  },
+  unitCostDistr(km){ return km <= 30 ? 5.00 : 5.00 + (km-30)*0.10; },
+  unitCostApp(km)  { return km <= 30 ? 5.00 : 5.00 + (km-30)*0.05; },
+  unitCostProd(ton){
+    const v = Math.floor(ton/10000) * 10000;
+    const tab = window.appData.prodTable;
+    let c = tab[0][1];
+    for (const [t, cc] of tab){ if (v >= t) c = cc; else break; }
+    return c;
+  },
+  // Compute completo: prende plants (lista già filtrata per "active") e factor
+  compute(plants, factor){
+    const PROV = window.appData.provinces;
+    const PORTS = window.appData.ports;
+    const F = factor;
+
+    if (plants.length === 0){
+      // niente stab → totale 0 ma volume positivo "scoperto"
+      return {
+        plants:[], provDemand:PROV.map(p => p.demand*F),
+        provAssign:[], provDist:[], tonPerPlant:[],
+        prodUnitPerPlant:[], prodCostPerPlant:[],
+        portAssign:[], portDist:[], appUnitPerPlant:[], appCostPerPlant:[],
+        distrPerPlant:[],
+        totalApp:0, totalProd:0, totalDistr:0, totalCost:0,
+        totalVol:PROV.reduce((s,p)=>s+p.demand*F,0), unitTotal:0
+      };
+    }
+    const provDemand = PROV.map(p => p.demand * F);
+    const provAssign = new Array(PROV.length);
+    const provDist   = new Array(PROV.length);
+    for (let i = 0; i < PROV.length; i++){
+      let bj = 0, bd = Infinity;
+      for (let j = 0; j < plants.length; j++){
+        const d = Engine.haversine(PROV[i].lat, PROV[i].lon, plants[j].lat, plants[j].lon);
+        if (d < bd){ bd = d; bj = j; }
+      }
+      provAssign[i] = bj; provDist[i] = bd;
+    }
+    const distrPerPlant = new Array(plants.length).fill(0);
+    let totalDistr = 0;
+    for (let i = 0; i < PROV.length; i++){
+      const u = Engine.unitCostDistr(provDist[i]);
+      const c = provDemand[i] * u;
+      distrPerPlant[provAssign[i]] += c;
+      totalDistr += c;
+    }
+    const tonPerPlant = new Array(plants.length).fill(0);
+    for (let i = 0; i < PROV.length; i++) tonPerPlant[provAssign[i]] += provDemand[i];
+    const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
+    const prodCostPerPlant = tonPerPlant.map((t, i) => t * prodUnitPerPlant[i]);
+    const totalProd = prodCostPerPlant.reduce((s,x)=>s+x,0);
+    const portAssign = new Array(plants.length);
+    const portDist   = new Array(plants.length);
+    const appUnitPerPlant = new Array(plants.length);
+    const appCostPerPlant = new Array(plants.length);
+    let totalApp = 0;
+    for (let j = 0; j < plants.length; j++){
+      let bk = 0, bd = Infinity;
+      for (let k = 0; k < PORTS.length; k++){
+        const d = Engine.haversine(plants[j].lat, plants[j].lon, PORTS[k].lat, PORTS[k].lon);
+        if (d < bd){ bd = d; bk = k; }
+      }
+      portAssign[j] = bk; portDist[j] = bd;
+      appUnitPerPlant[j] = Engine.unitCostApp(bd);
+      appCostPerPlant[j] = tonPerPlant[j] * appUnitPerPlant[j];
+      totalApp += appCostPerPlant[j];
+    }
+    const totalCost = totalApp + totalProd + totalDistr;
+    const totalVol  = tonPerPlant.reduce((s,x)=>s+x,0);
+    const unitTotal = totalVol > 0 ? totalCost/totalVol : 0;
+    return {
+      plants, provDemand, provAssign, provDist,
+      tonPerPlant, prodUnitPerPlant, prodCostPerPlant,
+      portAssign, portDist, appUnitPerPlant, appCostPerPlant,
+      distrPerPlant, totalApp, totalProd, totalDistr, totalCost, totalVol, unitTotal
+    };
+  },
+  // Snap-to-land: ritorna {lat,lon,snapped, provName,distance}
+  nearestServedProv(lat, lon){
+    let best = null, bestD = Infinity;
+    for (const p of window.appData.provinces){
+      if (p.demand <= 0) continue;
+      const d = Engine.haversine(lat, lon, p.lat, p.lon);
+      if (d < bestD){ bestD = d; best = p; }
+    }
+    return {province: best, distance: bestD};
+  },
+  snapToLand(lat, lon){
+    const {province, distance} = Engine.nearestServedProv(lat, lon);
+    if (!province) return {lat, lon, snapped:false};
+    if (distance > LAND_SNAP_KM)
+      return {lat:province.lat, lon:province.lon, snapped:true,
+              provName:province.name, distance};
+    return {lat, lon, snapped:false, provName:province.name, distance};
+  },
+  // K-Means++ pesato sulla domanda (max 100 iter, vincolo terraferma)
+  kmeansPlusPlusWeighted(K, factor){
+    const PROV = window.appData.provinces;
+    const points = PROV.filter(p => p.demand > 0)
+                       .map(p => ({lat:p.lat, lon:p.lon, w:p.demand*factor}));
+    if (points.length === 0 || K <= 0) return [];
+    const wSum = a => a.reduce((s,x)=>s+x,0);
+    const pickW = (ws) => {
+      const tot = wSum(ws); if (tot <= 0) return Math.floor(Math.random()*ws.length);
+      let r = Math.random()*tot, c = 0;
+      for (let i = 0; i < ws.length; i++){ c += ws[i]; if (c >= r) return i; }
+      return ws.length - 1;
+    };
+    const centers = [];
+    centers.push({lat:points[pickW(points.map(p=>p.w))].lat, lon:points[pickW(points.map(p=>p.w))].lon});
+    while (centers.length < K){
+      const dists = points.map(p => {
+        let m = Infinity;
+        for (const c of centers){
+          const d = Engine.haversine(p.lat,p.lon,c.lat,c.lon);
+          if (d < m) m = d;
+        }
+        return m*m*p.w;
+      });
+      const idx = pickW(dists);
+      centers.push({lat:points[idx].lat, lon:points[idx].lon});
+    }
+    for (let it = 0; it < 100; it++){
+      const a = points.map(p => {
+        let bi=0, bd=Infinity;
+        for (let i = 0; i < K; i++){
+          const d = Engine.haversine(p.lat,p.lon,centers[i].lat,centers[i].lon);
+          if (d < bd){ bd = d; bi = i; }
+        }
+        return bi;
+      });
+      let changed = false;
+      for (let i = 0; i < K; i++){
+        const cl = points.filter((_, j) => a[j] === i);
+        if (cl.length === 0) continue;
+        const W = wSum(cl.map(p=>p.w));
+        const lat = cl.reduce((s,p)=>s+p.lat*p.w,0)/W;
+        const lon = cl.reduce((s,p)=>s+p.lon*p.w,0)/W;
+        if (Math.abs(lat-centers[i].lat)>0.001 || Math.abs(lon-centers[i].lon)>0.001){
+          centers[i] = {lat, lon}; changed = true;
+        }
+      }
+      if (!changed) break;
+    }
+    return centers.map(c => {
+      const s = Engine.snapToLand(c.lat, c.lon);
+      return {lat:s.lat, lon:s.lon, snapped:s.snapped};
+    });
+  },
+  // Greedy: posizionare un nuovo stab nella provincia (con domanda>0) che minimizza il costo totale
+  greedyBestProvince(currentPlants, factor){
+    let best = null, bestC = Infinity;
+    for (const p of window.appData.provinces){
+      if (p.demand <= 0) continue;
+      const trial = currentPlants.concat([{name:'_tmp', lat:p.lat, lon:p.lon}]);
+      const r = Engine.compute(trial, factor);
+      if (r.totalCost < bestC){ bestC = r.totalCost; best = p; }
+    }
+    return best;
+  }
+};
+
+/* ====================================================================
+   UTILITY
+   ==================================================================== */
+const fmt = (v, dec=0) => v.toLocaleString('it-IT', {maximumFractionDigits:dec, minimumFractionDigits:dec});
+function flashStatus(msg, ms=4000){
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  clearTimeout(flashStatus._t);
+  flashStatus._t = setTimeout(()=>{ el.textContent='Pronto.'; }, ms);
+}
+function setupChartDefaults(){
+  Chart.defaults.color = '#8b949e';
+  Chart.defaults.font.size = 10;
+  Chart.defaults.borderColor = '#30363d';
+}
+setupChartDefaults();
+
+/* ====================================================================
+   NAV — gestione delle pagine
+   ==================================================================== */
+const Nav = {
+  current:'home',
+  show(page){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.page===page));
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+page));
+    Nav.current = page;
+    if (page === 'greenfield') Greenfield.onShow();
+    else if (page === 'brownfield') Brownfield.onShow();
+    else if (page === 'data') DataPage.onShow();
+  }
+};
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=>Nav.show(t.dataset.page)));
+document.querySelectorAll('.home-card').forEach(c => c.addEventListener('click', ()=>Nav.show(c.dataset.go)));
+
+/* ====================================================================
+   GREENFIELD PAGE
+   ==================================================================== */
+const Greenfield = {
+  initialized:false,
+  state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false, sel:-1},
+  map:null, layers:{}, markers:{plants:[], circles:[]},
+  charts:{},
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.render();
+  },
+  init(){
+    // ---------- mappa ----------
+    this.map = L.map('map-gf', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
+    };
+    this.drawProvinces();
+    this.drawPorts();
+    this.drawPlants();
+    // ---------- charts ----------
+    this.charts.stack = new Chart(document.getElementById('gf-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('gf-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${(c.parsed/1e6).toFixed(2)} M€ (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
+        cutout:'55%', layout:{padding:{top:14}}
+      }
+    });
+    const lt = window.appData.prodTable;
+    this.charts.line = new Chart(document.getElementById('gf-chart-line').getContext('2d'), {
+      type:'line',
+      data:{labels:lt.map(r=>(r[0]/1000)+'k'),
+        datasets:[
+          {label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff',
+           backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},
+          {label:'Stab. attivi', data:[], borderColor:'#f85149',
+           backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}
+        ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}},
+                y:{ticks:{callback:v=>v+' €'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    // ---------- listeners ----------
+    const sN = document.getElementById('gf-sld-n');
+    const sD = document.getElementById('gf-sld-d');
+    sN.addEventListener('input', ()=>{
+      document.getElementById('gf-sld-n-val').textContent = sN.value;
+      const N = parseInt(sN.value);
+      if (N > this.state.plants.length){
+        while (this.state.plants.length < N){
+          const k = this.state.plants.length;
+          this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4});
+        }
+      } else if (N < this.state.plants.length){
+        this.state.plants = this.state.plants.slice(0, N);
+        if (this.state.sel >= N) this.state.sel = -1;
+      }
+      this.drawPlants(); this.render();
+    });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('gf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('gf-btn-opt').addEventListener('click', ()=>{
+      flashStatus('Ottimizzazione K‑Means++ in corso…', 8000);
+      setTimeout(()=>{
+        const K = this.state.plants.length;
+        const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+        const snap = cs.filter(c => c.snapped).length;
+        this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+        this.state.sel = -1;
+        this.drawPlants(); this.render();
+        flashStatus(snap===0
+          ? `Ottimizzato: ${K} stab. al centroide pesato dei cluster.`
+          : `Ottimizzato: ${K} stab. (${snap} centroidi agganciati a terra).`, 5000);
+      }, 30);
+    });
+    document.getElementById('gf-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p}));
+      sN.value = 3; document.getElementById('gf-sld-n-val').textContent = '3';
+      sD.value = 1.0; document.getElementById('gf-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0; this.state.sel = -1;
+      this.drawProvinces(); this.drawPlants(); this.render();
+      flashStatus('Default ripristinato.');
+    });
+    document.getElementById('gf-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+      flashStatus(this.state.unit ? 'Modalità unitaria (€/ton).' : 'Modalità assoluta (€).');
+    });
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles();
+      }
+    });
+  },
+  // Re-renderer mappa province
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`)
+       .addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const sel = (idx === this.state.sel);
+      const icon = L.divIcon({className:'',
+        html:`<div class="plant-icon ${sel?'selected':''}" title="${p.name}">🏭</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000});
+      m.on('dragend', e => {
+        const ll = e.target.getLatLng();
+        const snap = Engine.snapToLand(ll.lat, ll.lng);
+        this.state.plants[idx].lat = snap.lat;
+        this.state.plants[idx].lon = snap.lon;
+        if (snap.snapped){
+          e.target.setLatLng([snap.lat, snap.lon]);
+          flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+        }
+        this.render();
+      });
+      m.on('click', ()=>{
+        this.state.sel = (this.state.sel===idx) ? -1 : idx;
+        this.drawPlants(); this.drawLinks();
+      });
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+  },
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult) return;
+    const idx = this.state.sel, stab = this.state.plants[idx];
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === idx){
+        L.polyline([[p.lat,p.lon],[stab.lat,stab.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85});
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25});
+      }
+    });
+    const port = window.appData.ports[this.lastResult.portAssign[idx]];
+    if (port) L.polyline([[stab.lat,stab.lon],[port.lat,port.lon]],
+      {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55}));
+  },
+  render(){
+    const r = Engine.compute(this.state.plants, this.state.factor);
+    this.lastResult = r;
+    // KPIs
+    document.getElementById('gf-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gf-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('gf-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('gf-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('gf-kpi-vol').textContent = fmt(r.totalVol);
+    // Charts
+    const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+      this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}};
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+      this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}};
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // line chart points
+    const lt = window.appData.prodTable;
+    const pts = this.state.plants.map((p,i)=>{
+      const v = Math.floor(r.tonPerPlant[i]/10000)*10000;
+      let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; });
+      return {x:bi, y:r.prodUnitPerPlant[i]};
+    });
+    this.charts.line.data.datasets[1].data = pts;
+    this.charts.line.update('none');
+    // links update
+    if (this.state.sel >= 0) this.drawLinks();
+    else { this.layers.links.clearLayers(); this.resetProvinceStyles(); }
+  },
+  // chiamato quando i dati globali cambiano (Data page)
+  onDataChange(){
+    if (this.initialized){
+      const lt = window.appData.prodTable;
+      this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k');
+      this.charts.line.data.datasets[0].data = lt.map(r=>r[1]);
+      this.drawProvinces(); this.drawPorts(); this.render();
+    }
+  }
+};
+
+/* ====================================================================
+   BROWNFIELD PAGE
+   ==================================================================== */
+const Brownfield = {
+  initialized:false,
+  state:{
+    plants:[],     // tutti gli stab (fixed + new), con flag active
+    factor:1.0,
+    unit:false,
+    nextId:0
+  },
+  baseline:null, // result della baseline (sempre 7 Veronesi attivi)
+  map:null, layers:{}, markers:{plants:[], circles:[]},
+  charts:{},
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.render();
+  },
+  buildVeronesiPlants(){
+    return window.appData.veronesi.map((v,i)=>({
+      id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true
+    }));
+  },
+  init(){
+    this.state.plants = this.buildVeronesiPlants();
+    this.state.nextId = this.state.plants.length;
+    // ---------- mappa ----------
+    this.map = L.map('map-bf', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map)
+    };
+    this.drawProvinces(); this.drawPorts(); this.drawPlants();
+    // ---------- charts ----------
+    this.charts.bar = new Chart(document.getElementById('bf-chart-bar').getContext('2d'), {
+      type:'bar', data:{labels:['App','Prod','Distr','Totale'], datasets:[
+        {label:'Scenario', data:[0,0,0,0], backgroundColor:'#3aa0ff'},
+        {label:'Baseline', data:[0,0,0,0], backgroundColor:'#8b949e'}
+      ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('bf-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}
+      }
+    });
+    const lt = window.appData.prodTable;
+    this.charts.line = new Chart(document.getElementById('bf-chart-line').getContext('2d'), {
+      type:'line',
+      data:{labels:lt.map(r=>(r[0]/1000)+'k'),
+        datasets:[
+          {label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff',
+           backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},
+          {label:'Stab. attivi', data:[], borderColor:'#f85149',
+           backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}
+        ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}},
+                y:{ticks:{callback:v=>v+' €'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    // ---------- listeners ----------
+    const sD = document.getElementById('bf-sld-d');
+    sD.addEventListener('input', ()=>{
+      document.getElementById('bf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('bf-btn-add').addEventListener('click', ()=>{
+      if (this.state.plants.length >= 9){
+        flashStatus('Limite massimo (9 stab.) raggiunto.', 4000); return;
+      }
+      flashStatus('Ricerca greedy della provincia ottimale…', 8000);
+      setTimeout(()=>{
+        const active = this.state.plants.filter(p=>p.active);
+        const best = Engine.greedyBestProvince(active, this.state.factor);
+        if (!best){ flashStatus('Impossibile trovare una posizione iniziale.', 4000); return; }
+        const id = this.state.nextId++;
+        const idx = this.state.plants.filter(p=>!p.fixed).length + 1;
+        this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`, lat:best.lat, lon:best.lon, fixed:false, active:true});
+        this.drawPlants(); this.render();
+        flashStatus(`Aggiunto stabilimento "Nuovo ${idx}" a ${best.name}.`, 5000);
+      }, 30);
+    });
+    document.getElementById('bf-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = this.buildVeronesiPlants();
+      this.state.nextId = this.state.plants.length;
+      sD.value = 1.0; document.getElementById('bf-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawPlants(); this.render();
+      flashStatus('7 Veronesi ripristinati (baseline AS‑IS).');
+    });
+    document.getElementById('bf-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+    });
+  },
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const cls = p.active
+        ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
+        : 'plant-icon disabled';
+      const lbl = p.fixed ? '🔒' : '🏭';
+      const icon = L.divIcon({className:'',
+        html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000});
+      if (!p.fixed){
+        m.on('dragend', e => {
+          const ll = e.target.getLatLng();
+          const snap = Engine.snapToLand(ll.lat, ll.lng);
+          this.state.plants[idx].lat = snap.lat;
+          this.state.plants[idx].lon = snap.lon;
+          if (snap.snapped){
+            e.target.setLatLng([snap.lat, snap.lon]);
+            flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+          }
+          this.render();
+        });
+      }
+      m.bindTooltip(p.name + (p.active?'':' (disattivato)'), {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+    this.renderPlantList();
+  },
+  renderPlantList(){
+    const list = document.getElementById('bf-plant-list');
+    list.innerHTML = '';
+    this.state.plants.forEach((p, idx) => {
+      const row = document.createElement('div');
+      row.className = 'plant-row';
+      row.innerHTML = `
+        ${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'}
+        <span class="name">${p.name}</span>
+        <span class="badge-state ${p.active?'on':'off'}">${p.active?'ATTIVO':'OFF'}</span>
+      `;
+      const btnTog = document.createElement('button');
+      btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm';
+      btnTog.textContent = p.active ? 'Disattiva' : 'Attiva';
+      btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); };
+      row.appendChild(btnTog);
+      if (!p.fixed){
+        const btnRm = document.createElement('button');
+        btnRm.className = 'btn btn-warning btn-sm';
+        btnRm.textContent = '✕';
+        btnRm.title = 'Rimuovi nuovo stab.';
+        btnRm.onclick = ()=>{
+          this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.drawPlants(); this.render();
+        };
+        row.appendChild(btnRm);
+      }
+      list.appendChild(row);
+    });
+  },
+  render(){
+    const active = this.state.plants.filter(p=>p.active);
+    const r = Engine.compute(active, this.state.factor);
+    // baseline: 7 Veronesi tutti attivi al fattore corrente
+    const allVero = this.state.plants.filter(p=>p.fixed).map(p=>({...p}));
+    const b = Engine.compute(allVero, this.state.factor);
+    this.lastResult = r; this.baseline = b;
+    // KPIs con delta
+    const setKpi = (id, val, base, isUnit=false) => {
+      const el = document.getElementById(id);
+      const elD = document.getElementById(id+'-delta');
+      let txt;
+      if (isUnit){
+        txt = fmt(val,2) + ' €/ton';
+      } else {
+        if (this.state.unit) txt = fmt(val,2) + ' €/ton';
+        else txt = fmt(val/1e6,2) + ' M€';
+      }
+      el.textContent = txt;
+      if (base !== undefined && elD){
+        const delta = val - base;
+        const pct = base !== 0 ? (delta/base*100) : 0;
+        const dir = delta > 0 ? 'up' : (delta < 0 ? 'down' : '');
+        const sign = delta >= 0 ? '+' : '';
+        const dtxt = isUnit
+          ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+          : (this.state.unit
+              ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+              : `${sign}${fmt(delta/1e6,2)} M€ (${sign}${pct.toFixed(1)}%)`);
+        elD.textContent = dtxt;
+        elD.className = 'delta ' + dir;
+      }
+    };
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    const VB = b.totalVol > 0 ? b.totalVol : 1;
+    if (this.state.unit){
+      setKpi('bf-kpi-total', r.totalCost/V,    b.totalCost/VB, true);
+      setKpi('bf-kpi-app',   r.totalApp/V,     b.totalApp/VB);
+      setKpi('bf-kpi-prod',  r.totalProd/V,    b.totalProd/VB);
+      setKpi('bf-kpi-distr', r.totalDistr/V,   b.totalDistr/VB);
+    } else {
+      setKpi('bf-kpi-total', r.totalCost,  b.totalCost);
+      setKpi('bf-kpi-app',   r.totalApp,   b.totalApp);
+      setKpi('bf-kpi-prod',  r.totalProd,  b.totalProd);
+      setKpi('bf-kpi-distr', r.totalDistr, b.totalDistr);
+    }
+    // €/ton totale (sempre €/ton)
+    document.getElementById('bf-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton';
+    const elDu = document.getElementById('bf-kpi-unit-delta');
+    const dU = r.unitTotal - b.unitTotal;
+    const sign = dU >= 0 ? '+' : '';
+    elDu.textContent = `${sign}${fmt(dU,2)} €/ton`;
+    elDu.className = 'delta ' + (dU>0?'up':(dU<0?'down':''));
+    // Bar chart: scenario vs baseline
+    if (this.state.unit){
+      this.charts.bar.data.datasets[0].data = [r.totalApp/V, r.totalProd/V, r.totalDistr/V, r.totalCost/V];
+      this.charts.bar.data.datasets[1].data = [b.totalApp/VB,b.totalProd/VB,b.totalDistr/VB,b.totalCost/VB];
+      this.charts.bar.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+      this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}};
+    } else {
+      this.charts.bar.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr, r.totalCost];
+      this.charts.bar.data.datasets[1].data = [b.totalApp, b.totalProd, b.totalDistr, b.totalCost];
+      this.charts.bar.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+      this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}};
+    }
+    this.charts.bar.update('none');
+    // Pie (scenario)
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // Line chart points (scenario)
+    const lt = window.appData.prodTable;
+    const pts = active.map((p,i)=>{
+      const v = Math.floor(r.tonPerPlant[i]/10000)*10000;
+      let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; });
+      return {x:bi, y:r.prodUnitPerPlant[i]};
+    });
+    this.charts.line.data.datasets[1].data = pts;
+    this.charts.line.update('none');
+  },
+  onDataChange(){
+    if (this.initialized){
+      const lt = window.appData.prodTable;
+      this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k');
+      this.charts.line.data.datasets[0].data = lt.map(r=>r[1]);
+      this.drawProvinces(); this.drawPorts(); this.render();
+    }
+  }
+};
+
+/* ====================================================================
+   DATA PAGE
+   ==================================================================== */
+const DataPage = {
+  initialized:false,
+  state:{ scale:1.0, percentMode:false },
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    this.renderProvinces();
+    this.renderPorts();
+    this.renderProdTable();
+  },
+  init(){
+    // ---------- province ----------
+    document.getElementById('dp-scale').addEventListener('input', e=>{
+      this.state.scale = parseFloat(e.target.value);
+      document.getElementById('dp-scale-val').textContent = this.state.scale.toFixed(1)+'×';
+      window.appData.provinces.forEach(p => p.demand = p._orig * this.state.scale);
+      this.renderProvinces();
+      this.broadcast();
+    });
+    document.getElementById('dp-mode').addEventListener('change', e=>{
+      this.state.percentMode = e.target.checked;
+      this.renderProvinces();
+    });
+    document.getElementById('dp-reset').addEventListener('click', ()=>{
+      window.appData.provinces.forEach(p => p.demand = p._orig);
+      this.state.scale = 1.0;
+      document.getElementById('dp-scale').value = 1.0;
+      document.getElementById('dp-scale-val').textContent = '1.0×';
+      this.renderProvinces();
+      this.broadcast();
+      flashStatus('Domanda ripristinata ai valori originali.');
+    });
+    // ---------- porti ----------
+    document.getElementById('po-add').addEventListener('click', ()=>{
+      if (window.appData.ports.length >= 10){
+        flashStatus('Limite max 10 porti.', 3000); return;
+      }
+      window.appData.ports.push({name:'Nuovo porto', lat:42, lon:12});
+      this.renderPorts(); this.broadcast();
+    });
+    document.getElementById('po-reset').addEventListener('click', ()=>{
+      window.appData.ports = JSON.parse(JSON.stringify(PORTS_ORIG));
+      this.renderPorts(); this.broadcast();
+      flashStatus('Porti ripristinati.');
+    });
+    // ---------- prod table ----------
+    document.getElementById('pt-add').addEventListener('click', ()=>{
+      const t = window.appData.prodTable;
+      const last = t[t.length-1];
+      window.appData.prodTable.push([last[0]+10000, Math.max(5, last[1]-0.5)]);
+      this.renderProdTable(); this.broadcast();
+    });
+    document.getElementById('pt-reset').addEventListener('click', ()=>{
+      window.appData.prodTable = JSON.parse(JSON.stringify(PROD_TABLE_ORIG));
+      this.renderProdTable(); this.broadcast();
+      flashStatus('Tabella costi ripristinata.');
+    });
+    // ---------- import / export ----------
+    document.getElementById('json-export').addEventListener('click', ()=>{
+      const data = {
+        provinces: window.appData.provinces.map(p=>({name:p.name, lat:p.lat, lon:p.lon, demand:p.demand})),
+        ports: window.appData.ports,
+        prodTable: window.appData.prodTable
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'facility_location_data.json';
+      a.click();
+      flashStatus('Dati esportati in JSON.');
+    });
+    document.getElementById('json-import').addEventListener('click', ()=>{
+      document.getElementById('json-import-file').click();
+    });
+    document.getElementById('json-import-file').addEventListener('change', e=>{
+      const f = e.target.files[0]; if (!f) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        try{
+          const d = JSON.parse(evt.target.result);
+          if (d.provinces) window.appData.provinces = d.provinces.map(p=>({...p, _orig:p.demand}));
+          if (d.ports) window.appData.ports = d.ports;
+          if (d.prodTable) window.appData.prodTable = d.prodTable;
+          this.renderProvinces(); this.renderPorts(); this.renderProdTable();
+          this.broadcast();
+          flashStatus('Dati importati con successo.');
+        } catch(err){
+          flashStatus('Errore nel parsing JSON: ' + err.message, 6000);
+        }
+      };
+      reader.readAsText(f);
+    });
+  },
+  renderProvinces(){
+    const tb = document.querySelector('#dp-table tbody');
+    tb.innerHTML = '';
+    let tot = 0;
+    window.appData.provinces.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      const dispVal = this.state.percentMode
+        ? (p._orig > 0 ? (p.demand / p._orig * 100).toFixed(1) : '0')
+        : p.demand.toFixed(2);
+      const suffix = this.state.percentMode ? '%' : 'ton';
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td>${p.name}</td>
+        <td>${p.lat.toFixed(4)}</td>
+        <td>${p.lon.toFixed(4)}</td>
+        <td><input type="number" step="${this.state.percentMode?'1':'0.01'}" value="${dispVal}"
+                   data-idx="${i}" data-mode="${this.state.percentMode?'pct':'abs'}"> ${suffix}</td>
+      `;
+      tb.appendChild(tr);
+      tot += p.demand;
+    });
+    document.getElementById('dp-total').textContent = fmt(tot,2) + ' ton';
+    // listeners
+    tb.querySelectorAll('input[type=number]').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const idx = parseInt(inp.dataset.idx);
+        const mode = inp.dataset.mode;
+        const v = parseFloat(inp.value);
+        const p = window.appData.provinces[idx];
+        if (mode === 'pct') p.demand = (p._orig || 0) * v / 100;
+        else p.demand = v;
+        this.renderProvinces();
+        this.broadcast();
+      });
+    });
+  },
+  renderPorts(){
+    const tb = document.querySelector('#po-table tbody');
+    tb.innerHTML = '';
+    window.appData.ports.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td><input type="text" value="${p.name}" data-idx="${i}" data-f="name"></td>
+        <td><input type="number" step="0.0001" value="${p.lat}" data-idx="${i}" data-f="lat"></td>
+        <td><input type="number" step="0.0001" value="${p.lon}" data-idx="${i}" data-f="lon"></td>
+        <td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const i = parseInt(inp.dataset.idx);
+        const f = inp.dataset.f;
+        const v = (f === 'name') ? inp.value : parseFloat(inp.value);
+        window.appData.ports[i][f] = v;
+        this.broadcast();
+      });
+    });
+    tb.querySelectorAll('button[data-act=rm]').forEach(b => {
+      b.addEventListener('click', ()=>{
+        const i = parseInt(b.dataset.idx);
+        window.appData.ports.splice(i,1);
+        this.renderPorts(); this.broadcast();
+      });
+    });
+  },
+  renderProdTable(){
+    const tb = document.querySelector('#pt-table tbody');
+    tb.innerHTML = '';
+    window.appData.prodTable.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td><input type="number" step="1000" value="${row[0]}" data-idx="${i}" data-f="0"></td>
+        <td><input type="number" step="0.5" value="${row[1]}" data-idx="${i}" data-f="1"></td>
+        <td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const i = parseInt(inp.dataset.idx);
+        const f = parseInt(inp.dataset.f);
+        window.appData.prodTable[i][f] = parseFloat(inp.value);
+        // riordina la tabella per ton crescenti (necessario per il VLOOKUP)
+        window.appData.prodTable.sort((a,b)=>a[0]-b[0]);
+        this.renderProdTable(); this.broadcast();
+      });
+    });
+    tb.querySelectorAll('button[data-act=rm]').forEach(b => {
+      b.addEventListener('click', ()=>{
+        const i = parseInt(b.dataset.idx);
+        if (window.appData.prodTable.length <= 1){
+          flashStatus('Impossibile rimuovere: serve almeno uno scaglione.', 4000); return;
+        }
+        window.appData.prodTable.splice(i,1);
+        this.renderProdTable(); this.broadcast();
+      });
+    });
+  },
+  // notifica le altre pagine che i dati globali sono cambiati
+  broadcast(){
+    if (Greenfield.initialized) Greenfield.onDataChange();
+    if (Brownfield.initialized) Brownfield.onDataChange();
+  }
+};
+
+/* ====================================================================
+   BOOT
+   ==================================================================== */
+// La home è attiva di default; le altre pagine si inizializzano on-demand
+flashStatus('Pronto. Scegli una pagina dalla navbar.');
+</script>
+</body>
+</html>
