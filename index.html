@@ -56,9 +56,14 @@ body{
 
 /* ======================= HOME ======================= */
 .home-wrap{
-  display:grid;grid-template-columns:1fr 1fr;gap:24px;
-  padding:32px;height:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  padding:24px;height:100%;
+  align-content:start;overflow-y:auto;
 }
+.home-card.convex{
+  border:1px dashed var(--accent);
+}
+.home-card.convex.brown{border-color:var(--accent-2);}
 .home-card{
   background:var(--bg-1);
   border:1px solid var(--bg-3);
@@ -160,6 +165,22 @@ body{
   margin:-4px 0 8px;
 }
 .chart-meta b{color:#79c0ff;font-weight:600;}
+/* Convex optimization UI */
+.opt-progress{
+  background:var(--bg-3);border-radius:4px;
+  padding:6px 8px;font-size:10px;color:var(--txt-dim);
+  font-family:monospace;margin-top:6px;display:none;
+}
+.opt-progress.show{display:block;}
+.cap-input{
+  width:60px;background:var(--bg-1);border:1px solid var(--bg-3);
+  color:var(--txt);padding:2px 4px;border-radius:3px;
+  font-family:monospace;font-size:11px;text-align:right;
+}
+.cap-cell{font-size:10px;color:var(--txt-dim);}
+.kpi.warn{border:1px solid var(--warn);background:linear-gradient(135deg,#d2992233,#d2992211);}
+.kpi.warn .value{color:var(--warn);}
+
 /* Pannello dettaglio stabilimento (GF + BF) */
 .detail-panel{display:none;}
 .detail-panel.show{display:block;}
@@ -340,6 +361,8 @@ body{
     <div class="tab active" data-page="home">🏠 Home</div>
     <div class="tab" data-page="greenfield">🏗️ Greenfield</div>
     <div class="tab" data-page="brownfield">🏭 Brownfield</div>
+    <div class="tab" data-page="gf-convex">🎯 GF Convex</div>
+    <div class="tab" data-page="bf-convex">🎯 BF Convex</div>
     <div class="tab" data-page="data">📊 Dati &amp; Input</div>
     <div class="tab" data-page="guide">📘 Guida</div>
   </div>
@@ -370,6 +393,28 @@ body{
         <li>KPI con delta vs baseline</li>
       </ul>
       <div class="cta">Apri Brownfield →</div>
+    </div>
+    <div class="home-card convex" data-go="gf-convex">
+      <div class="icon">🎯</div>
+      <h2>Greenfield – Ottimizzazione convessa</h2>
+      <p>Minimizza il <b>costo totale</b> (App. + Prod. + Distr.) con allocazione marginale + ricerca locale. Capacità infinita o finita parametrica.</p>
+      <ul>
+        <li>K‑Means++ come inizializzazione</li>
+        <li>Toggle capacità finita uniforme (50–500 kton)</li>
+        <li>Tracking domanda non servita</li>
+      </ul>
+      <div class="cta">Apri Greenfield Convex →</div>
+    </div>
+    <div class="home-card convex brown" data-go="bf-convex">
+      <div class="icon">🎯</div>
+      <h2>Brownfield – Ottimizzazione convessa</h2>
+      <p>Parte dai 7 Veronesi (fissi), riposiziona fino a 2 nuovi stab. Capacità modificabile <b>per singolo stabilimento</b>.</p>
+      <ul>
+        <li>Veronesi fissi · nuovi stab. liberi</li>
+        <li>Capacità per riga (kton)</li>
+        <li>Solver greedy + ricerca locale</li>
+      </ul>
+      <div class="cta">Apri Brownfield Convex →</div>
     </div>
   </div>
 </section>
@@ -417,7 +462,9 @@ body{
           <div class="detail-section-title">Approvvigionamento (porto)</div>
           <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="gf-detail-port">—</span></div>
           <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="gf-detail-port-dist">—</span></div>
-          <div class="detail-row"><span class="label">€/ton inbound</span><span class="val" id="gf-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo base (km)</span><span class="val" id="gf-detail-app-base">—</span></div>
+          <div class="detail-row"><span class="label">Maggiorazione porto</span><span class="val" id="gf-detail-app-markup">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario totale</span><span class="val" id="gf-detail-app-unit">—</span></div>
           <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="gf-detail-app-total">—</span></div>
 
           <div class="detail-section-title">Distribuzione (province)</div>
@@ -551,7 +598,9 @@ body{
           <div class="detail-section-title">Approvvigionamento (porto)</div>
           <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="bf-detail-port">—</span></div>
           <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="bf-detail-port-dist">—</span></div>
-          <div class="detail-row"><span class="label">€/ton inbound</span><span class="val" id="bf-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo base (km)</span><span class="val" id="bf-detail-app-base">—</span></div>
+          <div class="detail-row"><span class="label">Maggiorazione porto</span><span class="val" id="bf-detail-app-markup">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario totale</span><span class="val" id="bf-detail-app-unit">—</span></div>
           <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="bf-detail-app-total">—</span></div>
 
           <div class="detail-section-title">Distribuzione (province)</div>
@@ -630,6 +679,163 @@ body{
   </div>
 </section>
 
+<!-- =========================== GREENFIELD CONVEX =========================== -->
+<section id="page-gf-convex" class="page full-h">
+  <div class="scenario-layout">
+    <div class="map" id="map-gfc"></div>
+    <aside class="control-panel">
+      <div class="panel-section">
+        <h6>KPI in tempo reale</h6>
+        <div class="kpi-grid">
+          <div class="kpi full">
+            <div class="label">Costo Totale</div>
+            <div class="value" id="gfc-kpi-total">— €</div>
+            <div class="sub" id="gfc-kpi-unit" style="color:var(--txt-dim);font-size:10px;">— €/ton medio</div>
+          </div>
+          <div class="kpi"><div class="label">Approvvigionamento</div><div class="value" id="gfc-kpi-app">—</div><div class="kpi-meta" id="gfc-kpi-app-meta"></div></div>
+          <div class="kpi"><div class="label">Produzione</div><div class="value" id="gfc-kpi-prod">—</div></div>
+          <div class="kpi"><div class="label">Distribuzione</div><div class="value" id="gfc-kpi-distr">—</div><div class="kpi-meta" id="gfc-kpi-distr-meta"></div></div>
+          <div class="kpi"><div class="label">Volume servito</div><div class="value" id="gfc-kpi-vol">—</div></div>
+          <div class="kpi" id="gfc-kpi-unserved-card" style="display:none;"><div class="label">Domanda NON servita</div><div class="value" id="gfc-kpi-unserved">—</div></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Parametri</h6>
+        <div class="slider-row mb-2">
+          <label for="gfc-sld-n">N° stabilimenti</label>
+          <input type="range" class="form-range" id="gfc-sld-n" min="1" max="10" step="1" value="3">
+          <span class="val" id="gfc-sld-n-val">3</span>
+        </div>
+        <div class="slider-row mb-3">
+          <label for="gfc-sld-d">Fattore domanda</label>
+          <input type="range" class="form-range" id="gfc-sld-d" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="gfc-sld-d-val">1.0</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="gfc-btn-kmeans" class="btn btn-secondary btn-sm">📍 Inizializza con K‑Means++</button>
+          <button id="gfc-btn-reset" class="btn btn-secondary btn-sm">↺ Reset default</button>
+        </div>
+        <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="gfc-tgl-unit">
+          <label class="form-check-label small text-muted" for="gfc-tgl-unit">Mostra valori unitari (€/ton)</label>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Ottimizzazione convessa</h6>
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" role="switch" id="gfc-tgl-cap">
+          <label class="form-check-label small text-muted" for="gfc-tgl-cap">Capacità finita (uniforme)</label>
+        </div>
+        <div class="slider-row mb-3" id="gfc-cap-row" style="opacity:0.4;pointer-events:none;">
+          <label for="gfc-sld-cap">Capacità max</label>
+          <input type="range" class="form-range" id="gfc-sld-cap" min="50" max="500" step="10" value="200">
+          <span class="val" id="gfc-sld-cap-val">200kt</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="gfc-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza costo totale</button>
+        </div>
+        <div class="opt-progress" id="gfc-progress"></div>
+      </div>
+      <div class="panel-section">
+        <h6>Inefficienza routing</h6>
+        <div class="slider-row mb-2">
+          <label for="gfc-sld-iout">OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="gfc-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
+          <span class="val" id="gfc-sld-iout-val">1.8</span>
+        </div>
+        <div class="slider-row">
+          <label for="gfc-sld-iin">IN (× km approv.)</label>
+          <input type="range" class="form-range" id="gfc-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
+          <span class="val" id="gfc-sld-iin-val">1.4</span>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Analisi grafica</h6>
+        <div class="charts-row">
+          <div class="chart-box"><div class="chart-title">Costi per stabilimento</div><canvas id="gfc-chart-stack"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="gfc-chart-pie"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Convergenza ottimizzazione (M€)</div><canvas id="gfc-chart-conv"></canvas></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- =========================== BROWNFIELD CONVEX =========================== -->
+<section id="page-bf-convex" class="page full-h">
+  <div class="scenario-layout">
+    <div class="map" id="map-bfc"></div>
+    <aside class="control-panel">
+      <div class="panel-section">
+        <h6>KPI in tempo reale</h6>
+        <div class="kpi-grid">
+          <div class="kpi full">
+            <div class="label">Costo Totale</div>
+            <div class="value" id="bfc-kpi-total">— €</div>
+            <div class="sub" id="bfc-kpi-unit" style="color:var(--txt-dim);font-size:10px;">— €/ton medio</div>
+          </div>
+          <div class="kpi"><div class="label">Approvvigionamento</div><div class="value" id="bfc-kpi-app">—</div><div class="kpi-meta" id="bfc-kpi-app-meta"></div></div>
+          <div class="kpi"><div class="label">Produzione</div><div class="value" id="bfc-kpi-prod">—</div></div>
+          <div class="kpi"><div class="label">Distribuzione</div><div class="value" id="bfc-kpi-distr">—</div><div class="kpi-meta" id="bfc-kpi-distr-meta"></div></div>
+          <div class="kpi"><div class="label">Volume servito</div><div class="value" id="bfc-kpi-vol">—</div></div>
+          <div class="kpi" id="bfc-kpi-unserved-card" style="display:none;"><div class="label">Domanda NON servita</div><div class="value" id="bfc-kpi-unserved">—</div></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Parametri</h6>
+        <div class="slider-row mb-3">
+          <label for="bfc-sld-d">Fattore domanda</label>
+          <input type="range" class="form-range" id="bfc-sld-d" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="bfc-sld-d-val">1.0</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="bfc-btn-add" class="btn btn-warning btn-sm">➕ Aggiungi stabilimento</button>
+          <button id="bfc-btn-reset" class="btn btn-secondary btn-sm">↺ Ripristina 7 Veronesi</button>
+        </div>
+        <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="bfc-tgl-unit">
+          <label class="form-check-label small text-muted" for="bfc-tgl-unit">Mostra valori unitari (€/ton)</label>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Stabilimenti (max 9, capacità per riga)</h6>
+        <div id="bfc-plant-list"></div>
+      </div>
+      <div class="panel-section">
+        <h6>Ottimizzazione convessa</h6>
+        <p class="text-muted small mb-2" style="font-size:10px;">L'ottimizzazione muove solo i nuovi stab. (Veronesi fissi). Le capacità per riga vengono rispettate.</p>
+        <div class="d-grid gap-2">
+          <button id="bfc-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza costo totale</button>
+        </div>
+        <div class="opt-progress" id="bfc-progress"></div>
+      </div>
+      <div class="panel-section">
+        <h6>Inefficienza routing</h6>
+        <div class="slider-row mb-2">
+          <label for="bfc-sld-iout">OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="bfc-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
+          <span class="val" id="bfc-sld-iout-val">1.8</span>
+        </div>
+        <div class="slider-row">
+          <label for="bfc-sld-iin">IN (× km approv.)</label>
+          <input type="range" class="form-range" id="bfc-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
+          <span class="val" id="bfc-sld-iin-val">1.4</span>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Analisi grafica</h6>
+        <div class="charts-row">
+          <div class="chart-box"><div class="chart-title">Costi per stabilimento</div><canvas id="bfc-chart-stack"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="bfc-chart-pie"></canvas></div>
+          <div class="chart-box"><div class="chart-title">Convergenza ottimizzazione (M€)</div><canvas id="bfc-chart-conv"></canvas></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
 <!-- =========================== DATI & INPUT =========================== -->
 <section id="page-data" class="page full-h">
   <div class="data-wrap">
@@ -669,7 +875,7 @@ body{
       </div>
       <table class="data-table" id="po-table">
         <thead>
-          <tr><th>#</th><th>Nome</th><th>Lat</th><th>Lon</th><th></th></tr>
+          <tr><th>#</th><th>Nome</th><th>Lat</th><th>Lon</th><th>Maggiorazione (€/ton)</th><th></th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -868,11 +1074,11 @@ const PROVINCES_ORIG = [
 ].map(r => ({name:r[0], lat:r[1], lon:r[2], demand:r[3], _orig:r[3]}));
 
 const PORTS_ORIG = [
-  {name:"Venezia",lat:45.4791,lon:12.2403},
-  {name:"Ravenna",lat:44.4650,lon:12.2389},
-  {name:"Savona", lat:44.3057,lon: 8.4849},
-  {name:"Napoli", lat:40.8366,lon:14.2979},
-  {name:"Bari",   lat:41.1329,lon:16.8474}
+  {name:"Venezia", lat:45.4791, lon:12.2403, markup: 1},
+  {name:"Ravenna", lat:44.4650, lon:12.2389, markup: 0},
+  {name:"Savona",  lat:44.3057, lon: 8.4849, markup: 8},
+  {name:"Napoli",  lat:40.8366, lon:14.2979, markup:11},
+  {name:"Bari",    lat:41.1329, lon:16.8474, markup:11}
 ];
 
 // Curva costo produzione — calibrata sui dati reali Veronesi 2025
@@ -968,8 +1174,9 @@ const Engine = {
     }
     return T[T.length-1][1];
   },
-  // INBOUND: lookup approssimato per difetto (NO interpolazione), clamp ai due estremi
-  unitCostApp(km){
+  // INBOUND base: lookup approssimato per difetto (NO interpolazione), clamp ai due estremi
+  // È la sola componente chilometrica, senza maggiorazione portuale.
+  unitCostAppBase(km){
     const T = window.appData.inboundTariff;
     if (T.length === 0) return 0;
     if (km <= T[0][0])           return T[0][1];
@@ -979,6 +1186,10 @@ const Engine = {
       if (k <= km) cost = c; else break;
     }
     return cost;
+  },
+  // INBOUND completo: costo_base(km) + maggiorazione del porto (€/ton)
+  unitCostApp(km, markup = 0){
+    return Engine.unitCostAppBase(km) + (markup || 0);
   },
   unitCostProd(ton){
     const v = Math.floor(ton/10000) * 10000;
@@ -1036,11 +1247,14 @@ const Engine = {
     const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
     const prodCostPerPlant = tonPerPlant.map((t, i) => t * prodUnitPerPlant[i]);
     const totalProd = prodCostPerPlant.reduce((s,x)=>s+x,0);
-    // Approvvigionamento: applica ineffIn PRIMA del lookup tariffario
+    // Approvvigionamento: applica ineffIn PRIMA del lookup tariffario,
+    // poi somma la maggiorazione fissa del porto specifico.
     const portAssign = new Array(plants.length);
     const portDist   = new Array(plants.length);
-    const appUnitPerPlant = new Array(plants.length);
-    const appCostPerPlant = new Array(plants.length);
+    const appBaseUnitPerPlant = new Array(plants.length);
+    const appMarkupPerPlant   = new Array(plants.length);
+    const appUnitPerPlant     = new Array(plants.length);
+    const appCostPerPlant     = new Array(plants.length);
     let totalApp = 0;
     for (let j = 0; j < plants.length; j++){
       let bk = 0, bd = Infinity;
@@ -1049,9 +1263,13 @@ const Engine = {
         if (d < bd){ bd = d; bk = k; }
       }
       portAssign[j] = bk; portDist[j] = bd;
-      const effKm = bd * ineffIn;
-      appUnitPerPlant[j] = Engine.unitCostApp(effKm);
-      appCostPerPlant[j] = tonPerPlant[j] * appUnitPerPlant[j];
+      const effKm  = bd * ineffIn;
+      const baseU  = Engine.unitCostAppBase(effKm);
+      const markup = PORTS[bk].markup || 0;
+      appBaseUnitPerPlant[j] = baseU;
+      appMarkupPerPlant[j]   = markup;
+      appUnitPerPlant[j]     = baseU + markup;
+      appCostPerPlant[j]     = tonPerPlant[j] * appUnitPerPlant[j];
       totalApp += appCostPerPlant[j];
     }
     const totalCost = totalApp + totalProd + totalDistr;
@@ -1074,7 +1292,9 @@ const Engine = {
     return {
       plants, provDemand, provAssign, provDist,
       tonPerPlant, prodUnitPerPlant, prodCostPerPlant,
-      portAssign, portDist, appUnitPerPlant, appCostPerPlant,
+      portAssign, portDist,
+      appUnitPerPlant, appBaseUnitPerPlant, appMarkupPerPlant,
+      appCostPerPlant,
       distrPerPlant, totalApp, totalProd, totalDistr, totalCost, totalVol, unitTotal,
       avgKmIn, avgKmOut, avgKmInEff, avgKmOutEff,
       ineffIn, ineffOut
@@ -1162,6 +1382,237 @@ const Engine = {
       if (r.totalCost < bestC){ bestC = r.totalCost; best = p; }
     }
     return best;
+  },
+
+  /* ==================================================================
+     OTTIMIZZAZIONE CONVESSA (minimizzazione diretta del costo totale)
+     ================================================================== */
+
+  // Calcola tutto come compute() ma usando un'assegnazione provincia→stab
+  // arbitraria (provAssign[i] = -1 → provincia non servita).
+  computeWithAssignment(plants, factor, provAssign){
+    const PROV  = window.appData.provinces;
+    const PORTS = window.appData.ports;
+    const F = factor, N = plants.length, M = PROV.length;
+    const ineffIn  = window.appData.routingIneffIn;
+    const ineffOut = window.appData.routingIneffOut;
+
+    if (N === 0){
+      const totalDem = PROV.reduce((s,p)=>s+p.demand*F, 0);
+      return {
+        plants:[], provDemand:PROV.map(p=>p.demand*F),
+        provAssign:provAssign||[], provDist:[], tonPerPlant:[],
+        prodUnitPerPlant:[], prodCostPerPlant:[],
+        portAssign:[], portDist:[], appUnitPerPlant:[], appCostPerPlant:[],
+        distrPerPlant:[],
+        totalApp:0, totalProd:0, totalDistr:0, totalCost:0,
+        totalVol:0, unitTotal:0,
+        unservedDemand: totalDem,
+        avgKmIn:0, avgKmOut:0, avgKmInEff:0, avgKmOutEff:0,
+        ineffIn, ineffOut
+      };
+    }
+    const provDemand = PROV.map(p => p.demand * F);
+    const provDist   = new Array(M).fill(0);
+    const tonPerPlant = new Array(N).fill(0);
+    const distrPerPlant = new Array(N).fill(0);
+    let totalDistr = 0, unservedDemand = 0;
+
+    for (let i = 0; i < M; i++){
+      const j = provAssign[i];
+      if (j == null || j < 0){
+        unservedDemand += provDemand[i];
+        continue;
+      }
+      const km = Engine.haversine(PROV[i].lat, PROV[i].lon, plants[j].lat, plants[j].lon);
+      provDist[i] = km;
+      tonPerPlant[j] += provDemand[i];
+      const cost = provDemand[i] * Engine.unitCostDistr(km * ineffOut);
+      distrPerPlant[j] += cost;
+      totalDistr += cost;
+    }
+    const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
+    const prodCostPerPlant = tonPerPlant.map((t,i) => t * prodUnitPerPlant[i]);
+    const totalProd = prodCostPerPlant.reduce((s,x)=>s+x, 0);
+
+    const portAssign = new Array(N), portDist = new Array(N);
+    const appBaseUnitPerPlant = new Array(N), appMarkupPerPlant = new Array(N);
+    const appUnitPerPlant = new Array(N), appCostPerPlant = new Array(N);
+    let totalApp = 0;
+    for (let j = 0; j < N; j++){
+      let bk = 0, bd = Infinity;
+      for (let k = 0; k < PORTS.length; k++){
+        const d = Engine.haversine(plants[j].lat, plants[j].lon, PORTS[k].lat, PORTS[k].lon);
+        if (d < bd){ bd = d; bk = k; }
+      }
+      portAssign[j] = bk; portDist[j] = bd;
+      const baseU  = Engine.unitCostAppBase(bd * ineffIn);
+      const markup = PORTS[bk].markup || 0;
+      appBaseUnitPerPlant[j] = baseU;
+      appMarkupPerPlant[j]   = markup;
+      appUnitPerPlant[j]     = baseU + markup;
+      appCostPerPlant[j]     = tonPerPlant[j] * appUnitPerPlant[j];
+      totalApp += appCostPerPlant[j];
+    }
+    const totalCost = totalApp + totalProd + totalDistr;
+    const totalVol  = tonPerPlant.reduce((s,x)=>s+x, 0);
+    let kmDemandOut = 0;
+    for (let i = 0; i < M; i++){
+      if (provAssign[i] != null && provAssign[i] >= 0)
+        kmDemandOut += provDemand[i] * provDist[i];
+    }
+    const avgKmOut = totalVol > 0 ? kmDemandOut / totalVol : 0;
+    let kmTonIn = 0;
+    for (let j = 0; j < N; j++) kmTonIn += tonPerPlant[j] * portDist[j];
+    const avgKmIn = totalVol > 0 ? kmTonIn / totalVol : 0;
+    return {
+      plants, provDemand, provAssign, provDist,
+      tonPerPlant, prodUnitPerPlant, prodCostPerPlant,
+      portAssign, portDist,
+      appUnitPerPlant, appBaseUnitPerPlant, appMarkupPerPlant,
+      appCostPerPlant,
+      distrPerPlant,
+      totalApp, totalProd, totalDistr, totalCost, totalVol,
+      unitTotal: totalVol > 0 ? totalCost/totalVol : 0,
+      unservedDemand,
+      avgKmIn, avgKmOut,
+      avgKmInEff: avgKmIn * ineffIn,
+      avgKmOutEff: avgKmOut * ineffOut,
+      ineffIn, ineffOut
+    };
+  },
+
+  // Allocazione greedy con costo MARGINALE: per ogni provincia (in ordine
+  // discendente di domanda), prova tutti gli stab. e scegli quello che
+  // produce il minimo incremento di costo totale; rispetta capacities[j]
+  // (null/undefined = capacità infinita).
+  marginalAllocate(plants, factor, capacities){
+    const PROV  = window.appData.provinces;
+    const PORTS = window.appData.ports;
+    const N = plants.length, M = PROV.length, F = factor;
+    const ineffIn  = window.appData.routingIneffIn;
+    const ineffOut = window.appData.routingIneffOut;
+    if (N === 0) return new Array(M).fill(-1);
+
+    // Pre-compute porto più vicino (distanza + indice → markup) per ogni stab.
+    const plantPortDist = new Array(N);
+    const plantPortIdx  = new Array(N);
+    for (let j = 0; j < N; j++){
+      let bk = 0, bd = Infinity;
+      for (let k = 0; k < PORTS.length; k++){
+        const d = Engine.haversine(plants[j].lat, plants[j].lon, PORTS[k].lat, PORTS[k].lon);
+        if (d < bd){ bd = d; bk = k; }
+      }
+      plantPortDist[j] = bd;
+      plantPortIdx[j]  = bk;
+    }
+    const provOrder = PROV
+      .map((p, i) => ({i, d: p.demand * F}))
+      .filter(o => o.d > 0)
+      .sort((a, b) => b.d - a.d)
+      .map(o => o.i);
+
+    const provAssign  = new Array(M).fill(-1);
+    const tonPerPlant = new Array(N).fill(0);
+
+    for (const i of provOrder){
+      const demand = PROV[i].demand * F;
+      let bestJ = -1, bestDelta = Infinity;
+      for (let j = 0; j < N; j++){
+        // Vincolo capacità
+        const cap = capacities ? capacities[j] : null;
+        if (cap != null && cap > 0 && tonPerPlant[j] + demand > cap) continue;
+        // Δ distribuzione
+        const km = Engine.haversine(PROV[i].lat, PROV[i].lon, plants[j].lat, plants[j].lon);
+        const distrCost = demand * Engine.unitCostDistr(km * ineffOut);
+        // Δ produzione (curva non lineare → calcolo esatto)
+        const oldVol = tonPerPlant[j], newVol = oldVol + demand;
+        const prodDelta = newVol * Engine.unitCostProd(newVol)
+                       -  oldVol * Engine.unitCostProd(oldVol);
+        // Δ approvvigionamento — include la maggiorazione del porto più vicino
+        const portKm = plantPortDist[j];
+        const portMarkup = PORTS[plantPortIdx[j]].markup || 0;
+        const appUnit = Engine.unitCostApp(portKm * ineffIn, portMarkup);
+        const appDelta = demand * appUnit;     // costo lineare nel volume
+        const totalDelta = distrCost + prodDelta + appDelta;
+        if (totalDelta < bestDelta){ bestDelta = totalDelta; bestJ = j; }
+      }
+      if (bestJ >= 0){
+        provAssign[i]  = bestJ;
+        tonPerPlant[bestJ] += demand;
+      }
+    }
+    return provAssign;
+  },
+
+  // Optimizer principale: K-Means++ init + iterazioni di
+  // (allocazione marginale + ricerca locale per ogni stab. non fissato).
+  // capacities può essere null/undefined (infinita), un numero (uniforme)
+  // o un array (per stab.). fixed[j]=true congela lo stab. j (Brownfield).
+  optimizeConvex(initialPlants, factor, capacities, options = {}){
+    const maxIter   = options.maxIter   || 30;
+    const tolerance = options.tolerance || 0.0001;
+    const fixed     = options.fixed     || initialPlants.map(()=>false);
+    const onProgress = options.onProgress;
+    const stepSizes = [0.6, 0.3, 0.15];   // adaptive
+
+    // Normalizza capacities a un array
+    const N0 = initialPlants.length;
+    let caps;
+    if (capacities == null) caps = new Array(N0).fill(null);
+    else if (typeof capacities === 'number') caps = new Array(N0).fill(capacities);
+    else caps = capacities.slice();
+
+    let plants = initialPlants.map(p => ({...p}));
+
+    let assign  = Engine.marginalAllocate(plants, factor, caps);
+    let result  = Engine.computeWithAssignment(plants, factor, assign);
+    let bestCost = result.totalCost;
+    const history = [bestCost];
+
+    for (let iter = 0; iter < maxIter; iter++){
+      let iterImproved = false;
+      // Per ogni stab. non fissato, ricerca locale a step decrescenti
+      for (let j = 0; j < plants.length; j++){
+        if (fixed[j]) continue;
+        const orig = {...plants[j]};
+        let bestPos = orig, bestStepCost = bestCost;
+        for (const step of stepSizes){
+          let stepImproved = false;
+          for (let di = -2; di <= 2; di++){
+            for (let dk = -2; dk <= 2; dk++){
+              if (di === 0 && dk === 0) continue;
+              const newLat = orig.lat + di * step / 2;
+              const newLon = orig.lon + dk * step / 2;
+              const snap = Engine.snapToLand(newLat, newLon);
+              const trial = plants.slice();
+              trial[j] = {...orig, lat: snap.lat, lon: snap.lon};
+              const trialAssign = Engine.marginalAllocate(trial, factor, caps);
+              const trialResult = Engine.computeWithAssignment(trial, factor, trialAssign);
+              if (trialResult.totalCost < bestStepCost - 1){
+                bestStepCost = trialResult.totalCost;
+                bestPos = trial[j];
+                stepImproved = true;
+              }
+            }
+          }
+          if (stepImproved) break;
+        }
+        if (bestStepCost < bestCost - 1){
+          plants[j] = bestPos;
+          bestCost = bestStepCost;
+          iterImproved = true;
+        }
+      }
+      assign = Engine.marginalAllocate(plants, factor, caps);
+      result = Engine.computeWithAssignment(plants, factor, assign);
+      history.push(result.totalCost);
+      if (onProgress) onProgress(iter, result.totalCost, plants);
+      const improvement = (bestCost - result.totalCost) / Math.max(1, bestCost);
+      bestCost = Math.min(bestCost, result.totalCost);
+      if (!iterImproved || improvement < tolerance) break;
+    }
+    return {plants, history, finalResult: result, finalAssign: assign};
   }
 };
 
@@ -1217,10 +1668,12 @@ const Detail = {
     document.getElementById(prefix + '-detail-prod-total').textContent =
       fmt(prodTot/1e6, 3) + ' M€';
 
-    // ---- Approvvigionamento (porto) ----
+    // ---- Approvvigionamento (porto) — base + markup ----
     const portIdx  = result.portAssign[activeIdx];
     const port     = window.appData.ports[portIdx];
     const portDist = result.portDist[activeIdx];
+    const appBase  = result.appBaseUnitPerPlant ? result.appBaseUnitPerPlant[activeIdx] : 0;
+    const appMark  = result.appMarkupPerPlant   ? result.appMarkupPerPlant[activeIdx]   : 0;
     const appUnit  = result.appUnitPerPlant[activeIdx];
     const appTot   = result.appCostPerPlant[activeIdx];
     const ineffIn  = result.ineffIn || 1.0;
@@ -1228,6 +1681,10 @@ const Detail = {
       port ? port.name : '—';
     document.getElementById(prefix + '-detail-port-dist').textContent =
       `${portDist.toFixed(0)} → ${(portDist*ineffIn).toFixed(0)} km`;
+    document.getElementById(prefix + '-detail-app-base').textContent =
+      fmt(appBase, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-app-markup').textContent =
+      (appMark > 0 ? '+' : '') + fmt(appMark, 2) + ' €/ton';
     document.getElementById(prefix + '-detail-app-unit').textContent =
       fmt(appUnit, 2) + ' €/ton';
     document.getElementById(prefix + '-detail-app-total').textContent =
@@ -1305,6 +1762,8 @@ const Nav = {
     Nav.current = page;
     if (page === 'greenfield') Greenfield.onShow();
     else if (page === 'brownfield') Brownfield.onShow();
+    else if (page === 'gf-convex') GreenfieldConvex.onShow();
+    else if (page === 'bf-convex') BrownfieldConvex.onShow();
     else if (page === 'data') DataPage.onShow();
   }
 };
@@ -2065,6 +2524,639 @@ const Brownfield = {
 };
 
 /* ====================================================================
+   GREENFIELD CONVEX — ottimizzazione del costo totale, capacità infinita
+   o finita uniforme. Usa Engine.optimizeConvex.
+   ==================================================================== */
+const GreenfieldConvex = {
+  initialized:false,
+  state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false,
+         capFinite:false, capKt:200},
+  map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
+  lastResult:null,
+
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.render();
+  },
+
+  init(){
+    // Mappa
+    this.map = L.map('map-gfc', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map)
+    };
+    this.drawProvinces(); this.drawPorts(); this.drawPlants();
+
+    // Charts
+    this.charts.stack = new Chart(document.getElementById('gfc-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('gfc-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}}
+    });
+    this.charts.conv = new Chart(document.getElementById('gfc-chart-conv').getContext('2d'), {
+      type:'line', data:{labels:[], datasets:[{
+        label:'Costo (M€)', data:[], borderColor:'#79c0ff',
+        backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      }]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, title:{display:true, text:'Iterazione'}},
+                y:{ticks:{callback:v=>v.toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+
+    // Listeners
+    const sN = document.getElementById('gfc-sld-n');
+    const sD = document.getElementById('gfc-sld-d');
+    sN.addEventListener('input', ()=>{
+      document.getElementById('gfc-sld-n-val').textContent = sN.value;
+      const N = parseInt(sN.value);
+      if (N > this.state.plants.length){
+        while (this.state.plants.length < N){
+          const k = this.state.plants.length;
+          this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4});
+        }
+      } else if (N < this.state.plants.length){
+        this.state.plants = this.state.plants.slice(0, N);
+      }
+      this.drawPlants(); this.render();
+    });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('gfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('gfc-btn-kmeans').addEventListener('click', ()=>{
+      const K = this.state.plants.length;
+      const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+      this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+      this.drawPlants(); this.render();
+      flashStatus(`Inizializzato con K‑Means++: ${K} centroidi pesati sulla domanda.`);
+    });
+    document.getElementById('gfc-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p}));
+      sN.value = 3; document.getElementById('gfc-sld-n-val').textContent = '3';
+      sD.value = 1.0; document.getElementById('gfc-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawProvinces(); this.drawPlants(); this.render();
+    });
+    document.getElementById('gfc-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+    });
+    // Capacità
+    document.getElementById('gfc-tgl-cap').addEventListener('change', e=>{
+      this.state.capFinite = e.target.checked;
+      const row = document.getElementById('gfc-cap-row');
+      if (this.state.capFinite){ row.style.opacity = ''; row.style.pointerEvents = ''; }
+      else { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; }
+      this.render();
+    });
+    document.getElementById('gfc-sld-cap').addEventListener('input', e=>{
+      this.state.capKt = parseInt(e.target.value);
+      document.getElementById('gfc-sld-cap-val').textContent = this.state.capKt + 'kt';
+      if (this.state.capFinite) this.render();
+    });
+    // OPTIMIZE
+    document.getElementById('gfc-btn-optimize').addEventListener('click', ()=>{
+      this.runOptimization();
+    });
+    // Inefficienza
+    const sIout = document.getElementById('gfc-sld-iout');
+    const sIin  = document.getElementById('gfc-sld-iin');
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('gfc-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v; this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('gfc-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v; this.render();
+    });
+  },
+
+  syncIneffSliders(){
+    document.getElementById('gfc-sld-iout').value = window.appData.routingIneffOut;
+    document.getElementById('gfc-sld-iin').value  = window.appData.routingIneffIn;
+    document.getElementById('gfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('gfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="plant-icon" title="${p.name}">🏭</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000});
+      m.on('dragend', e => {
+        const ll = e.target.getLatLng();
+        const snap = Engine.snapToLand(ll.lat, ll.lng);
+        this.state.plants[idx].lat = snap.lat;
+        this.state.plants[idx].lon = snap.lon;
+        if (snap.snapped){
+          e.target.setLatLng([snap.lat, snap.lon]);
+          flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+        }
+        this.render();
+      });
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+  },
+
+  buildCapacities(){
+    if (!this.state.capFinite) return null;
+    const cap = this.state.capKt * 1000;
+    return this.state.plants.map(()=>cap);
+  },
+
+  runOptimization(){
+    const btn = document.getElementById('gfc-btn-optimize');
+    const prog = document.getElementById('gfc-progress');
+    btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…';
+    prog.classList.add('show');
+    prog.textContent = 'Avvio ottimizzazione…';
+    setTimeout(()=>{
+      // Init: K-Means++ su domande
+      const K = this.state.plants.length;
+      const seeds = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+      const initPlants = seeds.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+      const caps = this.buildCapacities();
+      const t0 = performance.now();
+      const out = Engine.optimizeConvex(initPlants, this.state.factor, caps, {
+        maxIter: 30, tolerance: 0.0001,
+        onProgress: (it, cost)=>{
+          prog.textContent = `Iter ${it+1} · costo ${(cost/1e6).toFixed(2)} M€`;
+        }
+      });
+      const dt = performance.now() - t0;
+      this.state.plants = out.plants.map((p,i)=>({name:`Stab ${i+1}`, lat:p.lat, lon:p.lon}));
+      this.drawPlants();
+      this.render();
+      // Aggiorna chart convergenza
+      this.charts.conv.data.labels = out.history.map((_,i)=>i);
+      this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      this.charts.conv.update('none');
+      const initCost = out.history[0], finCost = out.history[out.history.length-1];
+      const reduction = (initCost - finCost) / initCost * 100;
+      prog.textContent = `Convergenza in ${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`;
+      btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+      flashStatus(`Ottimizzazione completata: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000);
+    }, 30);
+  },
+
+  render(){
+    const caps = this.buildCapacities();
+    let r;
+    if (caps){
+      const a = Engine.marginalAllocate(this.state.plants, this.state.factor, caps);
+      r = Engine.computeWithAssignment(this.state.plants, this.state.factor, a);
+    } else {
+      r = Engine.compute(this.state.plants, this.state.factor);
+      r.unservedDemand = 0;
+    }
+    this.lastResult = r;
+    // KPI
+    document.getElementById('gfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('gfc-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('gfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('gfc-kpi-vol').textContent = fmt(r.totalVol);
+    // Domanda non servita
+    const card = document.getElementById('gfc-kpi-unserved-card');
+    if (r.unservedDemand > 0.5){
+      card.style.display = '';
+      card.classList.add('warn');
+      document.getElementById('gfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton';
+    } else { card.style.display = 'none'; card.classList.remove('warn'); }
+    document.getElementById('gfc-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('gfc-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    // Charts
+    const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+  },
+  onDataChange(){
+    if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); }
+  }
+};
+
+/* ====================================================================
+   BROWNFIELD CONVEX — stessa logica + capacità per riga (per stab.)
+   Solo i nuovi stab. (non fixed) sono riposizionati dall'ottimizzatore.
+   ==================================================================== */
+const BrownfieldConvex = {
+  initialized:false,
+  state:{ plants:[], factor:1.0, unit:false, nextId:0 },
+  map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
+  lastResult:null,
+  // Default capacità per stab. (kton); modificabili in tabella
+  defaultCapVeronesi: 500,   // alta = "infinita" salvo riduzione manuale
+  defaultCapNew:      150,
+
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.render();
+  },
+
+  buildVeronesiPlants(){
+    return window.appData.veronesi.map((v,i)=>({
+      id:i, name:v.name, lat:v.lat, lon:v.lon,
+      fixed:true, active:true, capKt:this.defaultCapVeronesi
+    }));
+  },
+
+  init(){
+    this.state.plants = this.buildVeronesiPlants();
+    this.state.nextId = this.state.plants.length;
+    // Mappa
+    this.map = L.map('map-bfc', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map)
+    };
+    this.drawProvinces(); this.drawPorts(); this.drawPlants();
+    // Charts
+    this.charts.stack = new Chart(document.getElementById('bfc-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+    this.charts.pie = new Chart(document.getElementById('bfc-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}}
+    });
+    this.charts.conv = new Chart(document.getElementById('bfc-chart-conv').getContext('2d'), {
+      type:'line', data:{labels:[], datasets:[{
+        label:'Costo (M€)', data:[], borderColor:'#79c0ff',
+        backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      }]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>v.toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+    // Listeners
+    const sD = document.getElementById('bfc-sld-d');
+    sD.addEventListener('input', ()=>{
+      document.getElementById('bfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('bfc-btn-add').addEventListener('click', ()=>{
+      if (this.state.plants.length >= 9){ flashStatus('Limite max 9 stab.'); return; }
+      flashStatus('Posizionamento greedy…', 6000);
+      setTimeout(()=>{
+        const active = this.state.plants.filter(p=>p.active);
+        const best = Engine.greedyBestProvince(active, this.state.factor);
+        if (!best){ flashStatus('Nessuna posizione iniziale valida.'); return; }
+        const id = this.state.nextId++;
+        const idx = this.state.plants.filter(p=>!p.fixed).length + 1;
+        this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`,
+          lat:best.lat, lon:best.lon, fixed:false, active:true, capKt:this.defaultCapNew});
+        this.drawPlants(); this.render();
+        flashStatus(`Aggiunto Nuovo ${idx} a ${best.name}.`);
+      }, 30);
+    });
+    document.getElementById('bfc-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = this.buildVeronesiPlants();
+      this.state.nextId = this.state.plants.length;
+      sD.value = 1.0; document.getElementById('bfc-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawPlants(); this.render();
+    });
+    document.getElementById('bfc-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked; this.render();
+    });
+    // OPTIMIZE
+    document.getElementById('bfc-btn-optimize').addEventListener('click', ()=>{
+      this.runOptimization();
+    });
+    // Inefficienza
+    const sIout = document.getElementById('bfc-sld-iout');
+    const sIin  = document.getElementById('bfc-sld-iin');
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('bfc-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v; this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v; this.render();
+    });
+  },
+
+  syncIneffSliders(){
+    document.getElementById('bfc-sld-iout').value = window.appData.routingIneffOut;
+    document.getElementById('bfc-sld-iin').value  = window.appData.routingIneffIn;
+    document.getElementById('bfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('bfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const cls = p.active
+        ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
+        : 'plant-icon disabled';
+      const lbl = p.fixed ? '🔒' : '🏭';
+      const icon = L.divIcon({className:'',
+        html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000});
+      if (!p.fixed){
+        m.on('dragend', e => {
+          const ll = e.target.getLatLng();
+          const snap = Engine.snapToLand(ll.lat, ll.lng);
+          this.state.plants[idx].lat = snap.lat;
+          this.state.plants[idx].lon = snap.lon;
+          if (snap.snapped){
+            e.target.setLatLng([snap.lat, snap.lon]);
+            flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+          }
+          this.render();
+        });
+      }
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+    this.renderPlantList();
+  },
+
+  renderPlantList(){
+    const list = document.getElementById('bfc-plant-list');
+    list.innerHTML = '';
+    this.state.plants.forEach((p, idx) => {
+      const row = document.createElement('div');
+      row.className = 'plant-row';
+      // saturazione (solo se lastResult)
+      let satTxt = '';
+      if (this.lastResult && p.active){
+        const active = this.state.plants.filter(x=>x.active);
+        const ai = active.indexOf(p);
+        if (ai >= 0){
+          const ton = this.lastResult.tonPerPlant[ai] || 0;
+          const sat = (ton/1000) / p.capKt * 100;
+          satTxt = ` · ${(ton/1000).toFixed(0)}/${p.capKt}kt (${sat.toFixed(0)}%)`;
+        }
+      }
+      row.innerHTML = `
+        ${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'}
+        <span class="name" style="flex:1;font-size:11px;">${p.name}<span class="cap-cell">${satTxt}</span></span>
+        <input type="number" class="cap-input" data-idx="${idx}" value="${p.capKt}" min="10" max="2000" step="10" title="Cap max (kton)">
+      `;
+      const btnTog = document.createElement('button');
+      btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm';
+      btnTog.textContent = p.active ? 'Off' : 'On';
+      btnTog.style.fontSize = '10px';
+      btnTog.style.padding = '2px 6px';
+      btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); };
+      row.appendChild(btnTog);
+      if (!p.fixed){
+        const btnRm = document.createElement('button');
+        btnRm.className = 'btn btn-warning btn-sm';
+        btnRm.textContent = '✕';
+        btnRm.style.fontSize = '10px';
+        btnRm.style.padding = '2px 6px';
+        btnRm.onclick = ()=>{
+          this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.drawPlants(); this.render();
+        };
+        row.appendChild(btnRm);
+      }
+      list.appendChild(row);
+      // listener su input cap
+      row.querySelector('.cap-input').addEventListener('change', e=>{
+        const v = parseInt(e.target.value);
+        if (v > 0){ p.capKt = v; this.render(); }
+      });
+    });
+  },
+
+  // Capacità per stab. ATTIVI (l'optimizer/compute lavora solo sui attivi)
+  buildCapacities(activePlants){
+    return activePlants.map(p => p.capKt * 1000);
+  },
+  buildFixedFlags(activePlants){
+    return activePlants.map(p => p.fixed === true);
+  },
+
+  runOptimization(){
+    const btn = document.getElementById('bfc-btn-optimize');
+    const prog = document.getElementById('bfc-progress');
+    btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…';
+    prog.classList.add('show');
+    prog.textContent = 'Avvio…';
+    setTimeout(()=>{
+      const active = this.state.plants.filter(p=>p.active);
+      if (active.length === 0){
+        prog.textContent = 'Nessuno stab. attivo.';
+        btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+        return;
+      }
+      const caps = this.buildCapacities(active);
+      const fixed = this.buildFixedFlags(active);
+      const t0 = performance.now();
+      const out = Engine.optimizeConvex(active, this.state.factor, caps, {
+        maxIter: 30, tolerance: 0.0001, fixed,
+        onProgress: (it, cost) => { prog.textContent = `Iter ${it+1} · ${(cost/1e6).toFixed(2)} M€`; }
+      });
+      const dt = performance.now() - t0;
+      // Aggiorno solo le coordinate dei nuovi stab. (i fissi non vengono mossi)
+      out.plants.forEach((p, i) => {
+        const orig = active[i];
+        if (!orig.fixed){
+          orig.lat = p.lat; orig.lon = p.lon;
+        }
+      });
+      this.drawPlants();
+      this.render();
+      this.charts.conv.data.labels = out.history.map((_,i)=>i);
+      this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      this.charts.conv.update('none');
+      const reduction = (out.history[0]-out.history[out.history.length-1])/out.history[0]*100;
+      prog.textContent = `${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`;
+      btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+      flashStatus(`Ottimizzazione: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000);
+    }, 30);
+  },
+
+  render(){
+    const active = this.state.plants.filter(p=>p.active);
+    const caps = this.buildCapacities(active);
+    const a = Engine.marginalAllocate(active, this.state.factor, caps);
+    const r = Engine.computeWithAssignment(active, this.state.factor, a);
+    this.lastResult = r;
+    document.getElementById('bfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('bfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('bfc-kpi-vol').textContent = fmt(r.totalVol);
+    const card = document.getElementById('bfc-kpi-unserved-card');
+    if (r.unservedDemand > 0.5){
+      card.style.display = ''; card.classList.add('warn');
+      document.getElementById('bfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton';
+    } else { card.style.display = 'none'; card.classList.remove('warn'); }
+    document.getElementById('bfc-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('bfc-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    // Charts
+    const labels = active.map((p,i)=>p.fixed ? p.name.split(' ')[0] : `N${i}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // refresh saturazioni nella lista
+    this.renderPlantList();
+  },
+  onDataChange(){
+    if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); }
+  }
+};
+
+/* ====================================================================
    DATA PAGE
    ==================================================================== */
 const DataPage = {
@@ -2103,7 +3195,7 @@ const DataPage = {
       if (window.appData.ports.length >= 10){
         flashStatus('Limite max 10 porti.', 3000); return;
       }
-      window.appData.ports.push({name:'Nuovo porto', lat:42, lon:12});
+      window.appData.ports.push({name:'Nuovo porto', lat:42, lon:12, markup:0});
       this.renderPorts(); this.broadcast();
     });
     document.getElementById('po-reset').addEventListener('click', ()=>{
@@ -2199,12 +3291,15 @@ const DataPage = {
     const tb = document.querySelector('#po-table tbody');
     tb.innerHTML = '';
     window.appData.ports.forEach((p, i) => {
+      // Garantisce esistenza del campo markup (compat. con dati pre-aggiornamento)
+      if (p.markup == null) p.markup = 0;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="text-muted">${i+1}</td>
-        <td><input type="text" value="${p.name}" data-idx="${i}" data-f="name"></td>
-        <td><input type="number" step="0.0001" value="${p.lat}" data-idx="${i}" data-f="lat"></td>
-        <td><input type="number" step="0.0001" value="${p.lon}" data-idx="${i}" data-f="lon"></td>
+        <td><input type="text"   value="${p.name}"  data-idx="${i}" data-f="name"></td>
+        <td><input type="number" step="0.0001" value="${p.lat}"    data-idx="${i}" data-f="lat"></td>
+        <td><input type="number" step="0.0001" value="${p.lon}"    data-idx="${i}" data-f="lon"></td>
+        <td><input type="number" step="0.1"    value="${p.markup}" data-idx="${i}" data-f="markup" title="Maggiorazione (€/ton)"></td>
         <td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>
       `;
       tb.appendChild(tr);
@@ -2214,7 +3309,7 @@ const DataPage = {
         const i = parseInt(inp.dataset.idx);
         const f = inp.dataset.f;
         const v = (f === 'name') ? inp.value : parseFloat(inp.value);
-        window.appData.ports[i][f] = v;
+        window.appData.ports[i][f] = isNaN(v) ? 0 : v;
         this.broadcast();
       });
     });
@@ -2264,6 +3359,8 @@ const DataPage = {
   broadcast(){
     if (Greenfield.initialized) Greenfield.onDataChange();
     if (Brownfield.initialized) Brownfield.onDataChange();
+    if (GreenfieldConvex.initialized) GreenfieldConvex.onDataChange();
+    if (BrownfieldConvex.initialized) BrownfieldConvex.onDataChange();
   }
 };
 
