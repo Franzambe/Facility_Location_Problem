@@ -342,6 +342,23 @@ body{
         </div>
       </div>
       <div class="panel-section">
+        <h6>Inefficienza routing</h6>
+        <div class="slider-row mb-2">
+          <label for="gf-sld-iout">OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="gf-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
+          <span class="val" id="gf-sld-iout-val">1.8</span>
+        </div>
+        <div class="slider-row">
+          <label for="gf-sld-iin">IN (× km approv.)</label>
+          <input type="range" class="form-range" id="gf-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
+          <span class="val" id="gf-sld-iin-val">1.4</span>
+        </div>
+        <div class="text-muted mt-2" style="font-size:10px;line-height:1.4;">
+          Default <b>1.8 OUT / 1.4 IN</b> calibrato sui dati Veronesi (gap ~50% vs assegnazione nearest‑neighbor).
+          Imposta <b>1.0</b> per vedere il lower bound teorico.
+        </div>
+      </div>
+      <div class="panel-section">
         <h6>Analisi grafica</h6>
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento (barre impilate)</div><canvas id="gf-chart-stack"></canvas></div>
@@ -413,6 +430,23 @@ body{
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="bf-tgl-unit">
           <label class="form-check-label small text-muted" for="bf-tgl-unit">Mostra valori unitari (€/ton)</label>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Inefficienza routing</h6>
+        <div class="slider-row mb-2">
+          <label for="bf-sld-iout">OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="bf-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
+          <span class="val" id="bf-sld-iout-val">1.8</span>
+        </div>
+        <div class="slider-row">
+          <label for="bf-sld-iin">IN (× km approv.)</label>
+          <input type="range" class="form-range" id="bf-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
+          <span class="val" id="bf-sld-iin-val">1.4</span>
+        </div>
+        <div class="text-muted mt-2" style="font-size:10px;line-height:1.4;">
+          Default <b>1.8 OUT / 1.4 IN</b> calibrato sui dati Veronesi.
+          Imposta <b>1.0</b> per il lower bound teorico (nearest‑neighbor puro).
         </div>
       </div>
       <div class="panel-section">
@@ -554,6 +588,10 @@ costo_app_stab = T_s · u_app</div>
     <h3>Fattore di domanda (0.5 – 2.0)</h3>
     <p>Moltiplica uniformemente la domanda di tutte le province prima dei calcoli. È il singolo parametro per esplorare scenari di crescita / contrazione.</p>
 
+    <h3>Fattore di inefficienza routing (1.0 – 3.0)</h3>
+    <p>Il modello assegna ogni provincia allo stab. <b>più vicino in linea d'aria</b>: questo produce il <b>lower bound</b> teorico dei costi. Nella realtà le tratte sono più lunghe per: specializzazione di sito (avicoli/suini), capacità installata, vincoli commerciali (cliente↔stab.), routing multi‑stop, ritorni a vuoto.</p>
+    <p>I due slider <code>Inefficienza OUT</code> (default <b>1.8×</b>) e <code>Inefficienza IN</code> (default <b>1.4×</b>) moltiplicano i km Haversine prima del lookup tariffario. Default calibrato sui dati Veronesi: la rete reale ha tratta media OUT ~110 km e IN ~135 km, mentre la nearest‑neighbor produce ~48 e ~92 km rispettivamente. Imposta i due slider a <b>1.0</b> per vedere il puro lower bound teorico.</p>
+
     <h2>3. Come usare le pagine</h2>
     <h3>🏗️ Greenfield</h3>
     <p>Per progettare una nuova rete da zero. Trascina i marker fabbrica per spostarli (vincolo terraferma a 80 km), usa K‑Means++ pesato sulla domanda
@@ -681,13 +719,17 @@ const PORTS_ORIG = [
   {name:"Bari",   lat:41.1329,lon:16.8474}
 ];
 
+// Curva costo produzione — calibrata sui dati reali Veronesi 2025
+// (DIRETTI + INDIRETTI + LOGISTICA, totale 68.3 M€ su 2.89 Mton = 23.6 €/ton media)
+// Range osservato: 20 €/ton (volumi >700kt) → 44 €/ton (volumi <50kt)
 const PROD_TABLE_ORIG = [
-  [0,100],[10000,70],[20000,55],[30000,45],[40000,38],[50000,33],
-  [60000,30],[70000,28],[80000,26],[90000,25],[100000,24],[110000,23],
-  [120000,22],[130000,21],[140000,20.5],[150000,20],[160000,19.5],[170000,19],
-  [180000,18.5],[190000,18],[200000,17.5],[210000,17],[220000,16.5],[230000,16],
-  [240000,15.5],[250000,15],[260000,14.5],[270000,14],[280000,13.5],[290000,13],
-  [300000,12.5],[310000,12],[320000,11.5],[330000,11],[340000,10.5],[350000,10]
+  [0,80],[10000,70],[20000,60],[30000,53],[40000,48],[50000,44],
+  [60000,41],[70000,38],[80000,36],[90000,34],[100000,32],[110000,30.5],
+  [120000,29.5],[130000,28.5],[140000,27.7],[150000,27],[160000,26.5],[170000,26],
+  [180000,25.7],[190000,25.3],[200000,25],[210000,24.7],[220000,24.5],[230000,24.2],
+  [240000,24],[250000,23.8],[260000,23.6],[270000,23.4],[280000,23.2],[290000,23.1],
+  [300000,23],[310000,22.8],[320000,22.6],[330000,22.4],[340000,22.2],[350000,22],
+  [400000,21.5],[450000,21.3],[500000,21],[600000,20.7],[700000,20.5],[800000,20]
 ];
 
 /* TARIFFA INBOUND (km → €/ton) — lookup approssimato per difetto, NO interpolazione */
@@ -734,7 +776,11 @@ window.appData = {
   prodTable:      JSON.parse(JSON.stringify(PROD_TABLE_ORIG)),
   veronesi:       JSON.parse(JSON.stringify(VERONESI)),
   inboundTariff:  JSON.parse(JSON.stringify(INBOUND_TARIFF_ORIG)),
-  outboundTariff: JSON.parse(JSON.stringify(OUTBOUND_TARIFF_ORIG))
+  outboundTariff: JSON.parse(JSON.stringify(OUTBOUND_TARIFF_ORIG)),
+  // Inefficienza routing — moltiplica i km Haversine prima del lookup tariffario.
+  // Default calibrato sui dati Veronesi (gap ~50% vs ottimo nearest-neighbor).
+  routingIneffIn:  1.4,
+  routingIneffOut: 1.8
 };
 
 const LAND_SNAP_KM = 80;
@@ -800,12 +846,17 @@ const Engine = {
         portAssign:[], portDist:[], appUnitPerPlant:[], appCostPerPlant:[],
         distrPerPlant:[],
         totalApp:0, totalProd:0, totalDistr:0, totalCost:0,
-        totalVol:PROV.reduce((s,p)=>s+p.demand*F,0), unitTotal:0
+        totalVol:PROV.reduce((s,p)=>s+p.demand*F,0), unitTotal:0,
+        avgKmIn:0, avgKmOut:0, avgKmInEff:0, avgKmOutEff:0
       };
     }
+    // Moltiplicatori inefficienza routing (default 1.4 IN / 1.8 OUT)
+    const ineffIn  = window.appData.routingIneffIn;
+    const ineffOut = window.appData.routingIneffOut;
+
     const provDemand = PROV.map(p => p.demand * F);
     const provAssign = new Array(PROV.length);
-    const provDist   = new Array(PROV.length);
+    const provDist   = new Array(PROV.length);   // km Haversine puri (linea d'aria)
     for (let i = 0; i < PROV.length; i++){
       let bj = 0, bd = Infinity;
       for (let j = 0; j < plants.length; j++){
@@ -814,10 +865,12 @@ const Engine = {
       }
       provAssign[i] = bj; provDist[i] = bd;
     }
+    // Distribuzione: applica ineffOut PRIMA del lookup tariffario
     const distrPerPlant = new Array(plants.length).fill(0);
     let totalDistr = 0;
     for (let i = 0; i < PROV.length; i++){
-      const u = Engine.unitCostDistr(provDist[i]);
+      const effKm = provDist[i] * ineffOut;
+      const u = Engine.unitCostDistr(effKm);
       const c = provDemand[i] * u;
       distrPerPlant[provAssign[i]] += c;
       totalDistr += c;
@@ -827,6 +880,7 @@ const Engine = {
     const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
     const prodCostPerPlant = tonPerPlant.map((t, i) => t * prodUnitPerPlant[i]);
     const totalProd = prodCostPerPlant.reduce((s,x)=>s+x,0);
+    // Approvvigionamento: applica ineffIn PRIMA del lookup tariffario
     const portAssign = new Array(plants.length);
     const portDist   = new Array(plants.length);
     const appUnitPerPlant = new Array(plants.length);
@@ -839,31 +893,35 @@ const Engine = {
         if (d < bd){ bd = d; bk = k; }
       }
       portAssign[j] = bk; portDist[j] = bd;
-      appUnitPerPlant[j] = Engine.unitCostApp(bd);
+      const effKm = bd * ineffIn;
+      appUnitPerPlant[j] = Engine.unitCostApp(effKm);
       appCostPerPlant[j] = tonPerPlant[j] * appUnitPerPlant[j];
       totalApp += appCostPerPlant[j];
     }
     const totalCost = totalApp + totalProd + totalDistr;
     const totalVol  = tonPerPlant.reduce((s,x)=>s+x,0);
     const unitTotal = totalVol > 0 ? totalCost/totalVol : 0;
-    // Tratta media OUT (stab→provincia, pesata sulla domanda effettiva di ogni provincia)
+    // Tratte medie pesate (linea d'aria)
     let kmDemandOut = 0;
     for (let i = 0; i < PROV.length; i++){
       kmDemandOut += provDemand[i] * provDist[i];
     }
     const avgKmOut = totalVol > 0 ? kmDemandOut / totalVol : 0;
-    // Tratta media IN (porto→stab, pesata sui ton lavorati da ogni stab)
     let kmTonIn = 0;
     for (let j = 0; j < plants.length; j++){
       kmTonIn += tonPerPlant[j] * portDist[j];
     }
     const avgKmIn = totalVol > 0 ? kmTonIn / totalVol : 0;
+    // Tratte effettive (con inefficienza)
+    const avgKmInEff  = avgKmIn  * ineffIn;
+    const avgKmOutEff = avgKmOut * ineffOut;
     return {
       plants, provDemand, provAssign, provDist,
       tonPerPlant, prodUnitPerPlant, prodCostPerPlant,
       portAssign, portDist, appUnitPerPlant, appCostPerPlant,
       distrPerPlant, totalApp, totalProd, totalDistr, totalCost, totalVol, unitTotal,
-      avgKmIn, avgKmOut
+      avgKmIn, avgKmOut, avgKmInEff, avgKmOutEff,
+      ineffIn, ineffOut
     };
   },
   // Snap-to-land: ritorna {lat,lon,snapped, provName,distance}
@@ -996,6 +1054,7 @@ const Greenfield = {
   onShow(){
     if (!this.initialized){ this.init(); this.initialized = true; }
     setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
     this.render();
   },
   init(){
@@ -1105,11 +1164,35 @@ const Greenfield = {
       this.render();
       flashStatus(this.state.unit ? 'Modalità unitaria (€/ton).' : 'Modalità assoluta (€).');
     });
+    // Inefficienza routing
+    const sIout = document.getElementById('gf-sld-iout');
+    const sIin  = document.getElementById('gf-sld-iin');
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('gf-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v;
+      this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('gf-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v;
+      this.render();
+    });
     this.map.on('click', ()=>{
       if (this.state.sel >= 0){
         this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles();
       }
     });
+  },
+  // sync slider con appData (viene chiamato in onShow)
+  syncIneffSliders(){
+    const sIout = document.getElementById('gf-sld-iout');
+    const sIin  = document.getElementById('gf-sld-iin');
+    sIout.value = window.appData.routingIneffOut;
+    sIin.value  = window.appData.routingIneffIn;
+    document.getElementById('gf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('gf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
   },
   // Re-renderer mappa province
   drawProvinces(){
@@ -1228,9 +1311,10 @@ const Greenfield = {
     this.charts.stack.update('none');
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
-    // Tratta media IN/OUT
+    // Tratta media IN/OUT (linea d'aria → effettiva con inefficienza)
     document.getElementById('gf-chart-meta').innerHTML =
-      `Tratta media · IN: <b>${r.avgKmIn.toFixed(0)} km</b> · OUT: <b>${r.avgKmOut.toFixed(0)} km</b>`;
+      `IN: ${r.avgKmIn.toFixed(0)} km × ${r.ineffIn.toFixed(1)} = <b>${r.avgKmInEff.toFixed(0)} km</b>` +
+      ` · OUT: ${r.avgKmOut.toFixed(0)} km × ${r.ineffOut.toFixed(1)} = <b>${r.avgKmOutEff.toFixed(0)} km</b>`;
     // line chart points
     const lt = window.appData.prodTable;
     const pts = this.state.plants.map((p,i)=>{
@@ -1272,6 +1356,7 @@ const Brownfield = {
   onShow(){
     if (!this.initialized){ this.init(); this.initialized = true; }
     setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
     this.render();
   },
   buildVeronesiPlants(){
@@ -1369,6 +1454,29 @@ const Brownfield = {
       this.state.unit = e.target.checked;
       this.render();
     });
+    // Inefficienza routing
+    const sIout = document.getElementById('bf-sld-iout');
+    const sIin  = document.getElementById('bf-sld-iin');
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('bf-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v;
+      this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('bf-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v;
+      this.render();
+    });
+  },
+  syncIneffSliders(){
+    const sIout = document.getElementById('bf-sld-iout');
+    const sIin  = document.getElementById('bf-sld-iin');
+    sIout.value = window.appData.routingIneffOut;
+    sIin.value  = window.appData.routingIneffIn;
+    document.getElementById('bf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('bf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
   },
   drawProvinces(){
     this.layers.provinces.clearLayers();
@@ -1525,10 +1633,11 @@ const Brownfield = {
     // Pie (scenario)
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
-    // Tratta media IN/OUT (scenario corrente vs baseline)
+    // Tratta media IN/OUT (linea d'aria → effettiva, scenario vs baseline)
     document.getElementById('bf-chart-meta').innerHTML =
-      `Tratta media · IN: <b>${r.avgKmIn.toFixed(0)} km</b> · OUT: <b>${r.avgKmOut.toFixed(0)} km</b>` +
-      ` <span style="opacity:.6">(baseline IN ${b.avgKmIn.toFixed(0)} · OUT ${b.avgKmOut.toFixed(0)})</span>`;
+      `IN: ${r.avgKmIn.toFixed(0)} km × ${r.ineffIn.toFixed(1)} = <b>${r.avgKmInEff.toFixed(0)} km</b>` +
+      ` · OUT: ${r.avgKmOut.toFixed(0)} km × ${r.ineffOut.toFixed(1)} = <b>${r.avgKmOutEff.toFixed(0)} km</b>` +
+      ` <span style="opacity:.6">(baseline IN ${b.avgKmInEff.toFixed(0)} · OUT ${b.avgKmOutEff.toFixed(0)} km)</span>`;
     // Line chart points (scenario)
     const lt = window.appData.prodTable;
     const pts = active.map((p,i)=>{
