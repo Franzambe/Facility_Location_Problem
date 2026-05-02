@@ -716,6 +716,7 @@ body{
           <div><i style="background:var(--plant);"></i>Stab. Veronesi 🔒 (fisso)</div>
           <div><i style="background:var(--plant-new);"></i>Nuovo stabilimento (trascinabile)</div>
           <div><i style="background:#555;"></i>Stab. disattivato</div>
+          <div class="mt-1" style="border-top:1px solid var(--bg-3);padding-top:6px;">📊 <span id="bf-legend-scenario">Scenario capacità: <b>Manuale</b></span></div>
         </div>
       </div>
     </aside>
@@ -884,6 +885,15 @@ body{
           <div class="chart-box"><div class="chart-title">Costi per stabilimento</div><canvas id="bfc-chart-stack"></canvas></div>
           <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="bfc-chart-pie"></canvas></div>
           <div class="chart-box"><div class="chart-title">Convergenza ottimizzazione (M€)</div><canvas id="bfc-chart-conv"></canvas></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h6>Legenda</h6>
+        <div class="legend">
+          <div><i style="background:var(--plant);"></i>Stab. Veronesi 🔒 (fisso)</div>
+          <div><i style="background:var(--plant-new);"></i>Nuovo stabilimento (trascinabile)</div>
+          <div><i style="background:#555;"></i>Stab. disattivato</div>
+          <div class="mt-1" style="border-top:1px solid var(--bg-3);padding-top:6px;">📊 <span id="bfc-legend-scenario">Capacità Veronesi: <b>Manuale</b></span></div>
         </div>
       </div>
     </aside>
@@ -1067,33 +1077,7 @@ costo_app_stab = T_s · u_app</div>
     <h3>📊 Dati &amp; Input</h3>
     <p>Per modificare i dati di partenza: domanda per provincia (slider o cella per cella, in % o in ton), porti, tabella scaglioni di produzione. Le modifiche si propagano in tempo reale alle pagine Greenfield e Brownfield. Dati importabili/esportabili in JSON.</p>
 
-    <h2>4. Approfondimenti sulle capacità e sui KPI</h2>
-
-    <h3>4.1 Capacità degli stabilimenti Veronesi</h3>
-    <p>I 7 stabilimenti reali hanno limiti produttivi storici ricavati dalla serie annua 2017–2025. I valori massimi registrati sono riportati nella sezione <b>Dati &amp; Input → 4.4 Stabilimenti Veronesi</b>. L'applicazione permette di simulare due scenari di upgrade strategico:</p>
-    <ul>
-      <li><b>+10%</b>: moltiplica il massimo storico per 1,1 (margine di sicurezza operativo).</li>
-      <li><b>7/7</b>: moltiplica il massimo storico per 7/6 ≈ 1,1667, simulando una capacità teorica con impianti operativi 7 giorni su 7.</li>
-    </ul>
-    <p>Nella pagina <b>Brownfield Convex</b>, l’attivazione di uno scenario modifica i vincoli di capacità usati nell’allocazione marginale e nell’ottimizzazione. La domanda non servita viene evidenziata nei KPI.</p>
-
-    <h3>4.2 Perché il grafico a torta rimane in assoluto anche con toggle €/ton</h3>
-    <p>Il grafico a torta mostra la <b>ripartizione percentuale dei costi totali (in M€)</b> tra le tre voci: approvvigionamento, produzione e distribuzione. Anche quando si seleziona la modalità “Mostra valori unitari (€/ton)”, le percentuali di ripartizione rimangono identiche (dividere ogni voce per il volume totale non altera le proporzioni). Il toggle quindi non modifica il grafico a torta per mantenere la leggibilità comparativa.</p>
-
-    <h3>4.3 Tariffe di trasporto fisse</h3>
-    <p>Le tariffe <b>inbound</b> (approvvigionamento) e <b>outbound</b> (distribuzione) sono state calibrate sui dati reali Veronesi e sono fissate nel modello. Non sono modificabili dall’interfaccia per garantire coerenza dei risultati con l’analisi industriale. Le tabelle complete sono visibili in sola lettura nella sezione <b>Dati &amp; Input → 4.5 Tariffe di trasporto</b>.</p>
-
-    <h3>4.4 Parametri modificabili e propagazione</h3>
-    <p>L’utente può modificare in tempo reale i seguenti elementi nella pagina <b>Dati &amp; Input</b>:</p>
-    <ul>
-      <li>Domanda provinciale (scala lineare o modifica singola in ton/%);</li>
-      <li>Porti (posizione geografica e maggiorazione €/ton);</li>
-      <li>Tabella costi di produzione (scaglioni ton → €/ton);</li>
-      <li><b>Capacità storiche dei Veronesi</b> e moltiplicatori degli scenari (+10%, 7/7).</li>
-    </ul>
-    <p>Ogni modifica si riflette istantaneamente nelle pagine Greenfield, Brownfield, GF Convex e BF Convex grazie al sistema di <code>broadcast()</code>. L’esportazione/importazione JSON include anche i dati di capacità.</p>
-
-    <h2>5. Glossario</h2>
+    <h2>4. Glossario</h2>
     <div class="gloss-row"><b>KPI</b><span>Key Performance Indicator. Le 6 metriche di rete: costo totale, App, Prod, Distr, volume ton, €/ton medio.</span></div>
     <div class="gloss-row"><b>ton</b><span>Tonnellate metriche per anno (1 ton = 1.000 kg).</span></div>
     <div class="gloss-row"><b>€/ton</b><span>Costo unitario per tonnellata. Si ottiene dividendo il costo totale (o di una voce) per il volume servito.</span></div>
@@ -1101,74 +1085,145 @@ costo_app_stab = T_s · u_app</div>
     <div class="gloss-row"><b>K‑Means</b><span>Algoritmo di clustering. K‑Means++ pesato sulla domanda inizializza i centroidi con probabilità proporzionale a D²·domanda; poi itera assegnazione e aggiornamento centroide (media pesata) fino a convergenza o 100 iterazioni.</span></div>
     <div class="gloss-row"><b>Snap‑to‑land</b><span>Vincolo terraferma. Se uno stabilimento finisce a oltre 80 km dalla provincia servita più vicina, viene riposizionato sul centroide di quella provincia (evita posizionamenti in mare).</span></div>
 
-    <h2>6. Dati di partenza</h2>
-    <p>Il dataset province con domanda proviene dal modello Veronesi (file <code>dati_province.md</code>). La <b>domanda totale di rete è ≈ 3.05 Mton/anno</b> (esclusi 0 isole). Le 14 province di Sicilia e Sardegna sono presenti con domanda 0 perché non servite. I 5 porti (Venezia, Ravenna, Savona, Napoli, Bari) e la tabella scaglioni costo produzione sono come descritti in <code>logica_calcolo.md</code>.</p>
+    <h2>5. Dati di partenza</h2>
+    <p>Il dataset province con domanda è il <b>mercato 2025</b> (≈ 2.866 Mton/anno totali su 107 province; le isole Sicilia/Sardegna sono presenti con valori reali ma molto piccoli). I 5 porti (Venezia, Ravenna, Savona, Napoli, Bari) hanno coordinate reali e <b>maggiorazione</b> €/ton specifica per porto. La tabella scaglioni costo produzione è calibrata sui dati reali Veronesi 2025.</p>
+
+    <h2>6. Capacità degli stabilimenti Veronesi</h2>
+    <p>I 7 impianti hanno <b>limiti produttivi storici</b> derivati dal massimo annuo registrato nella serie 2017–2025:</p>
+    <table style="width:100%;font-size:12px;border-collapse:collapse;margin:12px 0;">
+      <thead>
+        <tr style="background:var(--bg-2);color:var(--txt-dim);">
+          <th style="padding:6px 8px;text-align:left;">Stabilimento</th>
+          <th style="padding:6px 8px;text-align:right;">Max storico (ton)</th>
+          <th style="padding:6px 8px;text-align:right;">+10% (×1,1)</th>
+          <th style="padding:6px 8px;text-align:right;">7/7 (×7/6)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:4px 8px;">Quinto (VR)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">465.392</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">511.931</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">543.291</td></tr>
+        <tr><td style="padding:4px 8px;">San Pietro (VI)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">752.945</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">828.239</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">878.435</td></tr>
+        <tr><td style="padding:4px 8px;">Putignano (BA)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">253.544</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">278.898</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">295.801</td></tr>
+        <tr><td style="padding:4px 8px;">Acquanegra (CR)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">782.139</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">860.353</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">912.495</td></tr>
+        <tr><td style="padding:4px 8px;">San Polo (RE)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">320.910</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">353.001</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">374.395</td></tr>
+        <tr><td style="padding:4px 8px;">Ospedaletto (PD)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">449.741</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">494.716</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">524.698</td></tr>
+        <tr><td style="padding:4px 8px;">Fossano (CN)</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">333.380</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">366.718</td><td style="text-align:right;font-family:monospace;padding:4px 8px;">388.943</td></tr>
+      </tbody>
+    </table>
+    <p>Sono definiti due <b>scenari di capacità</b>:</p>
+    <ul>
+      <li><b>+10%</b> — margine di sicurezza: capacità = max × 1,1.</li>
+      <li><b>7/7</b> — capacità su turni 7gg/7: capacità = max × 7/6 ≈ 1,167.</li>
+    </ul>
+    <p>Un <b>toggle</b> nella pagina <code>Brownfield Convex</code> consente di passare tra Manuale / +10% / 7/7. Lo scenario attivo applica il valore corrispondente al campo <code>capKt</code> di tutti i 7 stab. Veronesi prima dell'<i>allocazione marginale</i>, e l'eventuale domanda non servita viene calcolata di conseguenza (KPI <i>Domanda NON servita</i> in giallo). Lo stesso toggle è presente in <code>Brownfield</code> classico ma è solo informativo (BF classico non vincola le capacità nei calcoli).</p>
+
+    <h2>7. Note di design</h2>
+
+    <h3>Perché il grafico a torta resta in valori assoluti anche con toggle €/ton</h3>
+    <p>La torta visualizza la <b>ripartizione percentuale</b> dei costi di rete (App / Prod / Distr). Le percentuali sono <b>identiche</b> sia in modalità "valori assoluti (M€)" sia in modalità "valori unitari (€/ton)" — perché dividere ogni voce per lo stesso volume totale non altera le proporzioni. Manteniamo la torta sui dati assoluti (M€) per leggibilità: il tooltip mostra direttamente l'impatto economico in milioni di euro, evitando ambiguità tra "% di un costo/ton" e "% di un totale".</p>
+
+    <h3>Tariffe inbound/outbound fisse</h3>
+    <p>I tariffari di trasporto (29 scaglioni inbound + 29 scaglioni outbound) sono <b>basati sui dati reali Veronesi</b> e <b>non sono modificabili dall'UI</b> per mantenere la coerenza del modello con il benchmark industriale. Sono visualizzati nella pagina <code>Dati &amp; Input</code> sezione 4.5 (sola lettura) per trasparenza. Gli unici parametri logistici modificabili sono: <i>maggiorazione €/ton per porto</i> (nei porti) e <i>fattori di inefficienza routing</i> (nei pannelli scenario, default 1.4 IN / 1.8 OUT).</p>
+
+    <h3>Parametri modificabili e propagazione</h3>
+    <p>Tutti i parametri seguenti sono modificabili dalla pagina <code>Dati &amp; Input</code> e vengono propagati istantaneamente alle pagine Greenfield, Brownfield, GF Convex e BF Convex tramite il meccanismo <code>broadcast()</code>:</p>
+    <ul>
+      <li><b>Domanda provinciale</b> (4.1): scala lineare globale (slider 0,5×–2,0×), modifica singola provincia in % o ton, o reset ai valori 2025 originali.</li>
+      <li><b>Porti</b> (4.2): nome, lat, lon, maggiorazione €/ton; aggiunta/rimozione porti (max 10).</li>
+      <li><b>Tabella costo produzione</b> (4.3): scaglioni FLOOR a 10.000 ton + €/ton.</li>
+      <li><b>Capacità storiche Veronesi</b> (4.4): max storico (ton) per ogni stab., moltiplicatori +10% e 7/7. Lo scenario attivo nel BF Convex viene riapplicato automaticamente ad ogni modifica.</li>
+      <li><b>Tariffe trasporto</b> (4.5): visualizzazione in sola lettura.</li>
+      <li><b>Esporta/Importa JSON</b> (4.6): include domande, porti, tariffari, capacità, moltiplicatori, scenario attivo, fattori di inefficienza.</li>
+    </ul>
   </div>
 </section>
 
+<!-- =========================== JAVASCRIPT =========================== -->
 <script>
 'use strict';
 
 /* ====================================================================
    APP DATA — STATE GLOBALE CONDIVISO
+   window.appData è letto/scritto da tutte le pagine.
    ==================================================================== */
 
+// Province "originali" (immutable copy per il reset)
+// Dati domanda 2025 — totale rete ≈ 2.866 Mton/anno (107 province)
 const PROVINCES_ORIG = [
+  // Abruzzo
   ["Chieti",42.3500,14.0017,5569.37],["L'Aquila",42.3500,13.4000,1087.57],
   ["Pescara",42.4500,14.2167,1558.40],["Teramo",42.0067,13.7167,1742.07],
+  // Basilicata
   ["Matera",40.6833,16.6000,1489.24],["Potenza",40.6333,15.8167,6522.88],
+  // Calabria
   ["Catanzaro",38.9000,16.5833,723.63],["Cosenza",39.2833,16.2500,3583.24],
   ["Crotone",39.0833,17.1333,2301.63],["Reggio di Calabria",38.1000,15.6500,1842.20],
   ["Vibo Valentia",38.0067,16.1000,189.77],
+  // Campania
   ["Avellino",40.9167,14.7833,11530.46],["Benevento",41.1333,14.7667,33033.02],
   ["Caserta",41.0667,14.3167,1582.83],["Napoli",40.3500,14.2500,8.53],
   ["Salerno",40.6833,14.7667,6132.53],
+  // Emilia-Romagna
   ["Bologna",44.0050,11.3500,3983.81],["Ferrara",44.0083,11.6333,24721.02],
   ["Forlì-Cesena",44.2167,12.0500,10572.97],["Modena",44.6500,10.9167,36727.03],
   ["Parma",44.8000,10.3500,27511.29],["Piacenza",45.0500,9.6833,21730.13],
   ["Ravenna",44.4167,12.2000,22693.88],["Reggio Emilia",44.7000,10.6333,20025.93],
   ["Rimini",44.0667,12.5667,1104.56],
+  // Friuli-Venezia Giulia (solo Pordenone e Udine nel dataset 2025)
   ["Pordenone",45.9500,12.6500,133593.70],["Udine",46.0667,13.2333,68212.52],
+  // Lazio
   ["Frosinone",41.6333,13.3667,139.80],["Latina",41.4667,12.8833,712.57],
   ["Rieti",42.3667,12.8667,2032.53],["Roma",41.9000,12.4833,3931.97],
   ["Viterbo",42.5500,12.1167,7019.39],
+  // Liguria
   ["Genova",44.4167,8.9167,1788.49],["Imperia",43.8833,8.0167,250.61],
   ["La Spezia",44.1167,9.8333,8.14],["Savona",44.3167,8.4667,286.91],
+  // Lombardia
   ["Bergamo",45.7000,9.6670,117938.54],["Brescia",45.5333,10.2000,226865.68],
   ["Como",45.8000,9.0833,234.10],["Cremona",45.1333,10.0333,216003.06],
   ["Lecco",45.8500,9.3833,264.64],["Lodi",45.3167,9.5000,33377.06],
   ["Mantova",45.1500,10.7833,174067.23],["Milano",45.4667,9.1833,3321.85],
   ["Monza e Brianza",46.0333,9.4333,16.50],["Pavia",45.1833,9.1667,24208.94],
   ["Sondrio",46.1833,9.8833,16106.16],["Varese",45.0083,8.8167,2930.64],
+  // Marche
   ["Ancona",43.6167,13.5167,1451.06],["Ascoli Piceno",42.8500,13.5667,1665.30],
   ["Fermo",43.2500,14.2000,1674.76],["Macerata",43.3000,13.4500,1642.75],
   ["Pesaro e Urbino",43.9000,12.9167,760.79],
+  // Molise
   ["Campobasso",41.5667,14.6500,87207.71],["Isernia",41.6000,14.2333,16535.87],
+  // Piemonte (no Verbano-Cusio-Ossola nel dataset 2025)
   ["Alessandria",44.9167,8.6167,8905.13],["Asti",44.8833,8.2000,6198.36],
   ["Biella",45.5667,8.0500,5470.35],["Cuneo",44.4000,7.5500,154109.15],
   ["Novara",45.4500,8.6333,8991.86],["Torino",45.0667,7.7000,72171.13],
   ["Vercelli",45.0033,8.4167,16503.82],
+  // Puglia
   ["Bari",41.1167,16.8833,21077.85],["Barletta-Andria-Trani",41.3667,16.4167,149.47],
   ["Brindisi",40.6500,17.9333,437.67],["Foggia",41.4667,15.5500,32722.08],
   ["Lecce",40.3500,18.1833,1688.75],["Taranto",40.4667,17.2333,8531.04],
+  // Sardegna (4 province storiche pre-riforma + Sud Sardegna)
   ["Cagliari",39.2167,9.1167,2955.49],["Carbonia-Iglesias",39.3833,8.9500,363.36],
   ["Medio Campidano",39.9167,9.2000,3010.69],["Nuoro",40.3167,9.2667,8032.20],
   ["Ogliastra",40.5167,9.9000,1702.28],["Olbia-Tempio",41.5500,9.5167,22.88],
   ["Oristano",39.9000,8.6000,6676.72],["Sassari",40.7167,8.5667,3097.45],
   ["Sud Sardegna",39.1667,8.9833,247.10],
+  // Sicilia
   ["Agrigento",37.3000,13.6000,653.46],["Caltanissetta",37.4833,14.0667,54.72],
   ["Catania",37.5000,15.0833,89.03],["Enna",37.5667,14.2667,589.91],
   ["Messina",38.1833,15.5667,1021.22],["Palermo",38.1167,13.3500,1171.74],
   ["Ragusa",36.9333,14.7333,4972.68],["Siracusa",37.0667,15.2833,668.54],
   ["Trapani",38.0167,12.5333,109.59],
+  // Toscana (no Prato nel dataset 2025)
   ["Arezzo",43.4667,11.8833,6589.09],["Firenze",43.7667,11.2500,122.89],
   ["Grosseto",42.7667,11.1167,8650.87],["Livorno",43.5500,10.3167,67.95],
   ["Lucca",43.8500,10.5167,608.02],["Massa-Carrara",44.0033,10.0833,202.92],
   ["Pisa",43.7167,10.4000,1214.22],["Pistoia",43.9333,10.9167,165.74],
   ["Siena",43.3167,11.3000,2278.74],
+  // Trentino-Alto Adige
   ["Bolzano",46.0050,11.3333,1285.67],["Trento",46.0667,11.1333,13427.46],
+  // Umbria
   ["Perugia",43.1167,12.4000,35750.57],["Terni",42.5667,12.6667,1411.13],
+  // Valle d'Aosta
   ["Valle d'Aosta",45.7333,7.3167,109.28],
+  // Veneto
   ["Belluno",46.1333,12.2167,2783.66],["Padova",45.4000,11.8833,132553.73],
   ["Rovigo",45.0667,11.8000,38400.25],["Treviso",45.0067,12.2500,54038.84],
   ["Venezia",45.4333,12.3500,21080.84],["Verona",45.4500,11.0000,645773.58],
@@ -1183,6 +1238,9 @@ const PORTS_ORIG = [
   {name:"Bari",    lat:41.1329, lon:16.8474, markup:11}
 ];
 
+// Curva costo produzione — calibrata sui dati reali Veronesi 2025
+// (DIRETTI + INDIRETTI + LOGISTICA, totale 68.3 M€ su 2.89 Mton = 23.6 €/ton media)
+// Range osservato: 20 €/ton (volumi >700kt) → 44 €/ton (volumi <50kt)
 const PROD_TABLE_ORIG = [
   [0,80],[10000,70],[20000,60],[30000,53],[40000,48],[50000,44],
   [60000,41],[70000,38],[80000,36],[90000,34],[100000,32],[110000,30.5],
@@ -1193,6 +1251,7 @@ const PROD_TABLE_ORIG = [
   [400000,21.5],[450000,21.3],[500000,21],[600000,20.7],[700000,20.5],[800000,20]
 ];
 
+/* TARIFFA INBOUND (km → €/ton) — lookup approssimato per difetto, NO interpolazione */
 const INBOUND_TARIFF_ORIG = [
   [30,5.153],[40,6.423],[50,7.479],[60,8.447],[70,9.249],
   [80,9.891],[90,10.378],[100,10.713],[110,11.264],[120,11.867],
@@ -1202,6 +1261,7 @@ const INBOUND_TARIFF_ORIG = [
   [1250,97.380],[1500,116.855],[1750,136.331],[1999,155.729]
 ];
 
+/* TARIFFA OUTBOUND (km → €/ton) — interpolazione lineare fra scaglioni */
 const OUTBOUND_TARIFF_ORIG = [
   [30,7.13],[40,8.57],[50,9.54],[60,10.89],[70,12.05],
   [80,13.03],[90,13.82],[100,14.42],[110,15.33],[120,16.15],
@@ -1211,6 +1271,7 @@ const OUTBOUND_TARIFF_ORIG = [
   [1250,138.80],[1500,166.55],[1750,194.31],[1999,221.96]
 ];
 
+// 7 stabilimenti reali Veronesi (fixed=true, non trascinabili)
 const VERONESI = [
   {name:"Quinto (VR)",       lat:45.4895369, lon:11.0193326, fixed:true},
   {name:"San Pietro (VI)",   lat:45.6017674, lon:11.6596853, fixed:true},
@@ -1221,6 +1282,8 @@ const VERONESI = [
   {name:"Fossano (CN)",      lat:44.564499,  lon: 7.709014,  fixed:true}
 ];
 
+// Capacità storiche 2017-2025 (max annuo per ogni Veronesi, in ton/anno)
+// Fonte: dati storici reali Veronesi forniti dall'utente
 const VERONESI_CAP_ORIG = [
   { name:"Quinto (VR)",      max:465392.22 },
   { name:"San Pietro (VI)",  max:752944.57 },
@@ -1237,6 +1300,7 @@ const DEFAULT_PLANTS_GF = [
   {name:"Stab 3 — Napoli", lat:40.8500, lon:14.2667}
 ];
 
+// State globale: deep-clonato dalle copie ORIG
 window.appData = {
   provinces:      JSON.parse(JSON.stringify(PROVINCES_ORIG)),
   ports:          JSON.parse(JSON.stringify(PORTS_ORIG)),
@@ -1244,17 +1308,22 @@ window.appData = {
   veronesi:       JSON.parse(JSON.stringify(VERONESI)),
   inboundTariff:  JSON.parse(JSON.stringify(INBOUND_TARIFF_ORIG)),
   outboundTariff: JSON.parse(JSON.stringify(OUTBOUND_TARIFF_ORIG)),
+  // Inefficienza routing — moltiplica i km Haversine prima del lookup tariffario.
+  // Default calibrato sui dati Veronesi (gap ~50% vs ottimo nearest-neighbor).
   routingIneffIn:  1.4,
   routingIneffOut: 1.8,
+  // Capacità storiche Veronesi (max annuo + moltiplicatori scenari)
   veronesiCapacityData: JSON.parse(JSON.stringify(VERONESI_CAP_ORIG)),
-  capacityMultiplier:   1.1,
-  capacity7days:        7/6,
-  capacityScenario:     'manual'
+  capacityMultiplier:   1.1,        // moltiplicatore scenario "+10%"
+  capacity7days:        7/6,        // moltiplicatore scenario "7gg/7" ≈ 1.1667
+  capacityScenario:     'manual'    // 'manual' | 'plus10' | '7days'
 };
 
+/* Helper capacità Veronesi */
 function vCapMax(idx)     { const r = window.appData.veronesiCapacityData[idx]; return r ? r.max : 0; }
 function vCapPlus10(idx)  { return vCapMax(idx) * window.appData.capacityMultiplier; }
 function vCap7days(idx)   { return vCapMax(idx) * window.appData.capacity7days; }
+// Applica lo scenario alle capacità (capKt in kton) di tutti gli stab. fissi
 function applyCapScenario(plants, scenario){
   if (scenario !== 'plus10' && scenario !== '7days') return;
   let veroIdx = 0;
@@ -1272,6 +1341,10 @@ function applyCapScenario(plants, scenario){
 
 const LAND_SNAP_KM = 80;
 
+/* ====================================================================
+   ENGINE — funzioni di calcolo condivise tra le pagine
+   Sempre lette da window.appData per propagare modifiche dalla pagina Dati.
+   ==================================================================== */
 const Engine = {
   haversine(lat1, lon1, lat2, lon2){
     const R = 6371;
@@ -1281,6 +1354,7 @@ const Engine = {
             + Math.cos(T(lat1)) * Math.cos(T(lat2)) * Math.sin(dLon/2)**2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   },
+  // OUTBOUND: interpolazione lineare fra scaglioni (extrapolazione clamp ai due estremi)
   unitCostDistr(km){
     const T = window.appData.outboundTariff;
     if (T.length === 0) return 0;
@@ -1294,6 +1368,8 @@ const Engine = {
     }
     return T[T.length-1][1];
   },
+  // INBOUND base: lookup approssimato per difetto (NO interpolazione), clamp ai due estremi
+  // È la sola componente chilometrica, senza maggiorazione portuale.
   unitCostAppBase(km){
     const T = window.appData.inboundTariff;
     if (T.length === 0) return 0;
@@ -1305,6 +1381,7 @@ const Engine = {
     }
     return cost;
   },
+  // INBOUND completo: costo_base(km) + maggiorazione del porto (€/ton)
   unitCostApp(km, markup = 0){
     return Engine.unitCostAppBase(km) + (markup || 0);
   },
@@ -1315,11 +1392,14 @@ const Engine = {
     for (const [t, cc] of tab){ if (v >= t) c = cc; else break; }
     return c;
   },
+  // Compute completo: prende plants (lista già filtrata per "active") e factor
   compute(plants, factor){
     const PROV = window.appData.provinces;
     const PORTS = window.appData.ports;
     const F = factor;
+
     if (plants.length === 0){
+      // niente stab → totale 0 ma volume positivo "scoperto"
       return {
         plants:[], provDemand:PROV.map(p => p.demand*F),
         provAssign:[], provDist:[], tonPerPlant:[],
@@ -1331,11 +1411,13 @@ const Engine = {
         avgKmIn:0, avgKmOut:0, avgKmInEff:0, avgKmOutEff:0
       };
     }
+    // Moltiplicatori inefficienza routing (default 1.4 IN / 1.8 OUT)
     const ineffIn  = window.appData.routingIneffIn;
     const ineffOut = window.appData.routingIneffOut;
+
     const provDemand = PROV.map(p => p.demand * F);
     const provAssign = new Array(PROV.length);
-    const provDist   = new Array(PROV.length);
+    const provDist   = new Array(PROV.length);   // km Haversine puri (linea d'aria)
     for (let i = 0; i < PROV.length; i++){
       let bj = 0, bd = Infinity;
       for (let j = 0; j < plants.length; j++){
@@ -1344,6 +1426,7 @@ const Engine = {
       }
       provAssign[i] = bj; provDist[i] = bd;
     }
+    // Distribuzione: applica ineffOut PRIMA del lookup tariffario
     const distrPerPlant = new Array(plants.length).fill(0);
     let totalDistr = 0;
     for (let i = 0; i < PROV.length; i++){
@@ -1358,6 +1441,8 @@ const Engine = {
     const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
     const prodCostPerPlant = tonPerPlant.map((t, i) => t * prodUnitPerPlant[i]);
     const totalProd = prodCostPerPlant.reduce((s,x)=>s+x,0);
+    // Approvvigionamento: applica ineffIn PRIMA del lookup tariffario,
+    // poi somma la maggiorazione fissa del porto specifico.
     const portAssign = new Array(plants.length);
     const portDist   = new Array(plants.length);
     const appBaseUnitPerPlant = new Array(plants.length);
@@ -1384,6 +1469,7 @@ const Engine = {
     const totalCost = totalApp + totalProd + totalDistr;
     const totalVol  = tonPerPlant.reduce((s,x)=>s+x,0);
     const unitTotal = totalVol > 0 ? totalCost/totalVol : 0;
+    // Tratte medie pesate (linea d'aria)
     let kmDemandOut = 0;
     for (let i = 0; i < PROV.length; i++){
       kmDemandOut += provDemand[i] * provDist[i];
@@ -1394,6 +1480,7 @@ const Engine = {
       kmTonIn += tonPerPlant[j] * portDist[j];
     }
     const avgKmIn = totalVol > 0 ? kmTonIn / totalVol : 0;
+    // Tratte effettive (con inefficienza)
     const avgKmInEff  = avgKmIn  * ineffIn;
     const avgKmOutEff = avgKmOut * ineffOut;
     return {
@@ -1407,6 +1494,7 @@ const Engine = {
       ineffIn, ineffOut
     };
   },
+  // Snap-to-land: ritorna {lat,lon,snapped, provName,distance}
   nearestServedProv(lat, lon){
     let best = null, bestD = Infinity;
     for (const p of window.appData.provinces){
@@ -1424,6 +1512,7 @@ const Engine = {
               provName:province.name, distance};
     return {lat, lon, snapped:false, provName:province.name, distance};
   },
+  // K-Means++ pesato sulla domanda (max 100 iter, vincolo terraferma)
   kmeansPlusPlusWeighted(K, factor){
     const PROV = window.appData.provinces;
     const points = PROV.filter(p => p.demand > 0)
@@ -1477,6 +1566,7 @@ const Engine = {
       return {lat:s.lat, lon:s.lon, snapped:s.snapped};
     });
   },
+  // Greedy: posizionare un nuovo stab nella provincia (con domanda>0) che minimizza il costo totale
   greedyBestProvince(currentPlants, factor){
     let best = null, bestC = Infinity;
     for (const p of window.appData.provinces){
@@ -1487,12 +1577,20 @@ const Engine = {
     }
     return best;
   },
+
+  /* ==================================================================
+     OTTIMIZZAZIONE CONVESSA (minimizzazione diretta del costo totale)
+     ================================================================== */
+
+  // Calcola tutto come compute() ma usando un'assegnazione provincia→stab
+  // arbitraria (provAssign[i] = -1 → provincia non servita).
   computeWithAssignment(plants, factor, provAssign){
     const PROV  = window.appData.provinces;
     const PORTS = window.appData.ports;
     const F = factor, N = plants.length, M = PROV.length;
     const ineffIn  = window.appData.routingIneffIn;
     const ineffOut = window.appData.routingIneffOut;
+
     if (N === 0){
       const totalDem = PROV.reduce((s,p)=>s+p.demand*F, 0);
       return {
@@ -1513,6 +1611,7 @@ const Engine = {
     const tonPerPlant = new Array(N).fill(0);
     const distrPerPlant = new Array(N).fill(0);
     let totalDistr = 0, unservedDemand = 0;
+
     for (let i = 0; i < M; i++){
       const j = provAssign[i];
       if (j == null || j < 0){
@@ -1529,6 +1628,7 @@ const Engine = {
     const prodUnitPerPlant = tonPerPlant.map(t => Engine.unitCostProd(t));
     const prodCostPerPlant = tonPerPlant.map((t,i) => t * prodUnitPerPlant[i]);
     const totalProd = prodCostPerPlant.reduce((s,x)=>s+x, 0);
+
     const portAssign = new Array(N), portDist = new Array(N);
     const appBaseUnitPerPlant = new Array(N), appMarkupPerPlant = new Array(N);
     const appUnitPerPlant = new Array(N), appCostPerPlant = new Array(N);
@@ -1575,6 +1675,11 @@ const Engine = {
       ineffIn, ineffOut
     };
   },
+
+  // Allocazione greedy con costo MARGINALE: per ogni provincia (in ordine
+  // discendente di domanda), prova tutti gli stab. e scegli quello che
+  // produce il minimo incremento di costo totale; rispetta capacities[j]
+  // (null/undefined = capacità infinita).
   marginalAllocate(plants, factor, capacities){
     const PROV  = window.appData.provinces;
     const PORTS = window.appData.ports;
@@ -1582,6 +1687,8 @@ const Engine = {
     const ineffIn  = window.appData.routingIneffIn;
     const ineffOut = window.appData.routingIneffOut;
     if (N === 0) return new Array(M).fill(-1);
+
+    // Pre-compute porto più vicino (distanza + indice → markup) per ogni stab.
     const plantPortDist = new Array(N);
     const plantPortIdx  = new Array(N);
     for (let j = 0; j < N; j++){
@@ -1598,23 +1705,29 @@ const Engine = {
       .filter(o => o.d > 0)
       .sort((a, b) => b.d - a.d)
       .map(o => o.i);
+
     const provAssign  = new Array(M).fill(-1);
     const tonPerPlant = new Array(N).fill(0);
+
     for (const i of provOrder){
       const demand = PROV[i].demand * F;
       let bestJ = -1, bestDelta = Infinity;
       for (let j = 0; j < N; j++){
+        // Vincolo capacità
         const cap = capacities ? capacities[j] : null;
         if (cap != null && cap > 0 && tonPerPlant[j] + demand > cap) continue;
+        // Δ distribuzione
         const km = Engine.haversine(PROV[i].lat, PROV[i].lon, plants[j].lat, plants[j].lon);
         const distrCost = demand * Engine.unitCostDistr(km * ineffOut);
+        // Δ produzione (curva non lineare → calcolo esatto)
         const oldVol = tonPerPlant[j], newVol = oldVol + demand;
         const prodDelta = newVol * Engine.unitCostProd(newVol)
                        -  oldVol * Engine.unitCostProd(oldVol);
+        // Δ approvvigionamento — include la maggiorazione del porto più vicino
         const portKm = plantPortDist[j];
         const portMarkup = PORTS[plantPortIdx[j]].markup || 0;
         const appUnit = Engine.unitCostApp(portKm * ineffIn, portMarkup);
-        const appDelta = demand * appUnit;
+        const appDelta = demand * appUnit;     // costo lineare nel volume
         const totalDelta = distrCost + prodDelta + appDelta;
         if (totalDelta < bestDelta){ bestDelta = totalDelta; bestJ = j; }
       }
@@ -1625,24 +1738,35 @@ const Engine = {
     }
     return provAssign;
   },
+
+  // Optimizer principale: K-Means++ init + iterazioni di
+  // (allocazione marginale + ricerca locale per ogni stab. non fissato).
+  // capacities può essere null/undefined (infinita), un numero (uniforme)
+  // o un array (per stab.). fixed[j]=true congela lo stab. j (Brownfield).
   optimizeConvex(initialPlants, factor, capacities, options = {}){
     const maxIter   = options.maxIter   || 30;
     const tolerance = options.tolerance || 0.0001;
     const fixed     = options.fixed     || initialPlants.map(()=>false);
     const onProgress = options.onProgress;
-    const stepSizes = [0.6, 0.3, 0.15];
+    const stepSizes = [0.6, 0.3, 0.15];   // adaptive
+
+    // Normalizza capacities a un array
     const N0 = initialPlants.length;
     let caps;
     if (capacities == null) caps = new Array(N0).fill(null);
     else if (typeof capacities === 'number') caps = new Array(N0).fill(capacities);
     else caps = capacities.slice();
+
     let plants = initialPlants.map(p => ({...p}));
+
     let assign  = Engine.marginalAllocate(plants, factor, caps);
     let result  = Engine.computeWithAssignment(plants, factor, assign);
     let bestCost = result.totalCost;
     const history = [bestCost];
+
     for (let iter = 0; iter < maxIter; iter++){
       let iterImproved = false;
+      // Per ogni stab. non fissato, ricerca locale a step decrescenti
       for (let j = 0; j < plants.length; j++){
         if (fixed[j]) continue;
         const orig = {...plants[j]};
@@ -1686,6 +1810,9 @@ const Engine = {
   }
 };
 
+/* ====================================================================
+   UTILITY
+   ==================================================================== */
 const fmt = (v, dec=0) => v.toLocaleString('it-IT', {maximumFractionDigits:dec, minimumFractionDigits:dec});
 function flashStatus(msg, ms=4000){
   const el = document.getElementById('status-msg');
@@ -1693,30 +1820,59 @@ function flashStatus(msg, ms=4000){
   clearTimeout(flashStatus._t);
   flashStatus._t = setTimeout(()=>{ el.textContent='Pronto.'; }, ms);
 }
+// Aggiorna l'indicatore "📊 Scenario capacità" nelle legende di BF e BFC
+function updateScenarioLegend(){
+  const sc = window.appData.capacityScenario || 'manual';
+  const lbl = sc === 'manual' ? 'Manuale' : (sc === 'plus10' ? '+10% (×1,1)' : '7gg/7 (×7/6)');
+  const txt = `Capacità Veronesi: <b>${lbl}</b>`;
+  const a = document.getElementById('bf-legend-scenario');
+  const b = document.getElementById('bfc-legend-scenario');
+  if (a) a.innerHTML = txt;
+  if (b) b.innerHTML = txt;
+}
 function setupChartDefaults(){
   Chart.defaults.color = '#8b949e';
   Chart.defaults.font.size = 10;
   Chart.defaults.borderColor = '#30363d';
 }
 setupChartDefaults();
+
+// Format compatto per ton (es. 12.345 ton → "12k", 645.773 ton → "646k", 1.250.000 → "1.25M")
 function fmtTon(v){
   if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
   if (v >= 1e3) return (v/1e3).toFixed(0) + 'k';
   return v.toFixed(0);
 }
 
+/* ====================================================================
+   DETAIL — Helper condiviso GF/BF per il pannello dettaglio stabilimento
+   Legge l'ultimo Engine.compute() della pagina e popola tutti i campi.
+   ==================================================================== */
 const Detail = {
+  // prefix: 'gf' o 'bf'
+  // result: this.lastResult (output di Engine.compute)
+  // plant: oggetto stabilimento (con .name, .lat, .lon)
+  // activeIdx: indice nello sub-array di stab. attivi (= indice nei campi di result)
   show(prefix, result, plant, activeIdx){
     const panel = document.getElementById(prefix + '-detail-panel');
     if (!result || !plant || activeIdx < 0){ this.hide(prefix); return; }
+
     panel.classList.add('show');
-    document.getElementById(prefix + '-detail-title').textContent = `Dettaglio: ${plant.name}`;
+    document.getElementById(prefix + '-detail-title').textContent =
+      `Dettaglio: ${plant.name}`;
+
+    // ---- Produzione ----
     const ton      = result.tonPerPlant[activeIdx];
     const prodUnit = result.prodUnitPerPlant[activeIdx];
     const prodTot  = result.prodCostPerPlant[activeIdx];
-    document.getElementById(prefix + '-detail-volume').textContent = fmt(ton, 0) + ' ton';
-    document.getElementById(prefix + '-detail-prod-unit').textContent = fmt(prodUnit, 2) + ' €/ton';
-    document.getElementById(prefix + '-detail-prod-total').textContent = fmt(prodTot/1e6, 3) + ' M€';
+    document.getElementById(prefix + '-detail-volume').textContent =
+      fmt(ton, 0) + ' ton';
+    document.getElementById(prefix + '-detail-prod-unit').textContent =
+      fmt(prodUnit, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-prod-total').textContent =
+      fmt(prodTot/1e6, 3) + ' M€';
+
+    // ---- Approvvigionamento (porto) — base + markup ----
     const portIdx  = result.portAssign[activeIdx];
     const port     = window.appData.ports[portIdx];
     const portDist = result.portDist[activeIdx];
@@ -1725,12 +1881,20 @@ const Detail = {
     const appUnit  = result.appUnitPerPlant[activeIdx];
     const appTot   = result.appCostPerPlant[activeIdx];
     const ineffIn  = result.ineffIn || 1.0;
-    document.getElementById(prefix + '-detail-port').textContent = port ? port.name : '—';
-    document.getElementById(prefix + '-detail-port-dist').textContent = `${portDist.toFixed(0)} → ${(portDist*ineffIn).toFixed(0)} km`;
-    document.getElementById(prefix + '-detail-app-base').textContent = fmt(appBase, 2) + ' €/ton';
-    document.getElementById(prefix + '-detail-app-markup').textContent = (appMark > 0 ? '+' : '') + fmt(appMark, 2) + ' €/ton';
-    document.getElementById(prefix + '-detail-app-unit').textContent = fmt(appUnit, 2) + ' €/ton';
-    document.getElementById(prefix + '-detail-app-total').textContent = fmt(appTot/1e6, 3) + ' M€';
+    document.getElementById(prefix + '-detail-port').textContent =
+      port ? port.name : '—';
+    document.getElementById(prefix + '-detail-port-dist').textContent =
+      `${portDist.toFixed(0)} → ${(portDist*ineffIn).toFixed(0)} km`;
+    document.getElementById(prefix + '-detail-app-base').textContent =
+      fmt(appBase, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-app-markup').textContent =
+      (appMark > 0 ? '+' : '') + fmt(appMark, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-app-unit').textContent =
+      fmt(appUnit, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-app-total').textContent =
+      fmt(appTot/1e6, 3) + ' M€';
+
+    // ---- Distribuzione (province servite) ----
     const ineffOut = result.ineffOut || 1.0;
     const PROV     = window.appData.provinces;
     const served   = [];
@@ -1738,31 +1902,55 @@ const Detail = {
       if (result.provAssign[i] === activeIdx && result.provDemand[i] > 0){
         const km   = result.provDist[i];
         const kmEff = km * ineffOut;
-        const cost = Engine.unitCostDistr(kmEff);
-        served.push({ name: PROV[i].name, ton: result.provDemand[i], km, kmEff, cost });
+        const cost = Engine.unitCostDistr(kmEff);    // coerente con il modello
+        served.push({
+          name: PROV[i].name,
+          ton:  result.provDemand[i],
+          km, kmEff, cost
+        });
       }
     }
     served.sort((a, b) => b.ton - a.ton);
+
+    // Media pesata distanza e costo (sui ton di domanda effettiva)
     let totTon = 0, kmW = 0, costW = 0;
-    for (const p of served){ totTon += p.ton; kmW += p.ton * p.km; costW += p.ton * p.cost; }
+    for (const p of served){
+      totTon += p.ton;
+      kmW    += p.ton * p.km;
+      costW  += p.ton * p.cost;
+    }
     const avgKm   = totTon > 0 ? kmW   / totTon : 0;
     const avgCost = totTon > 0 ? costW / totTon : 0;
     document.getElementById(prefix + '-detail-nprov').textContent = served.length.toString();
-    document.getElementById(prefix + '-detail-dist-avg').textContent = `${avgKm.toFixed(0)} → ${(avgKm*ineffOut).toFixed(0)} km`;
-    document.getElementById(prefix + '-detail-distr-unit').textContent = fmt(avgCost, 2) + ' €/ton';
-    document.getElementById(prefix + '-detail-distr-total').textContent = fmt(result.distrPerPlant[activeIdx]/1e6, 3) + ' M€';
+    document.getElementById(prefix + '-detail-dist-avg').textContent =
+      `${avgKm.toFixed(0)} → ${(avgKm*ineffOut).toFixed(0)} km`;
+    document.getElementById(prefix + '-detail-distr-unit').textContent =
+      fmt(avgCost, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-distr-total').textContent =
+      fmt(result.distrPerPlant[activeIdx]/1e6, 3) + ' M€';
+
+    // Tabella province (tutte, ma scrollabile dopo le prime 10)
     const tbody = document.getElementById(prefix + '-detail-prov-tbody');
     tbody.innerHTML = '';
     served.forEach((p, i) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td class="rank">${i+1}</td><td title="${p.name}">${p.name}</td><td>${fmtTon(p.ton)}</td><td>${p.km.toFixed(0)}</td><td>${p.cost.toFixed(2)}</td>`;
+      tr.innerHTML = `
+        <td class="rank">${i+1}</td>
+        <td title="${p.name}">${p.name}</td>
+        <td>${fmtTon(p.ton)}</td>
+        <td>${p.km.toFixed(0)}</td>
+        <td>${p.cost.toFixed(2)}</td>
+      `;
       tbody.appendChild(tr);
     });
+
+    // ---- Capacità storica (solo per stab. Veronesi fissi) ----
     const showRow = (id, show) => {
       const el = document.getElementById(prefix + '-' + id);
       if (el) el.style.display = show ? '' : 'none';
     };
-    const isVeronesi = plant.fixed === true && plant.id != null && window.appData.veronesiCapacityData[plant.id];
+    const isVeronesi = plant.fixed === true && plant.id != null
+                       && window.appData.veronesiCapacityData[plant.id];
     showRow('detail-cap-section',    isVeronesi);
     showRow('detail-cap-max-row',    isVeronesi);
     showRow('detail-cap-p10-row',    isVeronesi);
@@ -1781,10 +1969,14 @@ const Detail = {
       if (sc === 'plus10'){ scLbl = '+10%';      scVal = p10; }
       else if (sc === '7days'){ scLbl = '7gg/7'; scVal = c77; }
       else { scLbl = 'Manuale'; scVal = (plant.capKt || 0) * 1000; }
-      document.getElementById(prefix + '-detail-cap-active').textContent = `${scLbl} → ${fmt(scVal,0)} ton`;
+      document.getElementById(prefix + '-detail-cap-active').textContent =
+        `${scLbl} → ${fmt(scVal,0)} ton`;
     }
+
+    // Totale stabilimento (App + Prod + Distr)
     const total = appTot + prodTot + result.distrPerPlant[activeIdx];
-    document.getElementById(prefix + '-detail-total').textContent = fmt(total/1e6, 3) + ' M€';
+    document.getElementById(prefix + '-detail-total').textContent =
+      fmt(total/1e6, 3) + ' M€';
   },
   hide(prefix){
     const panel = document.getElementById(prefix + '-detail-panel');
@@ -1792,6 +1984,9 @@ const Detail = {
   }
 };
 
+/* ====================================================================
+   NAV — gestione delle pagine
+   ==================================================================== */
 const Nav = {
   current:'home',
   show(page){
@@ -1808,194 +2003,1542 @@ const Nav = {
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=>Nav.show(t.dataset.page)));
 document.querySelectorAll('.home-card').forEach(c => c.addEventListener('click', ()=>Nav.show(c.dataset.go)));
 
+/* ====================================================================
+   GREENFIELD PAGE
+   ==================================================================== */
 const Greenfield = {
   initialized:false,
   state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false, sel:-1},
   map:null, layers:{}, markers:{plants:[], circles:[]},
   charts:{},
-  onShow(){ if (!this.initialized){ this.init(); this.initialized = true; } setTimeout(()=>{ this.map.invalidateSize(); }, 50); this.syncIneffSliders(); this.render(); },
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.render();
+  },
   init(){
+    // ---------- mappa ----------
     this.map = L.map('map-gf', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19 }).addTo(this.map);
-    this.layers = { provinces: L.layerGroup().addTo(this.map), ports: L.layerGroup().addTo(this.map), plants: L.layerGroup().addTo(this.map), links: L.layerGroup().addTo(this.map) };
-    this.drawProvinces(); this.drawPorts(); this.drawPlants();
-    this.charts.stack = new Chart(document.getElementById('gf-chart-stack').getContext('2d'), { type:'bar', data:{labels:[], datasets:[{label:'App.',data:[],backgroundColor:'#ff9900'},{label:'Prod.',data:[],backgroundColor:'#3fb950'},{label:'Distr.',data:[],backgroundColor:'#3aa0ff'}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9}}}}, scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
-    this.charts.pie = new Chart(document.getElementById('gf-chart-pie').getContext('2d'), { type:'doughnut', data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0], backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}, tooltip:{callbacks:{label:c=>`${c.label}: ${(c.parsed/1e6).toFixed(2)} M€ (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}}, cutout:'55%', layout:{padding:{top:14}} } });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
+    };
+    this.drawProvinces();
+    this.drawPorts();
+    this.drawPlants();
+    // ---------- charts ----------
+    this.charts.stack = new Chart(document.getElementById('gf-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('gf-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${(c.parsed/1e6).toFixed(2)} M€ (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
+        cutout:'55%', layout:{padding:{top:14}}
+      }
+    });
     const lt = window.appData.prodTable;
-    this.charts.line = new Chart(document.getElementById('gf-chart-line').getContext('2d'), { type:'line', data:{labels:lt.map(r=>(r[0]/1000)+'k'), datasets:[{label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff', backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},{label:'Stab. attivi', data:[], borderColor:'#f85149', backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}}, y:{ticks:{callback:v=>v+' €'}}}, layout:{padding:{top:14}} } });
+    this.charts.line = new Chart(document.getElementById('gf-chart-line').getContext('2d'), {
+      type:'line',
+      data:{labels:lt.map(r=>(r[0]/1000)+'k'),
+        datasets:[
+          {label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff',
+           backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},
+          {label:'Stab. attivi', data:[], borderColor:'#f85149',
+           backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}
+        ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}},
+                y:{ticks:{callback:v=>v+' €'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    // ---------- listeners ----------
     const sN = document.getElementById('gf-sld-n');
     const sD = document.getElementById('gf-sld-d');
-    sN.addEventListener('input', ()=>{ document.getElementById('gf-sld-n-val').textContent = sN.value; const N = parseInt(sN.value); if (N > this.state.plants.length){ while (this.state.plants.length < N){ const k = this.state.plants.length; this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4}); } } else if (N < this.state.plants.length){ this.state.plants = this.state.plants.slice(0, N); if (this.state.sel >= N) this.state.sel = -1; } this.drawPlants(); this.render(); });
-    sD.addEventListener('input', ()=>{ document.getElementById('gf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1); this.state.factor = parseFloat(sD.value); this.drawProvinces(); this.render(); });
-    document.getElementById('gf-btn-opt').addEventListener('click', ()=>{ flashStatus('Ottimizzazione K‑Means++ in corso…', 8000); setTimeout(()=>{ const K = this.state.plants.length; const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor); const snap = cs.filter(c => c.snapped).length; this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon})); this.state.sel = -1; this.drawPlants(); this.render(); flashStatus(snap===0 ? `Ottimizzato: ${K} stab. al centroide pesato dei cluster.` : `Ottimizzato: ${K} stab. (${snap} centroidi agganciati a terra).`, 5000); }, 30); });
-    document.getElementById('gf-btn-reset').addEventListener('click', ()=>{ this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p})); sN.value = 3; document.getElementById('gf-sld-n-val').textContent = '3'; sD.value = 1.0; document.getElementById('gf-sld-d-val').textContent = '1.0'; this.state.factor = 1.0; this.state.sel = -1; this.drawProvinces(); this.drawPlants(); this.render(); flashStatus('Default ripristinato.'); });
-    document.getElementById('gf-tgl-unit').addEventListener('change', e=>{ this.state.unit = e.target.checked; this.render(); flashStatus(this.state.unit ? 'Modalità unitaria (€/ton).' : 'Modalità assoluta (€).'); });
+    sN.addEventListener('input', ()=>{
+      document.getElementById('gf-sld-n-val').textContent = sN.value;
+      const N = parseInt(sN.value);
+      if (N > this.state.plants.length){
+        while (this.state.plants.length < N){
+          const k = this.state.plants.length;
+          this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4});
+        }
+      } else if (N < this.state.plants.length){
+        this.state.plants = this.state.plants.slice(0, N);
+        if (this.state.sel >= N) this.state.sel = -1;
+      }
+      this.drawPlants(); this.render();
+    });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('gf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('gf-btn-opt').addEventListener('click', ()=>{
+      flashStatus('Ottimizzazione K‑Means++ in corso…', 8000);
+      setTimeout(()=>{
+        const K = this.state.plants.length;
+        const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+        const snap = cs.filter(c => c.snapped).length;
+        this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+        this.state.sel = -1;
+        this.drawPlants(); this.render();
+        flashStatus(snap===0
+          ? `Ottimizzato: ${K} stab. al centroide pesato dei cluster.`
+          : `Ottimizzato: ${K} stab. (${snap} centroidi agganciati a terra).`, 5000);
+      }, 30);
+    });
+    document.getElementById('gf-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p}));
+      sN.value = 3; document.getElementById('gf-sld-n-val').textContent = '3';
+      sD.value = 1.0; document.getElementById('gf-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0; this.state.sel = -1;
+      this.drawProvinces(); this.drawPlants(); this.render();
+      flashStatus('Default ripristinato.');
+    });
+    document.getElementById('gf-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+      flashStatus(this.state.unit ? 'Modalità unitaria (€/ton).' : 'Modalità assoluta (€).');
+    });
+    // Inefficienza routing
     const sIout = document.getElementById('gf-sld-iout');
     const sIin  = document.getElementById('gf-sld-iin');
-    sIout.addEventListener('input', ()=>{ const v = parseFloat(sIout.value); document.getElementById('gf-sld-iout-val').textContent = v.toFixed(1); window.appData.routingIneffOut = v; this.render(); });
-    sIin.addEventListener('input', ()=>{ const v = parseFloat(sIin.value); document.getElementById('gf-sld-iin-val').textContent = v.toFixed(1); window.appData.routingIneffIn = v; this.render(); });
-    this.map.on('click', ()=>{ if (this.state.sel >= 0){ this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('gf'); } });
-    document.getElementById('gf-detail-close').addEventListener('click', ()=>{ this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('gf'); });
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('gf-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v;
+      this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('gf-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v;
+      this.render();
+    });
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+        Detail.hide('gf');
+      }
+    });
+    // Pulsante chiudi pannello dettaglio
+    document.getElementById('gf-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('gf');
+    });
   },
-  syncIneffSliders(){ const sIout = document.getElementById('gf-sld-iout'); const sIin = document.getElementById('gf-sld-iin'); sIout.value = window.appData.routingIneffOut; sIin.value = window.appData.routingIneffIn; document.getElementById('gf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1); document.getElementById('gf-sld-iin-val').textContent = window.appData.routingIneffIn.toFixed(1); },
-  drawProvinces(){ this.layers.provinces.clearLayers(); this.markers.circles = []; window.appData.provinces.forEach(p => { const dEff = p.demand * this.state.factor; const c = L.circleMarker([p.lat,p.lon], { radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30), color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55 }); c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`); c.addTo(this.layers.provinces); this.markers.circles.push(c); }); },
-  drawPorts(){ this.layers.ports.clearLayers(); window.appData.ports.forEach(p => { const icon = L.divIcon({className:'', html:`<div class="port-icon" title="${p.name}">⚓</div>`, iconSize:[22,22], iconAnchor:[11,11]}); L.marker([p.lat,p.lon], {icon, zIndexOffset:500}).bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports); }); },
-  drawPlants(){ this.layers.plants.clearLayers(); this.markers.plants = []; this.state.plants.forEach((p, idx) => { const sel = (idx === this.state.sel); const icon = L.divIcon({className:'', html:`<div class="plant-icon ${sel?'selected':''}" title="${p.name}">🏭</div>`, iconSize:[28,28], iconAnchor:[14,14]}); const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000}); m.on('dragend', e => { const ll = e.target.getLatLng(); const snap = Engine.snapToLand(ll.lat, ll.lng); this.state.plants[idx].lat = snap.lat; this.state.plants[idx].lon = snap.lon; if (snap.snapped){ e.target.setLatLng([snap.lat, snap.lon]); flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`); } this.render(); }); m.on('click', ()=>{ this.state.sel = (this.state.sel===idx) ? -1 : idx; this.drawPlants(); this.drawLinks(); if (this.state.sel >= 0 && this.lastResult){ Detail.show('gf', this.lastResult, this.state.plants[this.state.sel], this.state.sel); } else { Detail.hide('gf'); } }); m.bindTooltip(p.name, {direction:'top', offset:[0,-14]}); m.addTo(this.layers.plants); this.markers.plants.push(m); }); },
-  drawLinks(){ this.layers.links.clearLayers(); if (this.state.sel < 0 || !this.lastResult) return; const idx = this.state.sel, stab = this.state.plants[idx]; window.appData.provinces.forEach((p, i) => { if (this.lastResult.provAssign[i] === idx){ L.polyline([[p.lat,p.lon],[stab.lat,stab.lon]], {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links); if (this.markers.circles[i]) this.markers.circles[i].setStyle({color:'#79c0ff', weight:2, fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85}); } else if (this.markers.circles[i]){ this.markers.circles[i].setStyle({color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25}); } }); const port = window.appData.ports[this.lastResult.portAssign[idx]]; if (port) L.polyline([[stab.lat,stab.lon],[port.lat,port.lon]], {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links); },
-  resetProvinceStyles(){ this.markers.circles.forEach(c => c.setStyle({color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55})); },
-  render(){ const r = Engine.compute(this.state.plants, this.state.factor); this.lastResult = r; document.getElementById('gf-kpi-total').textContent = fmt(r.totalCost) + ' €'; document.getElementById('gf-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton medio'; const V = r.totalVol > 0 ? r.totalVol : 1; if (this.state.unit){ document.getElementById('gf-kpi-app').textContent = fmt(r.totalApp/V,2) + ' €/ton'; document.getElementById('gf-kpi-prod').textContent = fmt(r.totalProd/V,2) + ' €/ton'; document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton'; } else { document.getElementById('gf-kpi-app').textContent = fmt(r.totalApp/1e6,2) + ' M€'; document.getElementById('gf-kpi-prod').textContent = fmt(r.totalProd/1e6,2) + ' M€'; document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€'; } document.getElementById('gf-kpi-vol').textContent = fmt(r.totalVol); const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`); this.charts.stack.data.labels = labels; const transform = (arr) => arr.map((c,i)=> { const v = r.tonPerPlant[i]; if (!this.state.unit) return c; return v > 0 ? c/v : 0; }); this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant); this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant); this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant); if (this.state.unit){ this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t'; this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}}; } else { this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M'; this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}}; } this.charts.stack.update('none'); this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr]; this.charts.pie.update('none'); document.getElementById('gf-kpi-app-meta').textContent = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`; document.getElementById('gf-kpi-distr-meta').textContent = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`; const lt = window.appData.prodTable; const pts = this.state.plants.map((p,i)=>{ const v = Math.floor(r.tonPerPlant[i]/10000)*10000; let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; }); return {x:bi, y:r.prodUnitPerPlant[i]}; }); this.charts.line.data.datasets[1].data = pts; this.charts.line.update('none'); if (this.state.sel >= 0){ this.drawLinks(); Detail.show('gf', r, this.state.plants[this.state.sel], this.state.sel); } else { this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('gf'); } },
-  onDataChange(){ if (this.initialized){ const lt = window.appData.prodTable; this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k'); this.charts.line.data.datasets[0].data = lt.map(r=>r[1]); this.drawProvinces(); this.drawPorts(); this.render(); } }
+  // sync slider con appData (viene chiamato in onShow)
+  syncIneffSliders(){
+    const sIout = document.getElementById('gf-sld-iout');
+    const sIin  = document.getElementById('gf-sld-iin');
+    sIout.value = window.appData.routingIneffOut;
+    sIin.value  = window.appData.routingIneffIn;
+    document.getElementById('gf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('gf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+  // Re-renderer mappa province
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`)
+       .addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const sel = (idx === this.state.sel);
+      const icon = L.divIcon({className:'',
+        html:`<div class="plant-icon ${sel?'selected':''}" title="${p.name}">🏭</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000});
+      m.on('dragend', e => {
+        const ll = e.target.getLatLng();
+        const snap = Engine.snapToLand(ll.lat, ll.lng);
+        this.state.plants[idx].lat = snap.lat;
+        this.state.plants[idx].lon = snap.lon;
+        if (snap.snapped){
+          e.target.setLatLng([snap.lat, snap.lon]);
+          flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+        }
+        this.render();
+      });
+      m.on('click', ()=>{
+        this.state.sel = (this.state.sel===idx) ? -1 : idx;
+        this.drawPlants(); this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          Detail.show('gf', this.lastResult, this.state.plants[this.state.sel], this.state.sel);
+        } else {
+          Detail.hide('gf');
+        }
+      });
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+  },
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult) return;
+    const idx = this.state.sel, stab = this.state.plants[idx];
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === idx){
+        L.polyline([[p.lat,p.lon],[stab.lat,stab.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85});
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25});
+      }
+    });
+    const port = window.appData.ports[this.lastResult.portAssign[idx]];
+    if (port) L.polyline([[stab.lat,stab.lon],[port.lat,port.lon]],
+      {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55}));
+  },
+  render(){
+    const r = Engine.compute(this.state.plants, this.state.factor);
+    this.lastResult = r;
+    // KPIs
+    document.getElementById('gf-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gf-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('gf-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('gf-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('gf-kpi-vol').textContent = fmt(r.totalVol);
+    // Charts
+    const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+      this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}};
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+      this.charts.stack.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}};
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // Tratta media nei KPI (storytelling: contesto a fianco del dato di costo)
+    document.getElementById('gf-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('gf-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    // line chart points
+    const lt = window.appData.prodTable;
+    const pts = this.state.plants.map((p,i)=>{
+      const v = Math.floor(r.tonPerPlant[i]/10000)*10000;
+      let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; });
+      return {x:bi, y:r.prodUnitPerPlant[i]};
+    });
+    this.charts.line.data.datasets[1].data = pts;
+    this.charts.line.update('none');
+    // links + pannello dettaglio
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      // In Greenfield activeIdx == sel (tutti gli stab. sono "attivi")
+      Detail.show('gf', r, this.state.plants[this.state.sel], this.state.sel);
+    } else {
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('gf');
+    }
+  },
+  // chiamato quando i dati globali cambiano (Data page)
+  onDataChange(){
+    if (this.initialized){
+      const lt = window.appData.prodTable;
+      this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k');
+      this.charts.line.data.datasets[0].data = lt.map(r=>r[1]);
+      this.drawProvinces(); this.drawPorts(); this.render();
+    }
+  }
 };
 
+/* ====================================================================
+   BROWNFIELD PAGE
+   ==================================================================== */
 const Brownfield = {
   initialized:false,
-  state:{ plants:[], factor:1.0, unit:false, nextId:0, sel:-1 },
-  baseline:null,
+  state:{
+    plants:[],     // tutti gli stab (fixed + new), con flag active
+    factor:1.0,
+    unit:false,
+    nextId:0,
+    sel:-1         // indice (in plants) dello stab. selezionato per highlight
+  },
+  baseline:null, // result della baseline (sempre 7 Veronesi attivi)
   map:null, layers:{}, markers:{plants:[], circles:[]},
   charts:{},
-  onShow(){ if (!this.initialized){ this.init(); this.initialized = true; } setTimeout(()=>{ this.map.invalidateSize(); }, 50); this.syncIneffSliders(); this.render(); },
-  buildVeronesiPlants(){ return window.appData.veronesi.map((v,i)=>({ id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true })); },
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.syncScenarioButtons();
+    updateScenarioLegend();
+    this.render();
+  },
+  syncScenarioButtons(){
+    const sc = window.appData.capacityScenario || 'manual';
+    document.querySelectorAll('#bf-scenario button').forEach(b =>
+      b.classList.toggle('active', b.dataset.scenario === sc));
+  },
+  buildVeronesiPlants(){
+    return window.appData.veronesi.map((v,i)=>({
+      id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true
+    }));
+  },
   init(){
     this.state.plants = this.buildVeronesiPlants();
     this.state.nextId = this.state.plants.length;
+    // ---------- mappa ----------
     this.map = L.map('map-bf', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19 }).addTo(this.map);
-    this.layers = { provinces: L.layerGroup().addTo(this.map), ports: L.layerGroup().addTo(this.map), plants: L.layerGroup().addTo(this.map), links: L.layerGroup().addTo(this.map) };
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
+    };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
-    this.map.on('click', ()=>{ if (this.state.sel >= 0){ this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('bf'); } });
-    document.getElementById('bf-detail-close').addEventListener('click', ()=>{ this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('bf'); });
-    this.charts.bar = new Chart(document.getElementById('bf-chart-bar').getContext('2d'), { type:'bar', data:{labels:['App','Prod','Distr','Totale'], datasets:[{label:'Scenario', data:[0,0,0,0], backgroundColor:'#3aa0ff'},{label:'Baseline', data:[0,0,0,0], backgroundColor:'#8b949e'}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}}, scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
-    this.charts.pie = new Chart(document.getElementById('bf-chart-pie').getContext('2d'), { type:'doughnut', data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0], backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}}, cutout:'55%', layout:{padding:{top:14}} } });
+    // Click sulla mappa (non su uno stab.) → deseleziona
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+        Detail.hide('bf');
+      }
+    });
+    // Pulsante chiudi pannello dettaglio
+    document.getElementById('bf-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('bf');
+    });
+    // ---------- charts ----------
+    this.charts.bar = new Chart(document.getElementById('bf-chart-bar').getContext('2d'), {
+      type:'bar', data:{labels:['App','Prod','Distr','Totale'], datasets:[
+        {label:'Scenario', data:[0,0,0,0], backgroundColor:'#3aa0ff'},
+        {label:'Baseline', data:[0,0,0,0], backgroundColor:'#8b949e'}
+      ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('bf-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}
+      }
+    });
     const lt = window.appData.prodTable;
-    this.charts.line = new Chart(document.getElementById('bf-chart-line').getContext('2d'), { type:'line', data:{labels:lt.map(r=>(r[0]/1000)+'k'), datasets:[{label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff', backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},{label:'Stab. attivi', data:[], borderColor:'#f85149', backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}}, y:{ticks:{callback:v=>v+' €'}}}, layout:{padding:{top:14}} } });
+    this.charts.line = new Chart(document.getElementById('bf-chart-line').getContext('2d'), {
+      type:'line',
+      data:{labels:lt.map(r=>(r[0]/1000)+'k'),
+        datasets:[
+          {label:'Tabella €/ton', data:lt.map(r=>r[1]), borderColor:'#79c0ff',
+           backgroundColor:'rgba(121,192,255,0.15)', fill:true, pointRadius:0, tension:0.25},
+          {label:'Stab. attivi', data:[], borderColor:'#f85149',
+           backgroundColor:'#f85149', showLine:false, pointRadius:5, pointHoverRadius:7}
+        ]},
+      options:{
+        maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8,font:{size:8}}},
+                y:{ticks:{callback:v=>v+' €'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    // ---------- listeners ----------
     const sD = document.getElementById('bf-sld-d');
-    sD.addEventListener('input', ()=>{ document.getElementById('bf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1); this.state.factor = parseFloat(sD.value); this.drawProvinces(); this.render(); });
-    document.getElementById('bf-btn-add').addEventListener('click', ()=>{ if (this.state.plants.length >= 9){ flashStatus('Limite massimo (9 stab.) raggiunto.', 4000); return; } flashStatus('Ricerca greedy della provincia ottimale…', 8000); setTimeout(()=>{ const active = this.state.plants.filter(p=>p.active); const best = Engine.greedyBestProvince(active, this.state.factor); if (!best){ flashStatus('Impossibile trovare una posizione iniziale.', 4000); return; } const id = this.state.nextId++; const idx = this.state.plants.filter(p=>!p.fixed).length + 1; this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`, lat:best.lat, lon:best.lon, fixed:false, active:true}); this.drawPlants(); this.render(); flashStatus(`Aggiunto stabilimento "Nuovo ${idx}" a ${best.name}.`, 5000); }, 30); });
-    document.getElementById('bf-btn-reset').addEventListener('click', ()=>{ this.state.plants = this.buildVeronesiPlants(); this.state.nextId = this.state.plants.length; this.state.sel = -1; sD.value = 1.0; document.getElementById('bf-sld-d-val').textContent = '1.0'; this.state.factor = 1.0; this.drawPlants(); this.render(); flashStatus('7 Veronesi ripristinati (baseline AS‑IS).'); });
-    document.getElementById('bf-tgl-unit').addEventListener('change', e=>{ this.state.unit = e.target.checked; this.render(); });
-    document.querySelectorAll('#bf-scenario button').forEach(btn => { btn.addEventListener('click', ()=>{ const sc = btn.dataset.scenario; window.appData.capacityScenario = sc; document.querySelectorAll('#bf-scenario button').forEach(b => b.classList.toggle('active', b.dataset.scenario === sc)); document.querySelectorAll('#bfc-scenario button').forEach(b => b.classList.toggle('active', b.dataset.scenario === sc)); flashStatus(`Scenario capacità: ${sc === 'manual' ? 'manuale' : (sc === 'plus10' ? '+10%' : '7gg/7')} (informativo in BF classico).`); this.render(); }); });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('bf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('bf-btn-add').addEventListener('click', ()=>{
+      if (this.state.plants.length >= 9){
+        flashStatus('Limite massimo (9 stab.) raggiunto.', 4000); return;
+      }
+      flashStatus('Ricerca greedy della provincia ottimale…', 8000);
+      setTimeout(()=>{
+        const active = this.state.plants.filter(p=>p.active);
+        const best = Engine.greedyBestProvince(active, this.state.factor);
+        if (!best){ flashStatus('Impossibile trovare una posizione iniziale.', 4000); return; }
+        const id = this.state.nextId++;
+        const idx = this.state.plants.filter(p=>!p.fixed).length + 1;
+        this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`, lat:best.lat, lon:best.lon, fixed:false, active:true});
+        this.drawPlants(); this.render();
+        flashStatus(`Aggiunto stabilimento "Nuovo ${idx}" a ${best.name}.`, 5000);
+      }, 30);
+    });
+    document.getElementById('bf-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = this.buildVeronesiPlants();
+      this.state.nextId = this.state.plants.length;
+      this.state.sel = -1;
+      sD.value = 1.0; document.getElementById('bf-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawPlants(); this.render();
+      flashStatus('7 Veronesi ripristinati (baseline AS‑IS).');
+    });
+    document.getElementById('bf-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+    });
+    // Scenario capacità Veronesi (informativo nel BF classico)
+    document.querySelectorAll('#bf-scenario button').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const sc = btn.dataset.scenario;
+        window.appData.capacityScenario = sc;
+        document.querySelectorAll('#bf-scenario button').forEach(b =>
+          b.classList.toggle('active', b.dataset.scenario === sc));
+        document.querySelectorAll('#bfc-scenario button').forEach(b =>
+          b.classList.toggle('active', b.dataset.scenario === sc));
+        updateScenarioLegend();
+        flashStatus(`Scenario capacità: ${sc === 'manual' ? 'manuale' : (sc === 'plus10' ? '+10%' : '7gg/7')} (informativo in BF classico).`);
+        this.render();   // refresh detail panel se aperto
+      });
+    });
+    // Inefficienza routing
     const sIout = document.getElementById('bf-sld-iout');
     const sIin  = document.getElementById('bf-sld-iin');
-    sIout.addEventListener('input', ()=>{ const v = parseFloat(sIout.value); document.getElementById('bf-sld-iout-val').textContent = v.toFixed(1); window.appData.routingIneffOut = v; this.render(); });
-    sIin.addEventListener('input', ()=>{ const v = parseFloat(sIin.value); document.getElementById('bf-sld-iin-val').textContent = v.toFixed(1); window.appData.routingIneffIn = v; this.render(); });
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('bf-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v;
+      this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('bf-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v;
+      this.render();
+    });
   },
-  syncIneffSliders(){ const sIout = document.getElementById('bf-sld-iout'); const sIin = document.getElementById('bf-sld-iin'); sIout.value = window.appData.routingIneffOut; sIin.value = window.appData.routingIneffIn; document.getElementById('bf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1); document.getElementById('bf-sld-iin-val').textContent = window.appData.routingIneffIn.toFixed(1); },
-  drawProvinces(){ this.layers.provinces.clearLayers(); this.markers.circles = []; window.appData.provinces.forEach(p => { const dEff = p.demand * this.state.factor; const c = L.circleMarker([p.lat,p.lon], { radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30), color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55 }); c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`); c.addTo(this.layers.provinces); this.markers.circles.push(c); }); },
-  drawPorts(){ this.layers.ports.clearLayers(); window.appData.ports.forEach(p => { const icon = L.divIcon({className:'', html:`<div class="port-icon" title="${p.name}">⚓</div>`, iconSize:[22,22], iconAnchor:[11,11]}); L.marker([p.lat,p.lon], {icon, zIndexOffset:500}).bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports); }); },
-  drawPlants(){ this.layers.plants.clearLayers(); this.markers.plants = []; this.state.plants.forEach((p, idx) => { const isSel = (idx === this.state.sel); let cls = p.active ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new') : 'plant-icon disabled'; if (isSel) cls += ' selected'; const lbl = p.fixed ? '🔒' : '🏭'; const icon = L.divIcon({className:'', html:`<div class="${cls}" title="${p.name}">${lbl}</div>`, iconSize:[28,28], iconAnchor:[14,14]}); const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000}); if (!p.fixed){ m.on('dragend', e => { const ll = e.target.getLatLng(); const snap = Engine.snapToLand(ll.lat, ll.lng); this.state.plants[idx].lat = snap.lat; this.state.plants[idx].lon = snap.lon; if (snap.snapped){ e.target.setLatLng([snap.lat, snap.lon]); flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`); } this.render(); }); } m.on('click', (ev)=>{ L.DomEvent.stopPropagation(ev); if (!p.active){ flashStatus(`${p.name} è disattivato — riattivalo per visualizzarne le aree servite.`, 4000); return; } this.state.sel = (this.state.sel === idx) ? -1 : idx; this.drawPlants(); this.drawLinks(); if (this.state.sel >= 0 && this.lastResult){ const active = this.state.plants.filter(x => x.active); const activeIdx = active.indexOf(p); Detail.show('bf', this.lastResult, p, activeIdx); } else { Detail.hide('bf'); } }); m.bindTooltip(p.name + (p.active?'':' (disattivato)'), {direction:'top', offset:[0,-14]}); m.addTo(this.layers.plants); this.markers.plants.push(m); }); this.renderPlantList(); },
-  drawLinks(){ this.layers.links.clearLayers(); if (this.state.sel < 0 || !this.lastResult){ this.resetProvinceStyles(); return; } const sel = this.state.plants[this.state.sel]; if (!sel || !sel.active){ this.resetProvinceStyles(); return; } const active = this.state.plants.filter(x => x.active); const activeIdx = active.indexOf(sel); if (activeIdx < 0){ this.resetProvinceStyles(); return; } window.appData.provinces.forEach((p, i) => { if (this.lastResult.provAssign[i] === activeIdx){ L.polyline([[p.lat,p.lon],[sel.lat,sel.lon]], {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links); if (this.markers.circles[i]) this.markers.circles[i].setStyle({ color:'#79c0ff', weight:2, fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85 }); } else if (this.markers.circles[i]){ this.markers.circles[i].setStyle({ color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25 }); } }); const port = window.appData.ports[this.lastResult.portAssign[activeIdx]]; if (port){ L.polyline([[sel.lat,sel.lon],[port.lat,port.lon]], {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links); } },
-  resetProvinceStyles(){ this.markers.circles.forEach(c => c.setStyle({ color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55 })); },
-  renderPlantList(){ const list = document.getElementById('bf-plant-list'); list.innerHTML = ''; this.state.plants.forEach((p, idx) => { const row = document.createElement('div'); row.className = 'plant-row'; row.innerHTML = `${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'} <span class="name">${p.name}</span> <span class="badge-state ${p.active?'on':'off'}">${p.active?'ATTIVO':'OFF'}</span>`; const btnTog = document.createElement('button'); btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm'; btnTog.textContent = p.active ? 'Disattiva' : 'Attiva'; btnTog.onclick = ()=>{ p.active = !p.active; if (!p.active && idx === this.state.sel) this.state.sel = -1; this.drawPlants(); this.render(); }; row.appendChild(btnTog); if (!p.fixed){ const btnRm = document.createElement('button'); btnRm.className = 'btn btn-warning btn-sm'; btnRm.textContent = '✕'; btnRm.title = 'Rimuovi nuovo stab.'; btnRm.onclick = ()=>{ this.state.plants = this.state.plants.filter(x=>x!==p); this.state.sel = -1; this.drawPlants(); this.render(); }; row.appendChild(btnRm); } list.appendChild(row); }); },
-  render(){ const active = this.state.plants.filter(p=>p.active); const r = Engine.compute(active, this.state.factor); const allVero = this.state.plants.filter(p=>p.fixed).map(p=>({...p})); const b = Engine.compute(allVero, this.state.factor); this.lastResult = r; this.baseline = b; const setKpi = (id, val, base, isUnit=false) => { const el = document.getElementById(id); const elD = document.getElementById(id+'-delta'); let txt; if (isUnit){ txt = fmt(val,2) + ' €/ton'; } else { if (this.state.unit) txt = fmt(val,2) + ' €/ton'; else txt = fmt(val/1e6,2) + ' M€'; } el.textContent = txt; if (base !== undefined && elD){ const delta = val - base; const pct = base !== 0 ? (delta/base*100) : 0; const dir = delta > 0 ? 'up' : (delta < 0 ? 'down' : ''); const sign = delta >= 0 ? '+' : ''; const dtxt = isUnit ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)` : (this.state.unit ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)` : `${sign}${fmt(delta/1e6,2)} M€ (${sign}${pct.toFixed(1)}%)`); elD.textContent = dtxt; elD.className = 'delta ' + dir; } }; const V = r.totalVol > 0 ? r.totalVol : 1; const VB = b.totalVol > 0 ? b.totalVol : 1; if (this.state.unit){ setKpi('bf-kpi-total', r.totalCost/V, b.totalCost/VB, true); setKpi('bf-kpi-app',   r.totalApp/V,  b.totalApp/VB); setKpi('bf-kpi-prod',  r.totalProd/V, b.totalProd/VB); setKpi('bf-kpi-distr', r.totalDistr/V, b.totalDistr/VB); } else { setKpi('bf-kpi-total', r.totalCost,  b.totalCost); setKpi('bf-kpi-app',   r.totalApp,   b.totalApp); setKpi('bf-kpi-prod',  r.totalProd,  b.totalProd); setKpi('bf-kpi-distr', r.totalDistr, b.totalDistr); } document.getElementById('bf-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton'; const elDu = document.getElementById('bf-kpi-unit-delta'); const dU = r.unitTotal - b.unitTotal; const sign = dU >= 0 ? '+' : ''; elDu.textContent = `${sign}${fmt(dU,2)} €/ton`; elDu.className = 'delta ' + (dU>0?'up':(dU<0?'down':'')); if (this.state.unit){ this.charts.bar.data.datasets[0].data = [r.totalApp/V, r.totalProd/V, r.totalDistr/V, r.totalCost/V]; this.charts.bar.data.datasets[1].data = [b.totalApp/VB,b.totalProd/VB,b.totalDistr/VB,b.totalCost/VB]; this.charts.bar.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t'; this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}}; } else { this.charts.bar.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr, r.totalCost]; this.charts.bar.data.datasets[1].data = [b.totalApp, b.totalProd, b.totalDistr, b.totalCost]; this.charts.bar.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M'; this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}}; } this.charts.bar.update('none'); this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr]; this.charts.pie.update('none'); const trattaApp = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`; const trattaDist = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`; const baseDeltaIn = Math.abs(r.avgKmInEff - b.avgKmInEff) > 0.5; const baseDeltaOut = Math.abs(r.avgKmOutEff - b.avgKmOutEff) > 0.5; document.getElementById('bf-kpi-app-meta').textContent = trattaApp + (baseDeltaIn ? ` (base ${b.avgKmInEff.toFixed(0)})` : ''); document.getElementById('bf-kpi-distr-meta').textContent = trattaDist + (baseDeltaOut ? ` (base ${b.avgKmOutEff.toFixed(0)})` : ''); const lt = window.appData.prodTable; const pts = active.map((p,i)=>{ const v = Math.floor(r.tonPerPlant[i]/10000)*10000; let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; }); return {x:bi, y:r.prodUnitPerPlant[i]}; }); this.charts.line.data.datasets[1].data = pts; this.charts.line.update('none'); if (this.state.sel >= 0){ this.drawLinks(); const sel = this.state.plants[this.state.sel]; if (sel && sel.active){ const activeIdx = active.indexOf(sel); Detail.show('bf', r, sel, activeIdx); } else { Detail.hide('bf'); } } else { this.layers.links.clearLayers(); this.resetProvinceStyles(); Detail.hide('bf'); } },
-  onDataChange(){ if (this.initialized){ const lt = window.appData.prodTable; this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k'); this.charts.line.data.datasets[0].data = lt.map(r=>r[1]); this.drawProvinces(); this.drawPorts(); this.render(); } }
+  syncIneffSliders(){
+    const sIout = document.getElementById('bf-sld-iout');
+    const sIin  = document.getElementById('bf-sld-iin');
+    sIout.value = window.appData.routingIneffOut;
+    sIin.value  = window.appData.routingIneffIn;
+    document.getElementById('bf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('bf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda effettiva: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const isSel = (idx === this.state.sel);
+      let cls = p.active
+        ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
+        : 'plant-icon disabled';
+      if (isSel) cls += ' selected';
+      const lbl = p.fixed ? '🔒' : '🏭';
+      const icon = L.divIcon({className:'',
+        html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000});
+      if (!p.fixed){
+        m.on('dragend', e => {
+          const ll = e.target.getLatLng();
+          const snap = Engine.snapToLand(ll.lat, ll.lng);
+          this.state.plants[idx].lat = snap.lat;
+          this.state.plants[idx].lon = snap.lon;
+          if (snap.snapped){
+            e.target.setLatLng([snap.lat, snap.lon]);
+            flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+          }
+          this.render();
+        });
+      }
+      // Click su uno stab. → seleziona/deseleziona (anche su Veronesi fissi)
+      m.on('click', (ev)=>{
+        L.DomEvent.stopPropagation(ev);
+        if (!p.active){
+          flashStatus(`${p.name} è disattivato — riattivalo per visualizzarne le aree servite.`, 4000);
+          return;
+        }
+        this.state.sel = (this.state.sel === idx) ? -1 : idx;
+        this.drawPlants();
+        this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          // lastResult è calcolato sugli stab. attivi → traduco l'indice
+          const active = this.state.plants.filter(x => x.active);
+          const activeIdx = active.indexOf(p);
+          Detail.show('bf', this.lastResult, p, activeIdx);
+        } else {
+          Detail.hide('bf');
+        }
+      });
+      m.bindTooltip(p.name + (p.active?'':' (disattivato)'), {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+    this.renderPlantList();
+  },
+  // Disegna linee di assegnazione e linea verso porto per lo stab. selezionato
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult){
+      this.resetProvinceStyles();
+      return;
+    }
+    const sel = this.state.plants[this.state.sel];
+    if (!sel || !sel.active){
+      this.resetProvinceStyles();
+      return;
+    }
+    // lastResult è calcolato sugli stab. attivi, quindi traduco l'indice
+    const active = this.state.plants.filter(x => x.active);
+    const activeIdx = active.indexOf(sel);
+    if (activeIdx < 0){ this.resetProvinceStyles(); return; }
+    // Province servite → linea blu tratteggiata + highlight cerchio
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === activeIdx){
+        L.polyline([[p.lat,p.lon],[sel.lat,sel.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({
+          color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85
+        });
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({
+          color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25
+        });
+      }
+    });
+    // Linea stab → porto di approvvigionamento (arancione)
+    const port = window.appData.ports[this.lastResult.portAssign[activeIdx]];
+    if (port){
+      L.polyline([[sel.lat,sel.lon],[port.lat,port.lon]],
+        {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+    }
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({
+      color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+    }));
+  },
+  renderPlantList(){
+    const list = document.getElementById('bf-plant-list');
+    list.innerHTML = '';
+    this.state.plants.forEach((p, idx) => {
+      const row = document.createElement('div');
+      row.className = 'plant-row';
+      row.innerHTML = `
+        ${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'}
+        <span class="name">${p.name}</span>
+        <span class="badge-state ${p.active?'on':'off'}">${p.active?'ATTIVO':'OFF'}</span>
+      `;
+      const btnTog = document.createElement('button');
+      btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm';
+      btnTog.textContent = p.active ? 'Disattiva' : 'Attiva';
+      btnTog.onclick = ()=>{
+        p.active = !p.active;
+        // Se disattivo lo stab. selezionato, deseleziono
+        if (!p.active && idx === this.state.sel) this.state.sel = -1;
+        this.drawPlants(); this.render();
+      };
+      row.appendChild(btnTog);
+      if (!p.fixed){
+        const btnRm = document.createElement('button');
+        btnRm.className = 'btn btn-warning btn-sm';
+        btnRm.textContent = '✕';
+        btnRm.title = 'Rimuovi nuovo stab.';
+        btnRm.onclick = ()=>{
+          this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.state.sel = -1;     // reset highlight per evitare indici sfasati
+          this.drawPlants(); this.render();
+        };
+        row.appendChild(btnRm);
+      }
+      list.appendChild(row);
+    });
+  },
+  render(){
+    const active = this.state.plants.filter(p=>p.active);
+    const r = Engine.compute(active, this.state.factor);
+    // baseline: 7 Veronesi tutti attivi al fattore corrente
+    const allVero = this.state.plants.filter(p=>p.fixed).map(p=>({...p}));
+    const b = Engine.compute(allVero, this.state.factor);
+    this.lastResult = r; this.baseline = b;
+    // KPIs con delta
+    const setKpi = (id, val, base, isUnit=false) => {
+      const el = document.getElementById(id);
+      const elD = document.getElementById(id+'-delta');
+      let txt;
+      if (isUnit){
+        txt = fmt(val,2) + ' €/ton';
+      } else {
+        if (this.state.unit) txt = fmt(val,2) + ' €/ton';
+        else txt = fmt(val/1e6,2) + ' M€';
+      }
+      el.textContent = txt;
+      if (base !== undefined && elD){
+        const delta = val - base;
+        const pct = base !== 0 ? (delta/base*100) : 0;
+        const dir = delta > 0 ? 'up' : (delta < 0 ? 'down' : '');
+        const sign = delta >= 0 ? '+' : '';
+        const dtxt = isUnit
+          ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+          : (this.state.unit
+              ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+              : `${sign}${fmt(delta/1e6,2)} M€ (${sign}${pct.toFixed(1)}%)`);
+        elD.textContent = dtxt;
+        elD.className = 'delta ' + dir;
+      }
+    };
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    const VB = b.totalVol > 0 ? b.totalVol : 1;
+    if (this.state.unit){
+      setKpi('bf-kpi-total', r.totalCost/V,    b.totalCost/VB, true);
+      setKpi('bf-kpi-app',   r.totalApp/V,     b.totalApp/VB);
+      setKpi('bf-kpi-prod',  r.totalProd/V,    b.totalProd/VB);
+      setKpi('bf-kpi-distr', r.totalDistr/V,   b.totalDistr/VB);
+    } else {
+      setKpi('bf-kpi-total', r.totalCost,  b.totalCost);
+      setKpi('bf-kpi-app',   r.totalApp,   b.totalApp);
+      setKpi('bf-kpi-prod',  r.totalProd,  b.totalProd);
+      setKpi('bf-kpi-distr', r.totalDistr, b.totalDistr);
+    }
+    // €/ton totale (sempre €/ton)
+    document.getElementById('bf-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton';
+    const elDu = document.getElementById('bf-kpi-unit-delta');
+    const dU = r.unitTotal - b.unitTotal;
+    const sign = dU >= 0 ? '+' : '';
+    elDu.textContent = `${sign}${fmt(dU,2)} €/ton`;
+    elDu.className = 'delta ' + (dU>0?'up':(dU<0?'down':''));
+    // Bar chart: scenario vs baseline
+    if (this.state.unit){
+      this.charts.bar.data.datasets[0].data = [r.totalApp/V, r.totalProd/V, r.totalDistr/V, r.totalCost/V];
+      this.charts.bar.data.datasets[1].data = [b.totalApp/VB,b.totalProd/VB,b.totalDistr/VB,b.totalCost/VB];
+      this.charts.bar.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+      this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)} €/ton`}};
+    } else {
+      this.charts.bar.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr, r.totalCost];
+      this.charts.bar.data.datasets[1].data = [b.totalApp, b.totalProd, b.totalDistr, b.totalCost];
+      this.charts.bar.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+      this.charts.bar.options.plugins.tooltip = {callbacks:{label:c=>`${c.dataset.label}: ${(c.parsed.y/1e6).toFixed(2)} M€`}};
+    }
+    this.charts.bar.update('none');
+    // Pie (scenario)
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // Tratta media nei KPI (scenario; baseline in parentesi solo se differisce)
+    const trattaApp  = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    const trattaDist = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    const baseDeltaIn  = Math.abs(r.avgKmInEff  - b.avgKmInEff)  > 0.5;
+    const baseDeltaOut = Math.abs(r.avgKmOutEff - b.avgKmOutEff) > 0.5;
+    document.getElementById('bf-kpi-app-meta').textContent =
+      trattaApp + (baseDeltaIn ? ` (base ${b.avgKmInEff.toFixed(0)})` : '');
+    document.getElementById('bf-kpi-distr-meta').textContent =
+      trattaDist + (baseDeltaOut ? ` (base ${b.avgKmOutEff.toFixed(0)})` : '');
+    // Line chart points (scenario)
+    const lt = window.appData.prodTable;
+    const pts = active.map((p,i)=>{
+      const v = Math.floor(r.tonPerPlant[i]/10000)*10000;
+      let bi = 0; lt.forEach(([t],k)=>{ if (v >= t) bi = k; });
+      return {x:bi, y:r.prodUnitPerPlant[i]};
+    });
+    this.charts.line.data.datasets[1].data = pts;
+    this.charts.line.update('none');
+    // Aggiorna linee di highlight + pannello dettaglio per lo stab. selezionato
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      const sel = this.state.plants[this.state.sel];
+      // Brownfield: lastResult è calcolato sugli stab. ATTIVI → traduco l'indice
+      if (sel && sel.active){
+        const activeIdx = active.indexOf(sel);
+        Detail.show('bf', r, sel, activeIdx);
+      } else {
+        Detail.hide('bf');
+      }
+    } else {
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('bf');
+    }
+  },
+  onDataChange(){
+    if (this.initialized){
+      const lt = window.appData.prodTable;
+      this.charts.line.data.labels = lt.map(r=>(r[0]/1000)+'k');
+      this.charts.line.data.datasets[0].data = lt.map(r=>r[1]);
+      this.drawProvinces(); this.drawPorts(); this.render();
+    }
+  }
 };
 
+/* ====================================================================
+   GREENFIELD CONVEX — ottimizzazione del costo totale, capacità infinita
+   o finita uniforme. Usa Engine.optimizeConvex.
+   ==================================================================== */
 const GreenfieldConvex = {
   initialized:false,
-  state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false, capFinite:false, capKt:200},
+  state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false,
+         capFinite:false, capKt:200},
   map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
   lastResult:null,
-  onShow(){ if (!this.initialized){ this.init(); this.initialized = true; } setTimeout(()=>{ this.map.invalidateSize(); }, 50); this.syncIneffSliders(); this.render(); },
+
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.render();
+  },
+
   init(){
+    // Mappa
     this.map = L.map('map-gfc', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19 }).addTo(this.map);
-    this.layers = { provinces: L.layerGroup().addTo(this.map), ports: L.layerGroup().addTo(this.map), plants: L.layerGroup().addTo(this.map) };
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map)
+    };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
-    this.charts.stack = new Chart(document.getElementById('gfc-chart-stack').getContext('2d'), { type:'bar', data:{labels:[], datasets:[{label:'App.',data:[],backgroundColor:'#ff9900'},{label:'Prod.',data:[],backgroundColor:'#3fb950'},{label:'Distr.',data:[],backgroundColor:'#3aa0ff'}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9}}}}, scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
-    this.charts.pie = new Chart(document.getElementById('gfc-chart-pie').getContext('2d'), { type:'doughnut', data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0], backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}}, cutout:'55%', layout:{padding:{top:14}} } });
-    this.charts.conv = new Chart(document.getElementById('gfc-chart-conv').getContext('2d'), { type:'line', data:{labels:[], datasets:[{ label:'Costo (M€)', data:[], borderColor:'#79c0ff', backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3 }]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}, title:{display:true, text:'Iterazione'}}, y:{ticks:{callback:v=>v.toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
+
+    // Charts
+    this.charts.stack = new Chart(document.getElementById('gfc-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}
+      }
+    });
+    this.charts.pie = new Chart(document.getElementById('gfc-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}}
+    });
+    this.charts.conv = new Chart(document.getElementById('gfc-chart-conv').getContext('2d'), {
+      type:'line', data:{labels:[], datasets:[{
+        label:'Costo (M€)', data:[], borderColor:'#79c0ff',
+        backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      }]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, title:{display:true, text:'Iterazione'}},
+                y:{ticks:{callback:v=>v.toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+
+    // Listeners
     const sN = document.getElementById('gfc-sld-n');
     const sD = document.getElementById('gfc-sld-d');
-    sN.addEventListener('input', ()=>{ document.getElementById('gfc-sld-n-val').textContent = sN.value; const N = parseInt(sN.value); if (N > this.state.plants.length){ while (this.state.plants.length < N){ const k = this.state.plants.length; this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4}); } } else if (N < this.state.plants.length){ this.state.plants = this.state.plants.slice(0, N); } this.drawPlants(); this.render(); });
-    sD.addEventListener('input', ()=>{ document.getElementById('gfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1); this.state.factor = parseFloat(sD.value); this.drawProvinces(); this.render(); });
-    document.getElementById('gfc-btn-kmeans').addEventListener('click', ()=>{ const K = this.state.plants.length; const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor); this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon})); this.drawPlants(); this.render(); flashStatus(`Inizializzato con K‑Means++: ${K} centroidi pesati sulla domanda.`); });
-    document.getElementById('gfc-btn-reset').addEventListener('click', ()=>{ this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p})); sN.value = 3; document.getElementById('gfc-sld-n-val').textContent = '3'; sD.value = 1.0; document.getElementById('gfc-sld-d-val').textContent = '1.0'; this.state.factor = 1.0; this.drawProvinces(); this.drawPlants(); this.render(); });
-    document.getElementById('gfc-tgl-unit').addEventListener('change', e=>{ this.state.unit = e.target.checked; this.render(); });
-    document.getElementById('gfc-tgl-cap').addEventListener('change', e=>{ this.state.capFinite = e.target.checked; const row = document.getElementById('gfc-cap-row'); if (this.state.capFinite){ row.style.opacity = ''; row.style.pointerEvents = ''; } else { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; } this.render(); });
-    document.getElementById('gfc-sld-cap').addEventListener('input', e=>{ this.state.capKt = parseInt(e.target.value); document.getElementById('gfc-sld-cap-val').textContent = this.state.capKt + 'kt'; if (this.state.capFinite) this.render(); });
-    document.getElementById('gfc-btn-optimize').addEventListener('click', ()=>{ this.runOptimization(); });
+    sN.addEventListener('input', ()=>{
+      document.getElementById('gfc-sld-n-val').textContent = sN.value;
+      const N = parseInt(sN.value);
+      if (N > this.state.plants.length){
+        while (this.state.plants.length < N){
+          const k = this.state.plants.length;
+          this.state.plants.push({name:`Stab ${k+1}`, lat:42.5+(Math.random()-0.5)*4, lon:12.5+(Math.random()-0.5)*4});
+        }
+      } else if (N < this.state.plants.length){
+        this.state.plants = this.state.plants.slice(0, N);
+      }
+      this.drawPlants(); this.render();
+    });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('gfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('gfc-btn-kmeans').addEventListener('click', ()=>{
+      const K = this.state.plants.length;
+      const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+      this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+      this.drawPlants(); this.render();
+      flashStatus(`Inizializzato con K‑Means++: ${K} centroidi pesati sulla domanda.`);
+    });
+    document.getElementById('gfc-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = DEFAULT_PLANTS_GF.map(p=>({...p}));
+      sN.value = 3; document.getElementById('gfc-sld-n-val').textContent = '3';
+      sD.value = 1.0; document.getElementById('gfc-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawProvinces(); this.drawPlants(); this.render();
+    });
+    document.getElementById('gfc-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked;
+      this.render();
+    });
+    // Capacità
+    document.getElementById('gfc-tgl-cap').addEventListener('change', e=>{
+      this.state.capFinite = e.target.checked;
+      const row = document.getElementById('gfc-cap-row');
+      if (this.state.capFinite){ row.style.opacity = ''; row.style.pointerEvents = ''; }
+      else { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; }
+      this.render();
+    });
+    document.getElementById('gfc-sld-cap').addEventListener('input', e=>{
+      this.state.capKt = parseInt(e.target.value);
+      document.getElementById('gfc-sld-cap-val').textContent = this.state.capKt + 'kt';
+      if (this.state.capFinite) this.render();
+    });
+    // OPTIMIZE
+    document.getElementById('gfc-btn-optimize').addEventListener('click', ()=>{
+      this.runOptimization();
+    });
+    // Inefficienza
     const sIout = document.getElementById('gfc-sld-iout');
     const sIin  = document.getElementById('gfc-sld-iin');
-    sIout.addEventListener('input', ()=>{ const v = parseFloat(sIout.value); document.getElementById('gfc-sld-iout-val').textContent = v.toFixed(1); window.appData.routingIneffOut = v; this.render(); });
-    sIin.addEventListener('input', ()=>{ const v = parseFloat(sIin.value); document.getElementById('gfc-sld-iin-val').textContent = v.toFixed(1); window.appData.routingIneffIn = v; this.render(); });
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('gfc-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v; this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('gfc-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v; this.render();
+    });
   },
-  syncIneffSliders(){ document.getElementById('gfc-sld-iout').value = window.appData.routingIneffOut; document.getElementById('gfc-sld-iin').value = window.appData.routingIneffIn; document.getElementById('gfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1); document.getElementById('gfc-sld-iin-val').textContent = window.appData.routingIneffIn.toFixed(1); },
-  drawProvinces(){ this.layers.provinces.clearLayers(); this.markers.circles = []; window.appData.provinces.forEach(p => { const dEff = p.demand * this.state.factor; const c = L.circleMarker([p.lat,p.lon], { radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30), color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55 }); c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`); c.addTo(this.layers.provinces); this.markers.circles.push(c); }); },
-  drawPorts(){ this.layers.ports.clearLayers(); window.appData.ports.forEach(p => { const icon = L.divIcon({className:'', html:`<div class="port-icon" title="${p.name}">⚓</div>`, iconSize:[22,22], iconAnchor:[11,11]}); L.marker([p.lat,p.lon], {icon, zIndexOffset:500}).bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports); }); },
-  drawPlants(){ this.layers.plants.clearLayers(); this.markers.plants = []; this.state.plants.forEach((p, idx) => { const icon = L.divIcon({className:'', html:`<div class="plant-icon" title="${p.name}">🏭</div>`, iconSize:[28,28], iconAnchor:[14,14]}); const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000}); m.on('dragend', e => { const ll = e.target.getLatLng(); const snap = Engine.snapToLand(ll.lat, ll.lng); this.state.plants[idx].lat = snap.lat; this.state.plants[idx].lon = snap.lon; if (snap.snapped){ e.target.setLatLng([snap.lat, snap.lon]); flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`); } this.render(); }); m.bindTooltip(p.name, {direction:'top', offset:[0,-14]}); m.addTo(this.layers.plants); this.markers.plants.push(m); }); },
-  buildCapacities(){ if (!this.state.capFinite) return null; const cap = this.state.capKt * 1000; return this.state.plants.map(()=>cap); },
-  runOptimization(){ const btn = document.getElementById('gfc-btn-optimize'); const prog = document.getElementById('gfc-progress'); btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…'; prog.classList.add('show'); prog.textContent = 'Avvio ottimizzazione…'; setTimeout(()=>{ const K = this.state.plants.length; const seeds = Engine.kmeansPlusPlusWeighted(K, this.state.factor); const initPlants = seeds.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon})); const caps = this.buildCapacities(); const t0 = performance.now(); const out = Engine.optimizeConvex(initPlants, this.state.factor, caps, { maxIter: 30, tolerance: 0.0001, onProgress: (it, cost)=>{ prog.textContent = `Iter ${it+1} · costo ${(cost/1e6).toFixed(2)} M€`; } }); const dt = performance.now() - t0; this.state.plants = out.plants.map((p,i)=>({name:`Stab ${i+1}`, lat:p.lat, lon:p.lon})); this.drawPlants(); this.render(); this.charts.conv.data.labels = out.history.map((_,i)=>i); this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6); this.charts.conv.update('none'); const initCost = out.history[0], finCost = out.history[out.history.length-1]; const reduction = (initCost - finCost) / initCost * 100; prog.textContent = `Convergenza in ${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`; btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale'; flashStatus(`Ottimizzazione completata: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000); }, 30); },
-  render(){ const caps = this.buildCapacities(); let r; if (caps){ const a = Engine.marginalAllocate(this.state.plants, this.state.factor, caps); r = Engine.computeWithAssignment(this.state.plants, this.state.factor, a); } else { r = Engine.compute(this.state.plants, this.state.factor); r.unservedDemand = 0; } this.lastResult = r; document.getElementById('gfc-kpi-total').textContent = fmt(r.totalCost) + ' €'; document.getElementById('gfc-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton medio'; const V = r.totalVol > 0 ? r.totalVol : 1; if (this.state.unit){ document.getElementById('gfc-kpi-app').textContent = fmt(r.totalApp/V,2) + ' €/ton'; document.getElementById('gfc-kpi-prod').textContent = fmt(r.totalProd/V,2) + ' €/ton'; document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton'; } else { document.getElementById('gfc-kpi-app').textContent = fmt(r.totalApp/1e6,2) + ' M€'; document.getElementById('gfc-kpi-prod').textContent = fmt(r.totalProd/1e6,2) + ' M€'; document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€'; } document.getElementById('gfc-kpi-vol').textContent = fmt(r.totalVol); const card = document.getElementById('gfc-kpi-unserved-card'); if (r.unservedDemand > 0.5){ card.style.display = ''; card.classList.add('warn'); document.getElementById('gfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton'; } else { card.style.display = 'none'; card.classList.remove('warn'); } document.getElementById('gfc-kpi-app-meta').textContent = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`; document.getElementById('gfc-kpi-distr-meta').textContent = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`; const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`); this.charts.stack.data.labels = labels; const transform = (arr) => arr.map((c,i)=> { const v = r.tonPerPlant[i]; if (!this.state.unit) return c; return v > 0 ? c/v : 0; }); this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant); this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant); this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant); if (this.state.unit){ this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t'; } else { this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M'; } this.charts.stack.update('none'); this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr]; this.charts.pie.update('none'); },
-  onDataChange(){ if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); } }
+
+  syncIneffSliders(){
+    document.getElementById('gfc-sld-iout').value = window.appData.routingIneffOut;
+    document.getElementById('gfc-sld-iin').value  = window.appData.routingIneffIn;
+    document.getElementById('gfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('gfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="plant-icon" title="${p.name}">🏭</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000});
+      m.on('dragend', e => {
+        const ll = e.target.getLatLng();
+        const snap = Engine.snapToLand(ll.lat, ll.lng);
+        this.state.plants[idx].lat = snap.lat;
+        this.state.plants[idx].lon = snap.lon;
+        if (snap.snapped){
+          e.target.setLatLng([snap.lat, snap.lon]);
+          flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+        }
+        this.render();
+      });
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+  },
+
+  buildCapacities(){
+    if (!this.state.capFinite) return null;
+    const cap = this.state.capKt * 1000;
+    return this.state.plants.map(()=>cap);
+  },
+
+  runOptimization(){
+    const btn = document.getElementById('gfc-btn-optimize');
+    const prog = document.getElementById('gfc-progress');
+    btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…';
+    prog.classList.add('show');
+    prog.textContent = 'Avvio ottimizzazione…';
+    setTimeout(()=>{
+      // Init: K-Means++ su domande
+      const K = this.state.plants.length;
+      const seeds = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
+      const initPlants = seeds.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
+      const caps = this.buildCapacities();
+      const t0 = performance.now();
+      const out = Engine.optimizeConvex(initPlants, this.state.factor, caps, {
+        maxIter: 30, tolerance: 0.0001,
+        onProgress: (it, cost)=>{
+          prog.textContent = `Iter ${it+1} · costo ${(cost/1e6).toFixed(2)} M€`;
+        }
+      });
+      const dt = performance.now() - t0;
+      this.state.plants = out.plants.map((p,i)=>({name:`Stab ${i+1}`, lat:p.lat, lon:p.lon}));
+      this.drawPlants();
+      this.render();
+      // Aggiorna chart convergenza
+      this.charts.conv.data.labels = out.history.map((_,i)=>i);
+      this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      this.charts.conv.update('none');
+      const initCost = out.history[0], finCost = out.history[out.history.length-1];
+      const reduction = (initCost - finCost) / initCost * 100;
+      prog.textContent = `Convergenza in ${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`;
+      btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+      flashStatus(`Ottimizzazione completata: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000);
+    }, 30);
+  },
+
+  render(){
+    const caps = this.buildCapacities();
+    let r;
+    if (caps){
+      const a = Engine.marginalAllocate(this.state.plants, this.state.factor, caps);
+      r = Engine.computeWithAssignment(this.state.plants, this.state.factor, a);
+    } else {
+      r = Engine.compute(this.state.plants, this.state.factor);
+      r.unservedDemand = 0;
+    }
+    this.lastResult = r;
+    // KPI
+    document.getElementById('gfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('gfc-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('gfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('gfc-kpi-vol').textContent = fmt(r.totalVol);
+    // Domanda non servita
+    const card = document.getElementById('gfc-kpi-unserved-card');
+    if (r.unservedDemand > 0.5){
+      card.style.display = '';
+      card.classList.add('warn');
+      document.getElementById('gfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton';
+    } else { card.style.display = 'none'; card.classList.remove('warn'); }
+    document.getElementById('gfc-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('gfc-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    // Charts
+    const labels = this.state.plants.map((p,i)=>`Stab ${i+1}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+  },
+  onDataChange(){
+    if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); }
+  }
 };
 
+/* ====================================================================
+   BROWNFIELD CONVEX — stessa logica + capacità per riga (per stab.)
+   Solo i nuovi stab. (non fixed) sono riposizionati dall'ottimizzatore.
+   ==================================================================== */
 const BrownfieldConvex = {
   initialized:false,
   state:{ plants:[], factor:1.0, unit:false, nextId:0 },
   map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
   lastResult:null,
-  defaultCapVeronesi: 500,
-  defaultCapNew: 150,
-  onShow(){ if (!this.initialized){ this.init(); this.initialized = true; } setTimeout(()=>{ this.map.invalidateSize(); }, 50); this.syncIneffSliders(); this.render(); },
-  buildVeronesiPlants(){ return window.appData.veronesi.map((v,i)=>({ id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true, capKt:this.defaultCapVeronesi })); },
+  // Default capacità per stab. (kton); modificabili in tabella
+  defaultCapVeronesi: 500,   // alta = "infinita" salvo riduzione manuale
+  defaultCapNew:      150,
+
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    this.syncIneffSliders();
+    this.syncScenarioButtons();
+    updateScenarioLegend();
+    this.render();
+  },
+
+  buildVeronesiPlants(){
+    const sc = window.appData.capacityScenario;
+    return window.appData.veronesi.map((v,i)=>{
+      let capKt = this.defaultCapVeronesi;
+      if (sc === 'plus10') capKt = Math.round(vCapPlus10(i)/1000);
+      else if (sc === '7days') capKt = Math.round(vCap7days(i)/1000);
+      return {id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true, capKt};
+    });
+  },
+
   init(){
     this.state.plants = this.buildVeronesiPlants();
     this.state.nextId = this.state.plants.length;
+    // Mappa
     this.map = L.map('map-bfc', {center:[42.5, 12.5], zoom:6, preferCanvas:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19 }).addTo(this.map);
-    this.layers = { provinces: L.layerGroup().addTo(this.map), ports: L.layerGroup().addTo(this.map), plants: L.layerGroup().addTo(this.map) };
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'&copy; OSM, &copy; CartoDB', subdomains:'abcd', maxZoom:19
+    }).addTo(this.map);
+    this.layers = {
+      provinces: L.layerGroup().addTo(this.map),
+      ports:     L.layerGroup().addTo(this.map),
+      plants:    L.layerGroup().addTo(this.map)
+    };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
-    this.charts.stack = new Chart(document.getElementById('bfc-chart-stack').getContext('2d'), { type:'bar', data:{labels:[], datasets:[{label:'App.',data:[],backgroundColor:'#ff9900'},{label:'Prod.',data:[],backgroundColor:'#3fb950'},{label:'Distr.',data:[],backgroundColor:'#3aa0ff'}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9}}}}, scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
-    this.charts.pie = new Chart(document.getElementById('bfc-chart-pie').getContext('2d'), { type:'doughnut', data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0], backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}}, cutout:'55%', layout:{padding:{top:14}} } });
-    this.charts.conv = new Chart(document.getElementById('bfc-chart-conv').getContext('2d'), { type:'line', data:{labels:[], datasets:[{ label:'Costo (M€)', data:[], borderColor:'#79c0ff', backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3 }]}, options:{ maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>v.toFixed(1)+'M'}}}, layout:{padding:{top:14}} } });
+    // Charts
+    this.charts.stack = new Chart(document.getElementById('bfc-chart-stack').getContext('2d'), {
+      type:'bar', data:{labels:[], datasets:[
+        {label:'App.',  data:[], backgroundColor:'#ff9900'},
+        {label:'Prod.', data:[], backgroundColor:'#3fb950'},
+        {label:'Distr.',data:[], backgroundColor:'#3aa0ff'}
+      ]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:8,font:{size:9}}}},
+        scales:{x:{stacked:true,grid:{display:false}}, y:{stacked:true, ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+    this.charts.pie = new Chart(document.getElementById('bfc-chart-pie').getContext('2d'), {
+      type:'doughnut',
+      data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
+        backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        cutout:'55%', layout:{padding:{top:14}}}
+    });
+    this.charts.conv = new Chart(document.getElementById('bfc-chart-conv').getContext('2d'), {
+      type:'line', data:{labels:[], datasets:[{
+        label:'Costo (M€)', data:[], borderColor:'#79c0ff',
+        backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      }]},
+      options:{maintainAspectRatio:false, responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}}, y:{ticks:{callback:v=>v.toFixed(1)+'M'}}},
+        layout:{padding:{top:14}}}
+    });
+    // Listeners
     const sD = document.getElementById('bfc-sld-d');
-    sD.addEventListener('input', ()=>{ document.getElementById('bfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1); this.state.factor = parseFloat(sD.value); this.drawProvinces(); this.render(); });
-    document.getElementById('bfc-btn-add').addEventListener('click', ()=>{ if (this.state.plants.length >= 9){ flashStatus('Limite max 9 stab.'); return; } flashStatus('Posizionamento greedy…', 6000); setTimeout(()=>{ const active = this.state.plants.filter(p=>p.active); const best = Engine.greedyBestProvince(active, this.state.factor); if (!best){ flashStatus('Nessuna posizione iniziale valida.'); return; } const id = this.state.nextId++; const idx = this.state.plants.filter(p=>!p.fixed).length + 1; this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`, lat:best.lat, lon:best.lon, fixed:false, active:true, capKt:this.defaultCapNew}); this.drawPlants(); this.render(); flashStatus(`Aggiunto Nuovo ${idx} a ${best.name}.`); }, 30); });
-    document.getElementById('bfc-btn-reset').addEventListener('click', ()=>{ this.state.plants = this.buildVeronesiPlants(); this.state.nextId = this.state.plants.length; sD.value = 1.0; document.getElementById('bfc-sld-d-val').textContent = '1.0'; this.state.factor = 1.0; this.drawPlants(); this.render(); });
-    document.getElementById('bfc-tgl-unit').addEventListener('change', e=>{ this.state.unit = e.target.checked; this.render(); });
-    document.querySelectorAll('#bfc-scenario button').forEach(btn => { btn.addEventListener('click', ()=>{ const sc = btn.dataset.scenario; window.appData.capacityScenario = sc; document.querySelectorAll('#bfc-scenario button').forEach(b => b.classList.toggle('active', b.dataset.scenario === sc)); document.querySelectorAll('#bf-scenario button').forEach(b => b.classList.toggle('active', b.dataset.scenario === sc)); if (sc !== 'manual'){ applyCapScenario(this.state.plants, sc); } this.drawPlants(); this.render(); const lbl = sc === 'manual' ? 'Manuale (valori utente)' : (sc === 'plus10' ? '+10% (max × 1,1)' : '7gg/7 (max × 7/6)'); const uns = (this.lastResult && this.lastResult.unservedDemand > 0.5) ? ` · Domanda non servita: ${fmt(this.lastResult.unservedDemand)} ton` : ''; flashStatus(`Scenario capacità applicato: ${lbl}${uns}`, 6000); }); });
-    document.getElementById('bfc-btn-optimize').addEventListener('click', ()=>{ this.runOptimization(); });
+    sD.addEventListener('input', ()=>{
+      document.getElementById('bfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
+      this.state.factor = parseFloat(sD.value);
+      this.drawProvinces(); this.render();
+    });
+    document.getElementById('bfc-btn-add').addEventListener('click', ()=>{
+      if (this.state.plants.length >= 9){ flashStatus('Limite max 9 stab.'); return; }
+      flashStatus('Posizionamento greedy…', 6000);
+      setTimeout(()=>{
+        const active = this.state.plants.filter(p=>p.active);
+        const best = Engine.greedyBestProvince(active, this.state.factor);
+        if (!best){ flashStatus('Nessuna posizione iniziale valida.'); return; }
+        const id = this.state.nextId++;
+        const idx = this.state.plants.filter(p=>!p.fixed).length + 1;
+        this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`,
+          lat:best.lat, lon:best.lon, fixed:false, active:true, capKt:this.defaultCapNew});
+        this.drawPlants(); this.render();
+        flashStatus(`Aggiunto Nuovo ${idx} a ${best.name}.`);
+      }, 30);
+    });
+    document.getElementById('bfc-btn-reset').addEventListener('click', ()=>{
+      this.state.plants = this.buildVeronesiPlants();
+      this.state.nextId = this.state.plants.length;
+      sD.value = 1.0; document.getElementById('bfc-sld-d-val').textContent = '1.0';
+      this.state.factor = 1.0;
+      this.drawPlants(); this.render();
+    });
+    document.getElementById('bfc-tgl-unit').addEventListener('change', e=>{
+      this.state.unit = e.target.checked; this.render();
+    });
+    // Scenario capacità Veronesi (modifica capKt + ricalcolo)
+    document.querySelectorAll('#bfc-scenario button').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const sc = btn.dataset.scenario;
+        window.appData.capacityScenario = sc;
+        document.querySelectorAll('#bfc-scenario button').forEach(b =>
+          b.classList.toggle('active', b.dataset.scenario === sc));
+        document.querySelectorAll('#bf-scenario button').forEach(b =>
+          b.classList.toggle('active', b.dataset.scenario === sc));
+        if (sc !== 'manual'){
+          applyCapScenario(this.state.plants, sc);
+        }
+        this.drawPlants(); this.render();
+        updateScenarioLegend();
+        const lbl = sc === 'manual' ? 'Manuale (valori utente)' : (sc === 'plus10' ? '+10% (max × 1,1)' : '7gg/7 (max × 7/6)');
+        const uns = (this.lastResult && this.lastResult.unservedDemand > 0.5)
+          ? ` · Domanda non servita: ${fmt(this.lastResult.unservedDemand)} ton`
+          : '';
+        flashStatus(`Scenario capacità applicato: ${lbl}${uns}`, 6000);
+      });
+    });
+    // OPTIMIZE
+    document.getElementById('bfc-btn-optimize').addEventListener('click', ()=>{
+      this.runOptimization();
+    });
+    // Inefficienza
     const sIout = document.getElementById('bfc-sld-iout');
     const sIin  = document.getElementById('bfc-sld-iin');
-    sIout.addEventListener('input', ()=>{ const v = parseFloat(sIout.value); document.getElementById('bfc-sld-iout-val').textContent = v.toFixed(1); window.appData.routingIneffOut = v; this.render(); });
-    sIin.addEventListener('input', ()=>{ const v = parseFloat(sIin.value); document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1); window.appData.routingIneffIn = v; this.render(); });
+    sIout.addEventListener('input', ()=>{
+      const v = parseFloat(sIout.value);
+      document.getElementById('bfc-sld-iout-val').textContent = v.toFixed(1);
+      window.appData.routingIneffOut = v; this.render();
+    });
+    sIin.addEventListener('input', ()=>{
+      const v = parseFloat(sIin.value);
+      document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1);
+      window.appData.routingIneffIn = v; this.render();
+    });
   },
-  syncIneffSliders(){ document.getElementById('bfc-sld-iout').value = window.appData.routingIneffOut; document.getElementById('bfc-sld-iin').value = window.appData.routingIneffIn; document.getElementById('bfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1); document.getElementById('bfc-sld-iin-val').textContent = window.appData.routingIneffIn.toFixed(1); },
-  drawProvinces(){ this.layers.provinces.clearLayers(); this.markers.circles = []; window.appData.provinces.forEach(p => { const dEff = p.demand * this.state.factor; const c = L.circleMarker([p.lat,p.lon], { radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30), color:'#1f87e6', weight:1, fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55 }); c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`); c.addTo(this.layers.provinces); this.markers.circles.push(c); }); },
-  drawPorts(){ this.layers.ports.clearLayers(); window.appData.ports.forEach(p => { const icon = L.divIcon({className:'', html:`<div class="port-icon" title="${p.name}">⚓</div>`, iconSize:[22,22], iconAnchor:[11,11]}); L.marker([p.lat,p.lon], {icon, zIndexOffset:500}).bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports); }); },
-  drawPlants(){ this.layers.plants.clearLayers(); this.markers.plants = []; this.state.plants.forEach((p, idx) => { const cls = p.active ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new') : 'plant-icon disabled'; const lbl = p.fixed ? '🔒' : '🏭'; const icon = L.divIcon({className:'', html:`<div class="${cls}" title="${p.name}">${lbl}</div>`, iconSize:[28,28], iconAnchor:[14,14]}); const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000}); if (!p.fixed){ m.on('dragend', e => { const ll = e.target.getLatLng(); const snap = Engine.snapToLand(ll.lat, ll.lng); this.state.plants[idx].lat = snap.lat; this.state.plants[idx].lon = snap.lon; if (snap.snapped){ e.target.setLatLng([snap.lat, snap.lon]); flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`); } this.render(); }); } m.bindTooltip(p.name, {direction:'top', offset:[0,-14]}); m.addTo(this.layers.plants); this.markers.plants.push(m); }); this.renderPlantList(); },
-  renderPlantList(){ const list = document.getElementById('bfc-plant-list'); list.innerHTML = ''; this.state.plants.forEach((p, idx) => { const row = document.createElement('div'); row.className = 'plant-row'; let satTxt = ''; if (this.lastResult && p.active){ const active = this.state.plants.filter(x=>x.active); const ai = active.indexOf(p); if (ai >= 0){ const ton = this.lastResult.tonPerPlant[ai] || 0; const sat = (ton/1000) / p.capKt * 100; satTxt = ` · ${(ton/1000).toFixed(0)}/${p.capKt}kt (${sat.toFixed(0)}%)`; } } row.innerHTML = `${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'} <span class="name" style="flex:1;font-size:11px;">${p.name}<span class="cap-cell">${satTxt}</span></span> <input type="number" class="cap-input" data-idx="${idx}" value="${p.capKt}" min="10" max="2000" step="10" title="Cap max (kton)">`; const btnTog = document.createElement('button'); btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm'; btnTog.textContent = p.active ? 'Off' : 'On'; btnTog.style.fontSize = '10px'; btnTog.style.padding = '2px 6px'; btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); }; row.appendChild(btnTog); if (!p.fixed){ const btnRm = document.createElement('button'); btnRm.className = 'btn btn-warning btn-sm'; btnRm.textContent = '✕'; btnRm.style.fontSize = '10px'; btnRm.style.padding = '2px 6px'; btnRm.onclick = ()=>{ this.state.plants = this.state.plants.filter(x=>x!==p); this.drawPlants(); this.render(); }; row.appendChild(btnRm); } list.appendChild(row); row.querySelector('.cap-input').addEventListener('change', e=>{ const v = parseInt(e.target.value); if (v > 0){ p.capKt = v; this.render(); } }); }); },
-  buildCapacities(activePlants){ return activePlants.map(p => p.capKt * 1000); },
-  buildFixedFlags(activePlants){ return activePlants.map(p => p.fixed === true); },
-  runOptimization(){ const btn = document.getElementById('bfc-btn-optimize'); const prog = document.getElementById('bfc-progress'); btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…'; prog.classList.add('show'); prog.textContent = 'Avvio…'; setTimeout(()=>{ const active = this.state.plants.filter(p=>p.active); if (active.length === 0){ prog.textContent = 'Nessuno stab. attivo.'; btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale'; return; } const caps = this.buildCapacities(active); const fixed = this.buildFixedFlags(active); const t0 = performance.now(); const out = Engine.optimizeConvex(active, this.state.factor, caps, { maxIter: 30, tolerance: 0.0001, fixed, onProgress: (it, cost) => { prog.textContent = `Iter ${it+1} · ${(cost/1e6).toFixed(2)} M€`; } }); const dt = performance.now() - t0; out.plants.forEach((p, i) => { const orig = active[i]; if (!orig.fixed){ orig.lat = p.lat; orig.lon = p.lon; } }); this.drawPlants(); this.render(); this.charts.conv.data.labels = out.history.map((_,i)=>i); this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6); this.charts.conv.update('none'); const reduction = (out.history[0]-out.history[out.history.length-1])/out.history[0]*100; prog.textContent = `${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`; btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale'; flashStatus(`Ottimizzazione: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000); }, 30); },
-  render(){ const active = this.state.plants.filter(p=>p.active); const caps = this.buildCapacities(active); const a = Engine.marginalAllocate(active, this.state.factor, caps); const r = Engine.computeWithAssignment(active, this.state.factor, a); this.lastResult = r; document.getElementById('bfc-kpi-total').textContent = fmt(r.totalCost) + ' €'; document.getElementById('bfc-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton medio'; const V = r.totalVol > 0 ? r.totalVol : 1; if (this.state.unit){ document.getElementById('bfc-kpi-app').textContent = fmt(r.totalApp/V,2) + ' €/ton'; document.getElementById('bfc-kpi-prod').textContent = fmt(r.totalProd/V,2) + ' €/ton'; document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton'; } else { document.getElementById('bfc-kpi-app').textContent = fmt(r.totalApp/1e6,2) + ' M€'; document.getElementById('bfc-kpi-prod').textContent = fmt(r.totalProd/1e6,2) + ' M€'; document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€'; } document.getElementById('bfc-kpi-vol').textContent = fmt(r.totalVol); const card = document.getElementById('bfc-kpi-unserved-card'); if (r.unservedDemand > 0.5){ card.style.display = ''; card.classList.add('warn'); document.getElementById('bfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton'; } else { card.style.display = 'none'; card.classList.remove('warn'); } document.getElementById('bfc-kpi-app-meta').textContent = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`; document.getElementById('bfc-kpi-distr-meta').textContent = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`; const labels = active.map((p,i)=>p.fixed ? p.name.split(' ')[0] : `N${i}`); this.charts.stack.data.labels = labels; const transform = (arr) => arr.map((c,i)=> { const v = r.tonPerPlant[i]; if (!this.state.unit) return c; return v > 0 ? c/v : 0; }); this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant); this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant); this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant); if (this.state.unit){ this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t'; } else { this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M'; } this.charts.stack.update('none'); this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr]; this.charts.pie.update('none'); this.renderPlantList(); },
-  onDataChange(){ if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); } }
+
+  syncIneffSliders(){
+    document.getElementById('bfc-sld-iout').value = window.appData.routingIneffOut;
+    document.getElementById('bfc-sld-iin').value  = window.appData.routingIneffIn;
+    document.getElementById('bfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('bfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
+  },
+
+  drawProvinces(){
+    this.layers.provinces.clearLayers();
+    this.markers.circles = [];
+    window.appData.provinces.forEach(p => {
+      const dEff = p.demand * this.state.factor;
+      const c = L.circleMarker([p.lat,p.lon], {
+        radius: dEff <=0 ? 3 : Math.min(40, 3 + Math.sqrt(dEff)/30),
+        color:'#1f87e6', weight:1,
+        fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+      });
+      c.bindPopup(`<b>${p.name}</b><br>Domanda: ${fmt(dEff)} ton/anno`);
+      c.addTo(this.layers.provinces);
+      this.markers.circles.push(c);
+    });
+  },
+  drawPorts(){
+    this.layers.ports.clearLayers();
+    window.appData.ports.forEach(p => {
+      const icon = L.divIcon({className:'',
+        html:`<div class="port-icon" title="${p.name}">⚓</div>`,
+        iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p.lat,p.lon], {icon, zIndexOffset:500})
+       .bindPopup(`<b>Porto di ${p.name}</b>`).addTo(this.layers.ports);
+    });
+  },
+  drawPlants(){
+    this.layers.plants.clearLayers();
+    this.markers.plants = [];
+    this.state.plants.forEach((p, idx) => {
+      const cls = p.active
+        ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
+        : 'plant-icon disabled';
+      const lbl = p.fixed ? '🔒' : '🏭';
+      const icon = L.divIcon({className:'',
+        html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
+        iconSize:[28,28], iconAnchor:[14,14]});
+      const m = L.marker([p.lat,p.lon], {icon, draggable:!p.fixed, zIndexOffset:1000});
+      if (!p.fixed){
+        m.on('dragend', e => {
+          const ll = e.target.getLatLng();
+          const snap = Engine.snapToLand(ll.lat, ll.lng);
+          this.state.plants[idx].lat = snap.lat;
+          this.state.plants[idx].lon = snap.lon;
+          if (snap.snapped){
+            e.target.setLatLng([snap.lat, snap.lon]);
+            flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
+          }
+          this.render();
+        });
+      }
+      m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
+      m.addTo(this.layers.plants);
+      this.markers.plants.push(m);
+    });
+    this.renderPlantList();
+  },
+
+  renderPlantList(){
+    const list = document.getElementById('bfc-plant-list');
+    list.innerHTML = '';
+    this.state.plants.forEach((p, idx) => {
+      const row = document.createElement('div');
+      row.className = 'plant-row';
+      // saturazione (solo se lastResult)
+      let satTxt = '';
+      if (this.lastResult && p.active){
+        const active = this.state.plants.filter(x=>x.active);
+        const ai = active.indexOf(p);
+        if (ai >= 0){
+          const ton = this.lastResult.tonPerPlant[ai] || 0;
+          const sat = (ton/1000) / p.capKt * 100;
+          satTxt = ` · ${(ton/1000).toFixed(0)}/${p.capKt}kt (${sat.toFixed(0)}%)`;
+        }
+      }
+      row.innerHTML = `
+        ${p.fixed ? '<span class="lock">🔒</span>' : '<span>🟠</span>'}
+        <span class="name" style="flex:1;font-size:11px;">${p.name}<span class="cap-cell">${satTxt}</span></span>
+        <input type="number" class="cap-input" data-idx="${idx}" value="${p.capKt}" min="10" max="2000" step="10" title="Cap max (kton)">
+      `;
+      const btnTog = document.createElement('button');
+      btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm';
+      btnTog.textContent = p.active ? 'Off' : 'On';
+      btnTog.style.fontSize = '10px';
+      btnTog.style.padding = '2px 6px';
+      btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); };
+      row.appendChild(btnTog);
+      if (!p.fixed){
+        const btnRm = document.createElement('button');
+        btnRm.className = 'btn btn-warning btn-sm';
+        btnRm.textContent = '✕';
+        btnRm.style.fontSize = '10px';
+        btnRm.style.padding = '2px 6px';
+        btnRm.onclick = ()=>{
+          this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.drawPlants(); this.render();
+        };
+        row.appendChild(btnRm);
+      }
+      list.appendChild(row);
+      // listener su input cap
+      row.querySelector('.cap-input').addEventListener('change', e=>{
+        const v = parseInt(e.target.value);
+        if (v > 0){ p.capKt = v; this.render(); }
+      });
+    });
+  },
+
+  // Capacità per stab. ATTIVI (l'optimizer/compute lavora solo sui attivi)
+  buildCapacities(activePlants){
+    return activePlants.map(p => p.capKt * 1000);
+  },
+  buildFixedFlags(activePlants){
+    return activePlants.map(p => p.fixed === true);
+  },
+
+  runOptimization(){
+    const btn = document.getElementById('bfc-btn-optimize');
+    const prog = document.getElementById('bfc-progress');
+    btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…';
+    prog.classList.add('show');
+    prog.textContent = 'Avvio…';
+    setTimeout(()=>{
+      const active = this.state.plants.filter(p=>p.active);
+      if (active.length === 0){
+        prog.textContent = 'Nessuno stab. attivo.';
+        btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+        return;
+      }
+      const caps = this.buildCapacities(active);
+      const fixed = this.buildFixedFlags(active);
+      const t0 = performance.now();
+      const out = Engine.optimizeConvex(active, this.state.factor, caps, {
+        maxIter: 30, tolerance: 0.0001, fixed,
+        onProgress: (it, cost) => { prog.textContent = `Iter ${it+1} · ${(cost/1e6).toFixed(2)} M€`; }
+      });
+      const dt = performance.now() - t0;
+      // Aggiorno solo le coordinate dei nuovi stab. (i fissi non vengono mossi)
+      out.plants.forEach((p, i) => {
+        const orig = active[i];
+        if (!orig.fixed){
+          orig.lat = p.lat; orig.lon = p.lon;
+        }
+      });
+      this.drawPlants();
+      this.render();
+      this.charts.conv.data.labels = out.history.map((_,i)=>i);
+      this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      this.charts.conv.update('none');
+      const reduction = (out.history[0]-out.history[out.history.length-1])/out.history[0]*100;
+      prog.textContent = `${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`;
+      btn.disabled = false; btn.textContent = '🎯 Ottimizza costo totale';
+      flashStatus(`Ottimizzazione: ${out.history.length-1} iter, costo ridotto del ${reduction.toFixed(1)}%`, 5000);
+    }, 30);
+  },
+
+  render(){
+    const active = this.state.plants.filter(p=>p.active);
+    const caps = this.buildCapacities(active);
+    const a = Engine.marginalAllocate(active, this.state.factor, caps);
+    const r = Engine.computeWithAssignment(active, this.state.factor, a);
+    this.lastResult = r;
+    document.getElementById('bfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('bfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
+    const V = r.totalVol > 0 ? r.totalVol : 1;
+    if (this.state.unit){
+      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
+      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
+      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+    } else {
+      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
+      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
+      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+    }
+    document.getElementById('bfc-kpi-vol').textContent = fmt(r.totalVol);
+    const card = document.getElementById('bfc-kpi-unserved-card');
+    if (r.unservedDemand > 0.5){
+      card.style.display = ''; card.classList.add('warn');
+      document.getElementById('bfc-kpi-unserved').textContent = fmt(r.unservedDemand) + ' ton';
+    } else { card.style.display = 'none'; card.classList.remove('warn'); }
+    document.getElementById('bfc-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('bfc-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    // Charts
+    const labels = active.map((p,i)=>p.fixed ? p.name.split(' ')[0] : `N${i}`);
+    this.charts.stack.data.labels = labels;
+    const transform = (arr) => arr.map((c,i)=> {
+      const v = r.tonPerPlant[i];
+      if (!this.state.unit) return c;
+      return v > 0 ? c/v : 0;
+    });
+    this.charts.stack.data.datasets[0].data = transform(r.appCostPerPlant);
+    this.charts.stack.data.datasets[1].data = transform(r.prodCostPerPlant);
+    this.charts.stack.data.datasets[2].data = transform(r.distrPerPlant);
+    if (this.state.unit){
+      this.charts.stack.options.scales.y.ticks.callback = v=>v.toFixed(0)+' €/t';
+    } else {
+      this.charts.stack.options.scales.y.ticks.callback = v=>(v/1e6).toFixed(1)+'M';
+    }
+    this.charts.stack.update('none');
+    this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
+    this.charts.pie.update('none');
+    // refresh saturazioni nella lista
+    this.renderPlantList();
+  },
+  onDataChange(){
+    if (this.initialized){
+      // Riapplica scenario capacità se attivo (i max storici possono essere cambiati in Dati)
+      const sc = window.appData.capacityScenario;
+      if (sc !== 'manual') applyCapScenario(this.state.plants, sc);
+      this.drawProvinces(); this.drawPorts(); this.drawPlants(); this.render();
+    }
+  },
+  // sincronizza i bottoni scenario con lo stato globale (chiamato da onShow)
+  syncScenarioButtons(){
+    const sc = window.appData.capacityScenario || 'manual';
+    document.querySelectorAll('#bfc-scenario button').forEach(b =>
+      b.classList.toggle('active', b.dataset.scenario === sc));
+  }
 };
 
+/* ====================================================================
+   DATA PAGE
+   ==================================================================== */
 const DataPage = {
   initialized:false,
   state:{ scale:1.0, percentMode:false },
-  onShow(){ if (!this.initialized){ this.init(); this.initialized = true; } this.renderProvinces(); this.renderPorts(); this.renderProdTable(); this.renderVeronesiCap(); this.renderTariffs(); },
+  onShow(){
+    if (!this.initialized){ this.init(); this.initialized = true; }
+    this.renderProvinces();
+    this.renderPorts();
+    this.renderProdTable();
+    this.renderVeronesiCap();
+    this.renderTariffs();
+  },
   init(){
-    document.getElementById('dp-scale').addEventListener('input', e=>{ this.state.scale = parseFloat(e.target.value); document.getElementById('dp-scale-val').textContent = this.state.scale.toFixed(1)+'×'; window.appData.provinces.forEach(p => p.demand = p._orig * this.state.scale); this.renderProvinces(); this.broadcast(); });
-    document.getElementById('dp-mode').addEventListener('change', e=>{ this.state.percentMode = e.target.checked; this.renderProvinces(); });
-    document.getElementById('dp-reset').addEventListener('click', ()=>{ window.appData.provinces.forEach(p => p.demand = p._orig); this.state.scale = 1.0; document.getElementById('dp-scale').value = 1.0; document.getElementById('dp-scale-val').textContent = '1.0×'; this.renderProvinces(); this.broadcast(); flashStatus('Domanda ripristinata ai valori originali.'); });
-    document.getElementById('po-add').addEventListener('click', ()=>{ if (window.appData.ports.length >= 10){ flashStatus('Limite max 10 porti.', 3000); return; } window.appData.ports.push({name:'Nuovo porto', lat:42, lon:12, markup:0}); this.renderPorts(); this.broadcast(); });
-    document.getElementById('po-reset').addEventListener('click', ()=>{ window.appData.ports = JSON.parse(JSON.stringify(PORTS_ORIG)); this.renderPorts(); this.broadcast(); flashStatus('Porti ripristinati.'); });
-    document.getElementById('pt-add').addEventListener('click', ()=>{ const t = window.appData.prodTable; const last = t[t.length-1]; window.appData.prodTable.push([last[0]+10000, Math.max(5, last[1]-0.5)]); this.renderProdTable(); this.broadcast(); });
-    document.getElementById('pt-reset').addEventListener('click', ()=>{ window.appData.prodTable = JSON.parse(JSON.stringify(PROD_TABLE_ORIG)); this.renderProdTable(); this.broadcast(); flashStatus('Tabella costi ripristinata.'); });
-    document.getElementById('vc-reset').addEventListener('click', ()=>{ window.appData.veronesiCapacityData = JSON.parse(JSON.stringify(VERONESI_CAP_ORIG)); window.appData.capacityMultiplier = 1.1; window.appData.capacity7days = 7/6; document.getElementById('vc-mult-p10').value = '1.1'; document.getElementById('vc-mult-77').value = '1.1667'; this.renderVeronesiCap(); this.broadcast(); flashStatus('Capacità Veronesi ripristinate ai valori originali.'); });
-    document.getElementById('vc-mult-p10').addEventListener('change', e=>{ const v = parseFloat(e.target.value); if (v > 0){ window.appData.capacityMultiplier = v; this.renderVeronesiCap(); this.broadcast(); } });
-    document.getElementById('vc-mult-77').addEventListener('change', e=>{ const v = parseFloat(e.target.value); if (v > 0){ window.appData.capacity7days = v; this.renderVeronesiCap(); this.broadcast(); } });
+    // ---------- province ----------
+    document.getElementById('dp-scale').addEventListener('input', e=>{
+      this.state.scale = parseFloat(e.target.value);
+      document.getElementById('dp-scale-val').textContent = this.state.scale.toFixed(1)+'×';
+      window.appData.provinces.forEach(p => p.demand = p._orig * this.state.scale);
+      this.renderProvinces();
+      this.broadcast();
+    });
+    document.getElementById('dp-mode').addEventListener('change', e=>{
+      this.state.percentMode = e.target.checked;
+      this.renderProvinces();
+    });
+    document.getElementById('dp-reset').addEventListener('click', ()=>{
+      window.appData.provinces.forEach(p => p.demand = p._orig);
+      this.state.scale = 1.0;
+      document.getElementById('dp-scale').value = 1.0;
+      document.getElementById('dp-scale-val').textContent = '1.0×';
+      this.renderProvinces();
+      this.broadcast();
+      flashStatus('Domanda ripristinata ai valori originali.');
+    });
+    // ---------- porti ----------
+    document.getElementById('po-add').addEventListener('click', ()=>{
+      if (window.appData.ports.length >= 10){
+        flashStatus('Limite max 10 porti.', 3000); return;
+      }
+      window.appData.ports.push({name:'Nuovo porto', lat:42, lon:12, markup:0});
+      this.renderPorts(); this.broadcast();
+    });
+    document.getElementById('po-reset').addEventListener('click', ()=>{
+      window.appData.ports = JSON.parse(JSON.stringify(PORTS_ORIG));
+      this.renderPorts(); this.broadcast();
+      flashStatus('Porti ripristinati.');
+    });
+    // ---------- prod table ----------
+    document.getElementById('pt-add').addEventListener('click', ()=>{
+      const t = window.appData.prodTable;
+      const last = t[t.length-1];
+      window.appData.prodTable.push([last[0]+10000, Math.max(5, last[1]-0.5)]);
+      this.renderProdTable(); this.broadcast();
+    });
+    document.getElementById('pt-reset').addEventListener('click', ()=>{
+      window.appData.prodTable = JSON.parse(JSON.stringify(PROD_TABLE_ORIG));
+      this.renderProdTable(); this.broadcast();
+      flashStatus('Tabella costi ripristinata.');
+    });
+    // ---------- capacità Veronesi ----------
+    document.getElementById('vc-reset').addEventListener('click', ()=>{
+      window.appData.veronesiCapacityData = JSON.parse(JSON.stringify(VERONESI_CAP_ORIG));
+      window.appData.capacityMultiplier = 1.1;
+      window.appData.capacity7days = 7/6;
+      document.getElementById('vc-mult-p10').value = '1.1';
+      document.getElementById('vc-mult-77').value = '1.1667';
+      this.renderVeronesiCap();
+      this.broadcast();
+      flashStatus('Capacità Veronesi ripristinate ai valori originali.');
+    });
+    document.getElementById('vc-mult-p10').addEventListener('change', e=>{
+      const v = parseFloat(e.target.value);
+      if (v > 0){ window.appData.capacityMultiplier = v; this.renderVeronesiCap(); this.broadcast(); }
+    });
+    document.getElementById('vc-mult-77').addEventListener('change', e=>{
+      const v = parseFloat(e.target.value);
+      if (v > 0){ window.appData.capacity7days = v; this.renderVeronesiCap(); this.broadcast(); }
+    });
+    // ---------- import / export ----------
     document.getElementById('json-export').addEventListener('click', ()=>{
       const data = {
         provinces: window.appData.provinces.map(p=>({name:p.name, lat:p.lat, lon:p.lon, demand:p.demand})),
         ports: window.appData.ports,
         prodTable: window.appData.prodTable,
         veronesiCapacityData: window.appData.veronesiCapacityData,
-        capacityMultiplier: window.appData.capacityMultiplier,
-        capacity7days: window.appData.capacity7days,
-        capacityScenario: window.appData.capacityScenario
+        capacityMultiplier:   window.appData.capacityMultiplier,
+        capacity7days:        window.appData.capacity7days,
+        capacityScenario:     window.appData.capacityScenario,
+        routingIneffIn:       window.appData.routingIneffIn,
+        routingIneffOut:      window.appData.routingIneffOut
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
@@ -2004,7 +3547,9 @@ const DataPage = {
       a.click();
       flashStatus('Dati esportati in JSON.');
     });
-    document.getElementById('json-import').addEventListener('click', ()=>{ document.getElementById('json-import-file').click(); });
+    document.getElementById('json-import').addEventListener('click', ()=>{
+      document.getElementById('json-import-file').click();
+    });
     document.getElementById('json-import-file').addEventListener('change', e=>{
       const f = e.target.files[0]; if (!f) return;
       const reader = new FileReader();
@@ -2015,10 +3560,13 @@ const DataPage = {
           if (d.ports) window.appData.ports = d.ports;
           if (d.prodTable) window.appData.prodTable = d.prodTable;
           if (d.veronesiCapacityData) window.appData.veronesiCapacityData = d.veronesiCapacityData;
-          if (d.capacityMultiplier) window.appData.capacityMultiplier = d.capacityMultiplier;
-          if (d.capacity7days) window.appData.capacity7days = d.capacity7days;
-          if (d.capacityScenario) window.appData.capacityScenario = d.capacityScenario;
-          this.renderProvinces(); this.renderPorts(); this.renderProdTable(); this.renderVeronesiCap();
+          if (d.capacityMultiplier != null) window.appData.capacityMultiplier = d.capacityMultiplier;
+          if (d.capacity7days != null)      window.appData.capacity7days      = d.capacity7days;
+          if (d.capacityScenario)           window.appData.capacityScenario   = d.capacityScenario;
+          if (d.routingIneffIn != null)     window.appData.routingIneffIn     = d.routingIneffIn;
+          if (d.routingIneffOut != null)    window.appData.routingIneffOut    = d.routingIneffOut;
+          this.renderProvinces(); this.renderPorts(); this.renderProdTable();
+          this.renderVeronesiCap(); this.renderTariffs();
           this.broadcast();
           flashStatus('Dati importati con successo.');
         } catch(err){
@@ -2028,14 +3576,170 @@ const DataPage = {
       reader.readAsText(f);
     });
   },
-  renderProvinces(){ const tb = document.querySelector('#dp-table tbody'); tb.innerHTML = ''; let tot = 0; window.appData.provinces.forEach((p, i) => { const tr = document.createElement('tr'); const dispVal = this.state.percentMode ? (p._orig > 0 ? (p.demand / p._orig * 100).toFixed(1) : '0') : p.demand.toFixed(2); const suffix = this.state.percentMode ? '%' : 'ton'; tr.innerHTML = `<td class="text-muted">${i+1}</td><td>${p.name}</td><td>${p.lat.toFixed(4)}</td><td>${p.lon.toFixed(4)}</td><td><input type="number" step="${this.state.percentMode?'1':'0.01'}" value="${dispVal}" data-idx="${i}" data-mode="${this.state.percentMode?'pct':'abs'}"> ${suffix}</td>`; tb.appendChild(tr); tot += p.demand; }); document.getElementById('dp-total').textContent = fmt(tot,2) + ' ton'; tb.querySelectorAll('input[type=number]').forEach(inp => { inp.addEventListener('change', ()=>{ const idx = parseInt(inp.dataset.idx); const mode = inp.dataset.mode; const v = parseFloat(inp.value); const p = window.appData.provinces[idx]; if (mode === 'pct') p.demand = (p._orig || 0) * v / 100; else p.demand = v; this.renderProvinces(); this.broadcast(); }); }); },
-  renderPorts(){ const tb = document.querySelector('#po-table tbody'); tb.innerHTML = ''; window.appData.ports.forEach((p, i) => { if (p.markup == null) p.markup = 0; const tr = document.createElement('tr'); tr.innerHTML = `<td class="text-muted">${i+1}</td><td><input type="text" value="${p.name}" data-idx="${i}" data-f="name"></td><td><input type="number" step="0.0001" value="${p.lat}" data-idx="${i}" data-f="lat"></td><td><input type="number" step="0.0001" value="${p.lon}" data-idx="${i}" data-f="lon"></td><td><input type="number" step="0.1" value="${p.markup}" data-idx="${i}" data-f="markup" title="Maggiorazione (€/ton)"></td><td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>`; tb.appendChild(tr); }); tb.querySelectorAll('input').forEach(inp => { inp.addEventListener('change', ()=>{ const i = parseInt(inp.dataset.idx); const f = inp.dataset.f; const v = (f === 'name') ? inp.value : parseFloat(inp.value); window.appData.ports[i][f] = isNaN(v) ? 0 : v; this.broadcast(); }); }); tb.querySelectorAll('button[data-act=rm]').forEach(b => { b.addEventListener('click', ()=>{ const i = parseInt(b.dataset.idx); window.appData.ports.splice(i,1); this.renderPorts(); this.broadcast(); }); }); },
-  renderProdTable(){ const tb = document.querySelector('#pt-table tbody'); tb.innerHTML = ''; window.appData.prodTable.forEach((row, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="text-muted">${i+1}</td><td><input type="number" step="1000" value="${row[0]}" data-idx="${i}" data-f="0"></td><td><input type="number" step="0.5" value="${row[1]}" data-idx="${i}" data-f="1"></td><td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>`; tb.appendChild(tr); }); tb.querySelectorAll('input').forEach(inp => { inp.addEventListener('change', ()=>{ const i = parseInt(inp.dataset.idx); const f = parseInt(inp.dataset.f); window.appData.prodTable[i][f] = parseFloat(inp.value); window.appData.prodTable.sort((a,b)=>a[0]-b[0]); this.renderProdTable(); this.broadcast(); }); }); tb.querySelectorAll('button[data-act=rm]').forEach(b => { b.addEventListener('click', ()=>{ const i = parseInt(b.dataset.idx); if (window.appData.prodTable.length <= 1){ flashStatus('Impossibile rimuovere: serve almeno uno scaglione.', 4000); return; } window.appData.prodTable.splice(i,1); this.renderProdTable(); this.broadcast(); }); }); },
-  renderVeronesiCap(){ const tb = document.querySelector('#vc-table tbody'); tb.innerHTML = ''; document.getElementById('vc-mult-p10').value = window.appData.capacityMultiplier; document.getElementById('vc-mult-77').value = window.appData.capacity7days.toFixed(4); window.appData.veronesiCapacityData.forEach((row, i) => { const tr = document.createElement('tr'); const p10 = row.max * window.appData.capacityMultiplier; const c77 = row.max * window.appData.capacity7days; tr.innerHTML = `<td class="text-muted">${i+1}</td><td>${row.name}</td><td><input type="number" step="100" value="${row.max.toFixed(2)}" data-idx="${i}"></td><td class="text-muted">${fmt(p10,0)}</td><td class="text-muted">${fmt(c77,0)}</td>`; tb.appendChild(tr); }); tb.querySelectorAll('input[type=number]').forEach(inp => { inp.addEventListener('change', ()=>{ const i = parseInt(inp.dataset.idx); const v = parseFloat(inp.value); if (v > 0){ window.appData.veronesiCapacityData[i].max = v; this.renderVeronesiCap(); this.broadcast(); } }); }); },
-  renderTariffs(){ const tIn = document.querySelector('#ti-table tbody'); const tOut = document.querySelector('#to-table tbody'); if (!tIn || !tOut) return; tIn.innerHTML = ''; window.appData.inboundTariff.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${row[0]}</td><td>${row[1].toFixed(3)}</td>`; tIn.appendChild(tr); }); tOut.innerHTML = ''; window.appData.outboundTariff.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${row[0]}</td><td>${row[1].toFixed(2)}</td>`; tOut.appendChild(tr); }); },
-  broadcast(){ if (Greenfield.initialized) Greenfield.onDataChange(); if (Brownfield.initialized) Brownfield.onDataChange(); if (GreenfieldConvex.initialized) GreenfieldConvex.onDataChange(); if (BrownfieldConvex.initialized) BrownfieldConvex.onDataChange(); }
+  renderProvinces(){
+    const tb = document.querySelector('#dp-table tbody');
+    tb.innerHTML = '';
+    let tot = 0;
+    window.appData.provinces.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      const dispVal = this.state.percentMode
+        ? (p._orig > 0 ? (p.demand / p._orig * 100).toFixed(1) : '0')
+        : p.demand.toFixed(2);
+      const suffix = this.state.percentMode ? '%' : 'ton';
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td>${p.name}</td>
+        <td>${p.lat.toFixed(4)}</td>
+        <td>${p.lon.toFixed(4)}</td>
+        <td><input type="number" step="${this.state.percentMode?'1':'0.01'}" value="${dispVal}"
+                   data-idx="${i}" data-mode="${this.state.percentMode?'pct':'abs'}"> ${suffix}</td>
+      `;
+      tb.appendChild(tr);
+      tot += p.demand;
+    });
+    document.getElementById('dp-total').textContent = fmt(tot,2) + ' ton';
+    // listeners
+    tb.querySelectorAll('input[type=number]').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const idx = parseInt(inp.dataset.idx);
+        const mode = inp.dataset.mode;
+        const v = parseFloat(inp.value);
+        const p = window.appData.provinces[idx];
+        if (mode === 'pct') p.demand = (p._orig || 0) * v / 100;
+        else p.demand = v;
+        this.renderProvinces();
+        this.broadcast();
+      });
+    });
+  },
+  renderPorts(){
+    const tb = document.querySelector('#po-table tbody');
+    tb.innerHTML = '';
+    window.appData.ports.forEach((p, i) => {
+      // Garantisce esistenza del campo markup (compat. con dati pre-aggiornamento)
+      if (p.markup == null) p.markup = 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td><input type="text"   value="${p.name}"  data-idx="${i}" data-f="name"></td>
+        <td><input type="number" step="0.0001" value="${p.lat}"    data-idx="${i}" data-f="lat"></td>
+        <td><input type="number" step="0.0001" value="${p.lon}"    data-idx="${i}" data-f="lon"></td>
+        <td><input type="number" step="0.1"    value="${p.markup}" data-idx="${i}" data-f="markup" title="Maggiorazione (€/ton)"></td>
+        <td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const i = parseInt(inp.dataset.idx);
+        const f = inp.dataset.f;
+        const v = (f === 'name') ? inp.value : parseFloat(inp.value);
+        window.appData.ports[i][f] = isNaN(v) ? 0 : v;
+        this.broadcast();
+      });
+    });
+    tb.querySelectorAll('button[data-act=rm]').forEach(b => {
+      b.addEventListener('click', ()=>{
+        const i = parseInt(b.dataset.idx);
+        window.appData.ports.splice(i,1);
+        this.renderPorts(); this.broadcast();
+      });
+    });
+  },
+  renderProdTable(){
+    const tb = document.querySelector('#pt-table tbody');
+    tb.innerHTML = '';
+    window.appData.prodTable.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td><input type="number" step="1000" value="${row[0]}" data-idx="${i}" data-f="0"></td>
+        <td><input type="number" step="0.5" value="${row[1]}" data-idx="${i}" data-f="1"></td>
+        <td><button class="btn btn-warning btn-sm" data-idx="${i}" data-act="rm">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const i = parseInt(inp.dataset.idx);
+        const f = parseInt(inp.dataset.f);
+        window.appData.prodTable[i][f] = parseFloat(inp.value);
+        // riordina la tabella per ton crescenti (necessario per il VLOOKUP)
+        window.appData.prodTable.sort((a,b)=>a[0]-b[0]);
+        this.renderProdTable(); this.broadcast();
+      });
+    });
+    tb.querySelectorAll('button[data-act=rm]').forEach(b => {
+      b.addEventListener('click', ()=>{
+        const i = parseInt(b.dataset.idx);
+        if (window.appData.prodTable.length <= 1){
+          flashStatus('Impossibile rimuovere: serve almeno uno scaglione.', 4000); return;
+        }
+        window.appData.prodTable.splice(i,1);
+        this.renderProdTable(); this.broadcast();
+      });
+    });
+  },
+  renderVeronesiCap(){
+    const tb = document.querySelector('#vc-table tbody');
+    tb.innerHTML = '';
+    document.getElementById('vc-mult-p10').value = window.appData.capacityMultiplier;
+    document.getElementById('vc-mult-77').value  = window.appData.capacity7days.toFixed(4);
+    window.appData.veronesiCapacityData.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      const p10 = row.max * window.appData.capacityMultiplier;
+      const c77 = row.max * window.appData.capacity7days;
+      tr.innerHTML = `
+        <td class="text-muted">${i+1}</td>
+        <td>${row.name}</td>
+        <td><input type="number" step="100" value="${row.max.toFixed(2)}" data-idx="${i}"></td>
+        <td class="text-muted">${fmt(p10,0)}</td>
+        <td class="text-muted">${fmt(c77,0)}</td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input[type=number]').forEach(inp => {
+      inp.addEventListener('change', ()=>{
+        const i = parseInt(inp.dataset.idx);
+        const v = parseFloat(inp.value);
+        if (v > 0){
+          window.appData.veronesiCapacityData[i].max = v;
+          this.renderVeronesiCap();
+          this.broadcast();
+        }
+      });
+    });
+  },
+  renderTariffs(){
+    const tIn = document.querySelector('#ti-table tbody');
+    const tOut = document.querySelector('#to-table tbody');
+    if (!tIn || !tOut) return;
+    tIn.innerHTML = '';
+    window.appData.inboundTariff.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row[0]}</td><td>${row[1].toFixed(3)}</td>`;
+      tIn.appendChild(tr);
+    });
+    tOut.innerHTML = '';
+    window.appData.outboundTariff.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row[0]}</td><td>${row[1].toFixed(2)}</td>`;
+      tOut.appendChild(tr);
+    });
+  },
+  // notifica le altre pagine che i dati globali sono cambiati
+  broadcast(){
+    if (Greenfield.initialized) Greenfield.onDataChange();
+    if (Brownfield.initialized) Brownfield.onDataChange();
+    if (GreenfieldConvex.initialized) GreenfieldConvex.onDataChange();
+    if (BrownfieldConvex.initialized) BrownfieldConvex.onDataChange();
+  }
 };
 
+/* ====================================================================
+   BOOT
+   ==================================================================== */
+// La home è attiva di default; le altre pagine si inizializzano on-demand
 flashStatus('Pronto. Scegli una pagina dalla navbar.');
 </script>
 </body>
