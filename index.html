@@ -743,6 +743,51 @@ body{
           <div class="kpi" id="gfc-kpi-unserved-card" style="display:none;"><div class="label">Domanda NON servita</div><div class="value" id="gfc-kpi-unserved">—</div></div>
         </div>
       </div>
+
+      <!-- Pannello dettaglio stabilimento (visibile su click) -->
+      <div class="panel-section detail-panel" id="gfc-detail-panel">
+        <h6>
+          <span id="gfc-detail-title">Dettaglio stabilimento</span>
+          <button class="close-btn" id="gfc-detail-close" title="Chiudi">✕</button>
+        </h6>
+        <div class="detail-grid">
+          <div class="detail-section-title">Produzione</div>
+          <div class="detail-row"><span class="label">Volume servito</span><span class="val" id="gfc-detail-volume">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario (tabella scaglioni)</span><span class="val" id="gfc-detail-prod-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale</span><span class="val" id="gfc-detail-prod-total">—</span></div>
+
+          <div class="detail-section-title">Approvvigionamento (porto)</div>
+          <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="gfc-detail-port">—</span></div>
+          <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="gfc-detail-port-dist">—</span></div>
+          <div class="detail-row"><span class="label">Costo base (km)</span><span class="val" id="gfc-detail-app-base">—</span></div>
+          <div class="detail-row"><span class="label">Maggiorazione porto</span><span class="val" id="gfc-detail-app-markup">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario totale</span><span class="val" id="gfc-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="gfc-detail-app-total">—</span></div>
+
+          <div class="detail-section-title">Distribuzione (province)</div>
+          <div class="detail-row"><span class="label">N° province servite</span><span class="val" id="gfc-detail-nprov">—</span></div>
+          <div class="detail-row"><span class="label">Distanza media pesata (lin → eff)</span><span class="val" id="gfc-detail-dist-avg">—</span></div>
+          <div class="detail-row"><span class="label">€/ton outbound medio</span><span class="val" id="gfc-detail-distr-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale outbound</span><span class="val" id="gfc-detail-distr-total">—</span></div>
+
+          <div class="detail-section-title">Top province servite (per volume)</div>
+          <div class="prov-table-wrap">
+            <table class="prov-table">
+              <thead><tr><th class="rank">#</th><th>Provincia</th><th>Ton</th><th>km</th><th>€/t</th></tr></thead>
+              <tbody id="gfc-detail-prov-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="detail-section-title" id="gfc-detail-cap-section" style="display:none;">Capacità storica Veronesi</div>
+          <div class="detail-row" id="gfc-detail-cap-max-row" style="display:none;"><span class="label">Max storico (2017‑2025)</span><span class="val" id="gfc-detail-cap-max">—</span></div>
+          <div class="detail-row" id="gfc-detail-cap-p10-row" style="display:none;"><span class="label">Scenario +10%</span><span class="val" id="gfc-detail-cap-p10">—</span></div>
+          <div class="detail-row" id="gfc-detail-cap-77-row" style="display:none;"><span class="label">Scenario 7/7</span><span class="val" id="gfc-detail-cap-77">—</span></div>
+          <div class="detail-row" id="gfc-detail-cap-active-row" style="display:none;"><span class="label">Scenario attivo</span><span class="val" id="gfc-detail-cap-active">—</span></div>
+
+          <div class="detail-row total"><span class="label">COSTO TOTALE STAB.</span><span class="val" id="gfc-detail-total">—</span></div>
+        </div>
+      </div>
+
       <div class="panel-section">
         <h6>Parametri</h6>
         <div class="slider-row mb-2">
@@ -826,6 +871,51 @@ body{
           <div class="kpi" id="bfc-kpi-unserved-card" style="display:none;"><div class="label">Domanda NON servita</div><div class="value" id="bfc-kpi-unserved">—</div></div>
         </div>
       </div>
+
+      <!-- Pannello dettaglio stabilimento (visibile su click) -->
+      <div class="panel-section detail-panel" id="bfc-detail-panel">
+        <h6>
+          <span id="bfc-detail-title">Dettaglio stabilimento</span>
+          <button class="close-btn" id="bfc-detail-close" title="Chiudi">✕</button>
+        </h6>
+        <div class="detail-grid">
+          <div class="detail-section-title">Produzione</div>
+          <div class="detail-row"><span class="label">Volume servito</span><span class="val" id="bfc-detail-volume">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario (tabella scaglioni)</span><span class="val" id="bfc-detail-prod-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale</span><span class="val" id="bfc-detail-prod-total">—</span></div>
+
+          <div class="detail-section-title">Approvvigionamento (porto)</div>
+          <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="bfc-detail-port">—</span></div>
+          <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="bfc-detail-port-dist">—</span></div>
+          <div class="detail-row"><span class="label">Costo base (km)</span><span class="val" id="bfc-detail-app-base">—</span></div>
+          <div class="detail-row"><span class="label">Maggiorazione porto</span><span class="val" id="bfc-detail-app-markup">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario totale</span><span class="val" id="bfc-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="bfc-detail-app-total">—</span></div>
+
+          <div class="detail-section-title">Distribuzione (province)</div>
+          <div class="detail-row"><span class="label">N° province servite</span><span class="val" id="bfc-detail-nprov">—</span></div>
+          <div class="detail-row"><span class="label">Distanza media pesata (lin → eff)</span><span class="val" id="bfc-detail-dist-avg">—</span></div>
+          <div class="detail-row"><span class="label">€/ton outbound medio</span><span class="val" id="bfc-detail-distr-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale outbound</span><span class="val" id="bfc-detail-distr-total">—</span></div>
+
+          <div class="detail-section-title">Top province servite (per volume)</div>
+          <div class="prov-table-wrap">
+            <table class="prov-table">
+              <thead><tr><th class="rank">#</th><th>Provincia</th><th>Ton</th><th>km</th><th>€/t</th></tr></thead>
+              <tbody id="bfc-detail-prov-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="detail-section-title" id="bfc-detail-cap-section" style="display:none;">Capacità storica Veronesi</div>
+          <div class="detail-row" id="bfc-detail-cap-max-row" style="display:none;"><span class="label">Max storico (2017‑2025)</span><span class="val" id="bfc-detail-cap-max">—</span></div>
+          <div class="detail-row" id="bfc-detail-cap-p10-row" style="display:none;"><span class="label">Scenario +10%</span><span class="val" id="bfc-detail-cap-p10">—</span></div>
+          <div class="detail-row" id="bfc-detail-cap-77-row" style="display:none;"><span class="label">Scenario 7/7</span><span class="val" id="bfc-detail-cap-77">—</span></div>
+          <div class="detail-row" id="bfc-detail-cap-active-row" style="display:none;"><span class="label">Scenario attivo</span><span class="val" id="bfc-detail-cap-active">—</span></div>
+
+          <div class="detail-row total"><span class="label">COSTO TOTALE STAB.</span><span class="val" id="bfc-detail-total">—</span></div>
+        </div>
+      </div>
+
       <div class="panel-section">
         <h6>Parametri</h6>
         <div class="slider-row mb-3">
@@ -2784,7 +2874,7 @@ const Brownfield = {
 const GreenfieldConvex = {
   initialized:false,
   state:{plants:DEFAULT_PLANTS_GF.map(p=>({...p})), factor:1.0, unit:false,
-         capFinite:false, capKt:200},
+         capFinite:false, capKt:200, sel:-1},
   map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
   lastResult:null,
 
@@ -2804,9 +2894,19 @@ const GreenfieldConvex = {
     this.layers = {
       provinces: L.layerGroup().addTo(this.map),
       ports:     L.layerGroup().addTo(this.map),
-      plants:    L.layerGroup().addTo(this.map)
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
     };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+        Detail.hide('gfc');
+      }
+    });
 
     // Charts
     this.charts.stack = new Chart(document.getElementById('gfc-chart-stack').getContext('2d'), {
@@ -2910,6 +3010,14 @@ const GreenfieldConvex = {
       document.getElementById('gfc-sld-iin-val').textContent = v.toFixed(1);
       window.appData.routingIneffIn = v; this.render();
     });
+    // Close detail panel
+    document.getElementById('gfc-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('gfc');
+    });
   },
 
   syncIneffSliders(){
@@ -2948,8 +3056,9 @@ const GreenfieldConvex = {
     this.layers.plants.clearLayers();
     this.markers.plants = [];
     this.state.plants.forEach((p, idx) => {
+      const sel = (idx === this.state.sel);
       const icon = L.divIcon({className:'',
-        html:`<div class="plant-icon" title="${p.name}">🏭</div>`,
+        html:`<div class="plant-icon ${sel?'selected':''}" title="${p.name}">🏭</div>`,
         iconSize:[28,28], iconAnchor:[14,14]});
       const m = L.marker([p.lat,p.lon], {icon, draggable:true, zIndexOffset:1000});
       m.on('dragend', e => {
@@ -2963,10 +3072,44 @@ const GreenfieldConvex = {
         }
         this.render();
       });
+      m.on('click', (ev)=>{
+        L.DomEvent.stopPropagation(ev);
+        this.state.sel = (this.state.sel === idx) ? -1 : idx;
+        this.drawPlants(); this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          Detail.show('gfc', this.lastResult, this.state.plants[this.state.sel], this.state.sel);
+        } else {
+          Detail.hide('gfc');
+        }
+      });
       m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
       m.addTo(this.layers.plants);
       this.markers.plants.push(m);
     });
+  },
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult){ this.resetProvinceStyles(); return; }
+    const idx = this.state.sel, stab = this.state.plants[idx];
+    if (!stab) return;
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === idx){
+        L.polyline([[p.lat,p.lon],[stab.lat,stab.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85});
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25});
+      }
+    });
+    const port = window.appData.ports[this.lastResult.portAssign[idx]];
+    if (port) L.polyline([[stab.lat,stab.lon],[port.lat,port.lon]],
+      {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55}));
   },
 
   buildCapacities(){
@@ -3065,6 +3208,15 @@ const GreenfieldConvex = {
     this.charts.stack.update('none');
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
+    // Pannello dettaglio (se uno stab. è selezionato) + links
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      Detail.show('gfc', r, this.state.plants[this.state.sel], this.state.sel);
+    } else {
+      this.layers.links && this.layers.links.clearLayers();
+      this.resetProvinceStyles && this.resetProvinceStyles();
+      Detail.hide('gfc');
+    }
   },
   onDataChange(){
     if (this.initialized){ this.drawProvinces(); this.drawPorts(); this.render(); }
@@ -3077,7 +3229,7 @@ const GreenfieldConvex = {
    ==================================================================== */
 const BrownfieldConvex = {
   initialized:false,
-  state:{ plants:[], factor:1.0, unit:false, nextId:0 },
+  state:{ plants:[], factor:1.0, unit:false, nextId:0, sel:-1 },
   map:null, layers:{}, markers:{plants:[], circles:[]}, charts:{},
   lastResult:null,
   // Default capacità per stab. (kton); modificabili in tabella
@@ -3114,9 +3266,19 @@ const BrownfieldConvex = {
     this.layers = {
       provinces: L.layerGroup().addTo(this.map),
       ports:     L.layerGroup().addTo(this.map),
-      plants:    L.layerGroup().addTo(this.map)
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
     };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+        Detail.hide('bfc');
+      }
+    });
     // Charts
     this.charts.stack = new Chart(document.getElementById('bfc-chart-stack').getContext('2d'), {
       type:'bar', data:{labels:[], datasets:[
@@ -3172,6 +3334,7 @@ const BrownfieldConvex = {
     document.getElementById('bfc-btn-reset').addEventListener('click', ()=>{
       this.state.plants = this.buildVeronesiPlants();
       this.state.nextId = this.state.plants.length;
+      this.state.sel = -1;
       sD.value = 1.0; document.getElementById('bfc-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0;
       this.drawPlants(); this.render();
@@ -3217,6 +3380,14 @@ const BrownfieldConvex = {
       document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1);
       window.appData.routingIneffIn = v; this.render();
     });
+    // Close detail panel
+    document.getElementById('bfc-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('bfc');
+    });
   },
 
   syncIneffSliders(){
@@ -3255,9 +3426,11 @@ const BrownfieldConvex = {
     this.layers.plants.clearLayers();
     this.markers.plants = [];
     this.state.plants.forEach((p, idx) => {
-      const cls = p.active
+      const isSel = (idx === this.state.sel);
+      let cls = p.active
         ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
         : 'plant-icon disabled';
+      if (isSel) cls += ' selected';
       const lbl = p.fixed ? '🔒' : '🏭';
       const icon = L.divIcon({className:'',
         html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
@@ -3276,11 +3449,63 @@ const BrownfieldConvex = {
           this.render();
         });
       }
+      m.on('click', (ev)=>{
+        L.DomEvent.stopPropagation(ev);
+        if (!p.active){
+          flashStatus(`${p.name} è disattivato — riattivalo per visualizzarne le aree servite.`, 4000);
+          return;
+        }
+        this.state.sel = (this.state.sel === idx) ? -1 : idx;
+        this.drawPlants();
+        this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          const active = this.state.plants.filter(x => x.active);
+          const activeIdx = active.indexOf(p);
+          Detail.show('bfc', this.lastResult, p, activeIdx);
+        } else {
+          Detail.hide('bfc');
+        }
+      });
       m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
       m.addTo(this.layers.plants);
       this.markers.plants.push(m);
     });
     this.renderPlantList();
+  },
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult){ this.resetProvinceStyles(); return; }
+    const sel = this.state.plants[this.state.sel];
+    if (!sel || !sel.active){ this.resetProvinceStyles(); return; }
+    const active = this.state.plants.filter(x => x.active);
+    const activeIdx = active.indexOf(sel);
+    if (activeIdx < 0){ this.resetProvinceStyles(); return; }
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === activeIdx){
+        L.polyline([[p.lat,p.lon],[sel.lat,sel.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({
+          color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85
+        });
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({
+          color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25
+        });
+      }
+    });
+    const port = window.appData.ports[this.lastResult.portAssign[activeIdx]];
+    if (port){
+      L.polyline([[sel.lat,sel.lon],[port.lat,port.lon]],
+        {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+    }
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({
+      color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+    }));
   },
 
   renderPlantList(){
@@ -3310,7 +3535,11 @@ const BrownfieldConvex = {
       btnTog.textContent = p.active ? 'Off' : 'On';
       btnTog.style.fontSize = '10px';
       btnTog.style.padding = '2px 6px';
-      btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); };
+      btnTog.onclick = ()=>{
+        p.active = !p.active;
+        if (!p.active && idx === this.state.sel) this.state.sel = -1;
+        this.drawPlants(); this.render();
+      };
       row.appendChild(btnTog);
       if (!p.fixed){
         const btnRm = document.createElement('button');
@@ -3320,6 +3549,7 @@ const BrownfieldConvex = {
         btnRm.style.padding = '2px 6px';
         btnRm.onclick = ()=>{
           this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.state.sel = -1;
           this.drawPlants(); this.render();
         };
         row.appendChild(btnRm);
@@ -3430,6 +3660,21 @@ const BrownfieldConvex = {
     this.charts.pie.update('none');
     // refresh saturazioni nella lista
     this.renderPlantList();
+    // Pannello dettaglio + linee (se uno stab. è selezionato)
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      const sel = this.state.plants[this.state.sel];
+      if (sel && sel.active){
+        const activeIdx = active.indexOf(sel);
+        Detail.show('bfc', r, sel, activeIdx);
+      } else {
+        Detail.hide('bfc');
+      }
+    } else {
+      this.layers.links && this.layers.links.clearLayers();
+      this.resetProvinceStyles && this.resetProvinceStyles();
+      Detail.hide('bfc');
+    }
   },
   onDataChange(){
     if (this.initialized){
