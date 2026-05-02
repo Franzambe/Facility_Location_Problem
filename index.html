@@ -123,6 +123,16 @@ body{
 .kpi .delta{font-size:10px;margin-top:2px;}
 .kpi .delta.up{color:var(--bad);}
 .kpi .delta.down{color:var(--good);}
+/* Metrica di contesto (es. tratta media) — colore neutro per non competere con il delta */
+.kpi .kpi-meta{
+  font-size:9px;
+  color:#79c0ff;
+  opacity:0.65;
+  font-style:italic;
+  margin-top:1px;
+  letter-spacing:0.2px;
+  font-family:monospace;
+}
 .kpi.full .value{font-size:22px;color:#79c0ff;}
 .form-range{accent-color:var(--accent);}
 .btn-primary{background:var(--accent);border-color:var(--accent);}
@@ -313,9 +323,17 @@ body{
             <div class="value" id="gf-kpi-total">— €</div>
             <div class="sub" id="gf-kpi-unit" style="color:var(--txt-dim);font-size:10px;">— €/ton medio</div>
           </div>
-          <div class="kpi"><div class="label">Approvvigionamento</div><div class="value" id="gf-kpi-app">—</div></div>
+          <div class="kpi">
+            <div class="label">Approvvigionamento</div>
+            <div class="value" id="gf-kpi-app">—</div>
+            <div class="kpi-meta" id="gf-kpi-app-meta"></div>
+          </div>
           <div class="kpi"><div class="label">Produzione</div><div class="value" id="gf-kpi-prod">—</div></div>
-          <div class="kpi"><div class="label">Distribuzione</div><div class="value" id="gf-kpi-distr">—</div></div>
+          <div class="kpi">
+            <div class="label">Distribuzione</div>
+            <div class="value" id="gf-kpi-distr">—</div>
+            <div class="kpi-meta" id="gf-kpi-distr-meta"></div>
+          </div>
           <div class="kpi"><div class="label">Volume rete (ton)</div><div class="value" id="gf-kpi-vol">—</div></div>
         </div>
       </div>
@@ -363,7 +381,6 @@ body{
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento (barre impilate)</div><canvas id="gf-chart-stack"></canvas></div>
           <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="gf-chart-pie"></canvas></div>
-          <div class="chart-meta" id="gf-chart-meta">Tratta media — IN: — km · OUT: — km</div>
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione (€/ton vs ton)</div><canvas id="gf-chart-line"></canvas></div>
         </div>
       </div>
@@ -397,6 +414,7 @@ body{
             <div class="label">Approvvigionamento</div>
             <div class="value" id="bf-kpi-app">—</div>
             <div class="delta" id="bf-kpi-app-delta">—</div>
+            <div class="kpi-meta" id="bf-kpi-app-meta"></div>
           </div>
           <div class="kpi">
             <div class="label">Produzione</div>
@@ -407,6 +425,7 @@ body{
             <div class="label">Distribuzione</div>
             <div class="value" id="bf-kpi-distr">—</div>
             <div class="delta" id="bf-kpi-distr-delta">—</div>
+            <div class="kpi-meta" id="bf-kpi-distr-meta"></div>
           </div>
           <div class="kpi">
             <div class="label">€/ton medio</div>
@@ -458,7 +477,6 @@ body{
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Scenario vs Baseline (per voce)</div><canvas id="bf-chart-bar"></canvas></div>
           <div class="chart-box"><div class="chart-title">Ripartizione % (scenario)</div><canvas id="bf-chart-pie"></canvas></div>
-          <div class="chart-meta" id="bf-chart-meta">Tratta media — IN: — km · OUT: — km</div>
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione</div><canvas id="bf-chart-line"></canvas></div>
         </div>
       </div>
@@ -1311,10 +1329,11 @@ const Greenfield = {
     this.charts.stack.update('none');
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
-    // Tratta media IN/OUT (linea d'aria → effettiva con inefficienza)
-    document.getElementById('gf-chart-meta').innerHTML =
-      `IN: ${r.avgKmIn.toFixed(0)} km × ${r.ineffIn.toFixed(1)} = <b>${r.avgKmInEff.toFixed(0)} km</b>` +
-      ` · OUT: ${r.avgKmOut.toFixed(0)} km × ${r.ineffOut.toFixed(1)} = <b>${r.avgKmOutEff.toFixed(0)} km</b>`;
+    // Tratta media nei KPI (storytelling: contesto a fianco del dato di costo)
+    document.getElementById('gf-kpi-app-meta').textContent =
+      `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    document.getElementById('gf-kpi-distr-meta').textContent =
+      `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
     // line chart points
     const lt = window.appData.prodTable;
     const pts = this.state.plants.map((p,i)=>{
@@ -1348,7 +1367,8 @@ const Brownfield = {
     plants:[],     // tutti gli stab (fixed + new), con flag active
     factor:1.0,
     unit:false,
-    nextId:0
+    nextId:0,
+    sel:-1         // indice (in plants) dello stab. selezionato per highlight
   },
   baseline:null, // result della baseline (sempre 7 Veronesi attivi)
   map:null, layers:{}, markers:{plants:[], circles:[]},
@@ -1375,9 +1395,19 @@ const Brownfield = {
     this.layers = {
       provinces: L.layerGroup().addTo(this.map),
       ports:     L.layerGroup().addTo(this.map),
-      plants:    L.layerGroup().addTo(this.map)
+      plants:    L.layerGroup().addTo(this.map),
+      links:     L.layerGroup().addTo(this.map)
     };
     this.drawProvinces(); this.drawPorts(); this.drawPlants();
+    // Click sulla mappa (non su uno stab.) → deseleziona
+    this.map.on('click', ()=>{
+      if (this.state.sel >= 0){
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+      }
+    });
     // ---------- charts ----------
     this.charts.bar = new Chart(document.getElementById('bf-chart-bar').getContext('2d'), {
       type:'bar', data:{labels:['App','Prod','Distr','Totale'], datasets:[
@@ -1445,6 +1475,7 @@ const Brownfield = {
     document.getElementById('bf-btn-reset').addEventListener('click', ()=>{
       this.state.plants = this.buildVeronesiPlants();
       this.state.nextId = this.state.plants.length;
+      this.state.sel = -1;
       sD.value = 1.0; document.getElementById('bf-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0;
       this.drawPlants(); this.render();
@@ -1507,9 +1538,11 @@ const Brownfield = {
     this.layers.plants.clearLayers();
     this.markers.plants = [];
     this.state.plants.forEach((p, idx) => {
-      const cls = p.active
+      const isSel = (idx === this.state.sel);
+      let cls = p.active
         ? (p.fixed ? 'plant-icon fixed' : 'plant-icon new')
         : 'plant-icon disabled';
+      if (isSel) cls += ' selected';
       const lbl = p.fixed ? '🔒' : '🏭';
       const icon = L.divIcon({className:'',
         html:`<div class="${cls}" title="${p.name}">${lbl}</div>`,
@@ -1528,11 +1561,67 @@ const Brownfield = {
           this.render();
         });
       }
+      // Click su uno stab. → seleziona/deseleziona (anche su Veronesi fissi)
+      m.on('click', (ev)=>{
+        L.DomEvent.stopPropagation(ev);
+        if (!p.active){
+          flashStatus(`${p.name} è disattivato — riattivalo per visualizzarne le aree servite.`, 4000);
+          return;
+        }
+        this.state.sel = (this.state.sel === idx) ? -1 : idx;
+        this.drawPlants();
+        this.drawLinks();
+      });
       m.bindTooltip(p.name + (p.active?'':' (disattivato)'), {direction:'top', offset:[0,-14]});
       m.addTo(this.layers.plants);
       this.markers.plants.push(m);
     });
     this.renderPlantList();
+  },
+  // Disegna linee di assegnazione e linea verso porto per lo stab. selezionato
+  drawLinks(){
+    this.layers.links.clearLayers();
+    if (this.state.sel < 0 || !this.lastResult){
+      this.resetProvinceStyles();
+      return;
+    }
+    const sel = this.state.plants[this.state.sel];
+    if (!sel || !sel.active){
+      this.resetProvinceStyles();
+      return;
+    }
+    // lastResult è calcolato sugli stab. attivi, quindi traduco l'indice
+    const active = this.state.plants.filter(x => x.active);
+    const activeIdx = active.indexOf(sel);
+    if (activeIdx < 0){ this.resetProvinceStyles(); return; }
+    // Province servite → linea blu tratteggiata + highlight cerchio
+    window.appData.provinces.forEach((p, i) => {
+      if (this.lastResult.provAssign[i] === activeIdx){
+        L.polyline([[p.lat,p.lon],[sel.lat,sel.lon]],
+          {color:'#3aa0ff', weight:1, opacity:0.55, dashArray:'4 4'}).addTo(this.layers.links);
+        if (this.markers.circles[i]) this.markers.circles[i].setStyle({
+          color:'#79c0ff', weight:2,
+          fillColor:'rgba(121,192,255,0.85)', fillOpacity:0.85
+        });
+      } else if (this.markers.circles[i]){
+        this.markers.circles[i].setStyle({
+          color:'#1f87e6', weight:1,
+          fillColor:'rgba(58,160,255,0.25)', fillOpacity:0.25
+        });
+      }
+    });
+    // Linea stab → porto di approvvigionamento (arancione)
+    const port = window.appData.ports[this.lastResult.portAssign[activeIdx]];
+    if (port){
+      L.polyline([[sel.lat,sel.lon],[port.lat,port.lon]],
+        {color:'#ff9900', weight:3, opacity:0.85}).addTo(this.layers.links);
+    }
+  },
+  resetProvinceStyles(){
+    this.markers.circles.forEach(c => c.setStyle({
+      color:'#1f87e6', weight:1,
+      fillColor:'rgba(58,160,255,0.55)', fillOpacity:0.55
+    }));
   },
   renderPlantList(){
     const list = document.getElementById('bf-plant-list');
@@ -1548,7 +1637,12 @@ const Brownfield = {
       const btnTog = document.createElement('button');
       btnTog.className = 'btn ' + (p.active?'btn-secondary':'btn-primary') + ' btn-sm';
       btnTog.textContent = p.active ? 'Disattiva' : 'Attiva';
-      btnTog.onclick = ()=>{ p.active = !p.active; this.drawPlants(); this.render(); };
+      btnTog.onclick = ()=>{
+        p.active = !p.active;
+        // Se disattivo lo stab. selezionato, deseleziono
+        if (!p.active && idx === this.state.sel) this.state.sel = -1;
+        this.drawPlants(); this.render();
+      };
       row.appendChild(btnTog);
       if (!p.fixed){
         const btnRm = document.createElement('button');
@@ -1557,6 +1651,7 @@ const Brownfield = {
         btnRm.title = 'Rimuovi nuovo stab.';
         btnRm.onclick = ()=>{
           this.state.plants = this.state.plants.filter(x=>x!==p);
+          this.state.sel = -1;     // reset highlight per evitare indici sfasati
           this.drawPlants(); this.render();
         };
         row.appendChild(btnRm);
@@ -1633,11 +1728,15 @@ const Brownfield = {
     // Pie (scenario)
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
-    // Tratta media IN/OUT (linea d'aria → effettiva, scenario vs baseline)
-    document.getElementById('bf-chart-meta').innerHTML =
-      `IN: ${r.avgKmIn.toFixed(0)} km × ${r.ineffIn.toFixed(1)} = <b>${r.avgKmInEff.toFixed(0)} km</b>` +
-      ` · OUT: ${r.avgKmOut.toFixed(0)} km × ${r.ineffOut.toFixed(1)} = <b>${r.avgKmOutEff.toFixed(0)} km</b>` +
-      ` <span style="opacity:.6">(baseline IN ${b.avgKmInEff.toFixed(0)} · OUT ${b.avgKmOutEff.toFixed(0)} km)</span>`;
+    // Tratta media nei KPI (scenario; baseline in parentesi solo se differisce)
+    const trattaApp  = `tratta ${r.avgKmIn.toFixed(0)}→${r.avgKmInEff.toFixed(0)} km`;
+    const trattaDist = `tratta ${r.avgKmOut.toFixed(0)}→${r.avgKmOutEff.toFixed(0)} km`;
+    const baseDeltaIn  = Math.abs(r.avgKmInEff  - b.avgKmInEff)  > 0.5;
+    const baseDeltaOut = Math.abs(r.avgKmOutEff - b.avgKmOutEff) > 0.5;
+    document.getElementById('bf-kpi-app-meta').textContent =
+      trattaApp + (baseDeltaIn ? ` (base ${b.avgKmInEff.toFixed(0)})` : '');
+    document.getElementById('bf-kpi-distr-meta').textContent =
+      trattaDist + (baseDeltaOut ? ` (base ${b.avgKmOutEff.toFixed(0)})` : '');
     // Line chart points (scenario)
     const lt = window.appData.prodTable;
     const pts = active.map((p,i)=>{
@@ -1647,6 +1746,9 @@ const Brownfield = {
     });
     this.charts.line.data.datasets[1].data = pts;
     this.charts.line.update('none');
+    // Aggiorna linee di highlight (province servite + porto) per lo stab. selezionato
+    if (this.state.sel >= 0) this.drawLinks();
+    else { this.layers.links.clearLayers(); this.resetProvinceStyles(); }
   },
   onDataChange(){
     if (this.initialized){
