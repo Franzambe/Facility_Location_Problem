@@ -144,6 +144,12 @@ body{
   color:var(--txt-dim);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;
   position:absolute;top:4px;left:8px;z-index:1;
 }
+.chart-meta{
+  color:var(--txt-dim);font-size:10px;font-family:monospace;
+  text-align:center;letter-spacing:0.3px;
+  margin:-4px 0 8px;
+}
+.chart-meta b{color:#79c0ff;font-weight:600;}
 /* Plant list (Brownfield) */
 .plant-row{
   display:flex;align-items:center;gap:8px;
@@ -340,6 +346,7 @@ body{
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento (barre impilate)</div><canvas id="gf-chart-stack"></canvas></div>
           <div class="chart-box"><div class="chart-title">Ripartizione percentuale</div><canvas id="gf-chart-pie"></canvas></div>
+          <div class="chart-meta" id="gf-chart-meta">Tratta media — IN: — km · OUT: — km</div>
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione (€/ton vs ton)</div><canvas id="gf-chart-line"></canvas></div>
         </div>
       </div>
@@ -417,6 +424,7 @@ body{
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Scenario vs Baseline (per voce)</div><canvas id="bf-chart-bar"></canvas></div>
           <div class="chart-box"><div class="chart-title">Ripartizione % (scenario)</div><canvas id="bf-chart-pie"></canvas></div>
+          <div class="chart-meta" id="bf-chart-meta">Tratta media — IN: — km · OUT: — km</div>
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione</div><canvas id="bf-chart-line"></canvas></div>
         </div>
       </div>
@@ -838,11 +846,24 @@ const Engine = {
     const totalCost = totalApp + totalProd + totalDistr;
     const totalVol  = tonPerPlant.reduce((s,x)=>s+x,0);
     const unitTotal = totalVol > 0 ? totalCost/totalVol : 0;
+    // Tratta media OUT (stab→provincia, pesata sulla domanda effettiva di ogni provincia)
+    let kmDemandOut = 0;
+    for (let i = 0; i < PROV.length; i++){
+      kmDemandOut += provDemand[i] * provDist[i];
+    }
+    const avgKmOut = totalVol > 0 ? kmDemandOut / totalVol : 0;
+    // Tratta media IN (porto→stab, pesata sui ton lavorati da ogni stab)
+    let kmTonIn = 0;
+    for (let j = 0; j < plants.length; j++){
+      kmTonIn += tonPerPlant[j] * portDist[j];
+    }
+    const avgKmIn = totalVol > 0 ? kmTonIn / totalVol : 0;
     return {
       plants, provDemand, provAssign, provDist,
       tonPerPlant, prodUnitPerPlant, prodCostPerPlant,
       portAssign, portDist, appUnitPerPlant, appCostPerPlant,
-      distrPerPlant, totalApp, totalProd, totalDistr, totalCost, totalVol, unitTotal
+      distrPerPlant, totalApp, totalProd, totalDistr, totalCost, totalVol, unitTotal,
+      avgKmIn, avgKmOut
     };
   },
   // Snap-to-land: ritorna {lat,lon,snapped, provName,distance}
@@ -1207,6 +1228,9 @@ const Greenfield = {
     this.charts.stack.update('none');
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
+    // Tratta media IN/OUT
+    document.getElementById('gf-chart-meta').innerHTML =
+      `Tratta media · IN: <b>${r.avgKmIn.toFixed(0)} km</b> · OUT: <b>${r.avgKmOut.toFixed(0)} km</b>`;
     // line chart points
     const lt = window.appData.prodTable;
     const pts = this.state.plants.map((p,i)=>{
@@ -1501,6 +1525,10 @@ const Brownfield = {
     // Pie (scenario)
     this.charts.pie.data.datasets[0].data = [r.totalApp, r.totalProd, r.totalDistr];
     this.charts.pie.update('none');
+    // Tratta media IN/OUT (scenario corrente vs baseline)
+    document.getElementById('bf-chart-meta').innerHTML =
+      `Tratta media · IN: <b>${r.avgKmIn.toFixed(0)} km</b> · OUT: <b>${r.avgKmOut.toFixed(0)} km</b>` +
+      ` <span style="opacity:.6">(baseline IN ${b.avgKmIn.toFixed(0)} · OUT ${b.avgKmOut.toFixed(0)})</span>`;
     // Line chart points (scenario)
     const lt = window.appData.prodTable;
     const pts = active.map((p,i)=>{
