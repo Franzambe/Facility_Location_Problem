@@ -160,6 +160,70 @@ body{
   margin:-4px 0 8px;
 }
 .chart-meta b{color:#79c0ff;font-weight:600;}
+/* Pannello dettaglio stabilimento (GF + BF) */
+.detail-panel{display:none;}
+.detail-panel.show{display:block;}
+.detail-panel h6{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.detail-panel h6 .close-btn{
+  cursor:pointer;color:var(--txt-dim);font-size:14px;
+  padding:0 4px;line-height:1;border:0;background:transparent;
+}
+.detail-panel h6 .close-btn:hover{color:var(--bad);}
+.detail-grid{font-size:11px;}
+.detail-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:3px 0;gap:8px;
+}
+.detail-row .label{color:var(--txt-dim);flex:0 1 auto;}
+.detail-row .val{
+  color:var(--txt);font-family:monospace;font-weight:500;
+  text-align:right;flex:0 0 auto;
+}
+.detail-row.total{
+  border-top:1px solid var(--accent);
+  margin-top:6px;padding-top:8px;font-size:13px;
+}
+.detail-row.total .val{color:#79c0ff;font-weight:700;}
+.detail-section-title{
+  color:var(--accent-2);
+  font-size:9px;text-transform:uppercase;letter-spacing:0.5px;
+  margin:10px 0 4px;font-weight:600;
+}
+.detail-divider{
+  border:0;border-top:1px solid var(--bg-3);
+  margin:8px 0 4px;
+}
+.prov-table-wrap{
+  max-height:200px;overflow-y:auto;
+  border:1px solid var(--bg-3);border-radius:4px;
+  background:var(--bg-3);
+}
+.prov-table-wrap::-webkit-scrollbar{width:6px;}
+.prov-table-wrap::-webkit-scrollbar-track{background:var(--bg-3);}
+.prov-table-wrap::-webkit-scrollbar-thumb{background:#525a64;border-radius:3px;}
+.prov-table{
+  width:100%;border-collapse:collapse;font-size:10px;
+}
+.prov-table th{
+  color:var(--txt-dim);text-transform:uppercase;font-size:8px;
+  letter-spacing:0.3px;padding:4px 6px;text-align:right;
+  background:var(--bg-2);position:sticky;top:0;z-index:1;
+  font-weight:600;
+}
+.prov-table th:nth-child(2){text-align:left;}
+.prov-table td{
+  padding:3px 6px;border-bottom:1px solid var(--bg-3);
+  font-family:monospace;text-align:right;color:var(--txt);
+}
+.prov-table td:nth-child(2){
+  text-align:left;font-family:inherit;
+  max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.prov-table tr:hover td{background:rgba(58,160,255,0.08);}
+.prov-table .rank{color:var(--txt-dim);width:18px;}
+
 /* Plant list (Brownfield) */
 .plant-row{
   display:flex;align-items:center;gap:8px;
@@ -337,6 +401,43 @@ body{
           <div class="kpi"><div class="label">Volume rete (ton)</div><div class="value" id="gf-kpi-vol">—</div></div>
         </div>
       </div>
+
+      <!-- Pannello dettaglio stabilimento (visibile su click) -->
+      <div class="panel-section detail-panel" id="gf-detail-panel">
+        <h6>
+          <span id="gf-detail-title">Dettaglio stabilimento</span>
+          <button class="close-btn" id="gf-detail-close" title="Chiudi">✕</button>
+        </h6>
+        <div class="detail-grid">
+          <div class="detail-section-title">Produzione</div>
+          <div class="detail-row"><span class="label">Volume servito</span><span class="val" id="gf-detail-volume">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario (tabella scaglioni)</span><span class="val" id="gf-detail-prod-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale</span><span class="val" id="gf-detail-prod-total">—</span></div>
+
+          <div class="detail-section-title">Approvvigionamento (porto)</div>
+          <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="gf-detail-port">—</span></div>
+          <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="gf-detail-port-dist">—</span></div>
+          <div class="detail-row"><span class="label">€/ton inbound</span><span class="val" id="gf-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="gf-detail-app-total">—</span></div>
+
+          <div class="detail-section-title">Distribuzione (province)</div>
+          <div class="detail-row"><span class="label">N° province servite</span><span class="val" id="gf-detail-nprov">—</span></div>
+          <div class="detail-row"><span class="label">Distanza media pesata (lin → eff)</span><span class="val" id="gf-detail-dist-avg">—</span></div>
+          <div class="detail-row"><span class="label">€/ton outbound medio</span><span class="val" id="gf-detail-distr-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale outbound</span><span class="val" id="gf-detail-distr-total">—</span></div>
+
+          <div class="detail-section-title">Top province servite (per volume)</div>
+          <div class="prov-table-wrap">
+            <table class="prov-table">
+              <thead><tr><th class="rank">#</th><th>Provincia</th><th>Ton</th><th>km</th><th>€/t</th></tr></thead>
+              <tbody id="gf-detail-prov-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="detail-row total"><span class="label">COSTO TOTALE STAB.</span><span class="val" id="gf-detail-total">—</span></div>
+        </div>
+      </div>
+
       <div class="panel-section">
         <h6>Parametri</h6>
         <div class="slider-row mb-2">
@@ -434,6 +535,43 @@ body{
           </div>
         </div>
       </div>
+
+      <!-- Pannello dettaglio stabilimento (visibile su click) -->
+      <div class="panel-section detail-panel" id="bf-detail-panel">
+        <h6>
+          <span id="bf-detail-title">Dettaglio stabilimento</span>
+          <button class="close-btn" id="bf-detail-close" title="Chiudi">✕</button>
+        </h6>
+        <div class="detail-grid">
+          <div class="detail-section-title">Produzione</div>
+          <div class="detail-row"><span class="label">Volume servito</span><span class="val" id="bf-detail-volume">—</span></div>
+          <div class="detail-row"><span class="label">Costo unitario (tabella scaglioni)</span><span class="val" id="bf-detail-prod-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale</span><span class="val" id="bf-detail-prod-total">—</span></div>
+
+          <div class="detail-section-title">Approvvigionamento (porto)</div>
+          <div class="detail-row"><span class="label">Porto assegnato</span><span class="val" id="bf-detail-port">—</span></div>
+          <div class="detail-row"><span class="label">Distanza (lin → eff)</span><span class="val" id="bf-detail-port-dist">—</span></div>
+          <div class="detail-row"><span class="label">€/ton inbound</span><span class="val" id="bf-detail-app-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale inbound</span><span class="val" id="bf-detail-app-total">—</span></div>
+
+          <div class="detail-section-title">Distribuzione (province)</div>
+          <div class="detail-row"><span class="label">N° province servite</span><span class="val" id="bf-detail-nprov">—</span></div>
+          <div class="detail-row"><span class="label">Distanza media pesata (lin → eff)</span><span class="val" id="bf-detail-dist-avg">—</span></div>
+          <div class="detail-row"><span class="label">€/ton outbound medio</span><span class="val" id="bf-detail-distr-unit">—</span></div>
+          <div class="detail-row"><span class="label">Costo totale outbound</span><span class="val" id="bf-detail-distr-total">—</span></div>
+
+          <div class="detail-section-title">Top province servite (per volume)</div>
+          <div class="prov-table-wrap">
+            <table class="prov-table">
+              <thead><tr><th class="rank">#</th><th>Provincia</th><th>Ton</th><th>km</th><th>€/t</th></tr></thead>
+              <tbody id="bf-detail-prov-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="detail-row total"><span class="label">COSTO TOTALE STAB.</span><span class="val" id="bf-detail-total">—</span></div>
+        </div>
+      </div>
+
       <div class="panel-section">
         <h6>Parametri</h6>
         <div class="slider-row mb-3">
@@ -1044,6 +1182,118 @@ function setupChartDefaults(){
 }
 setupChartDefaults();
 
+// Format compatto per ton (es. 12.345 ton → "12k", 645.773 ton → "646k", 1.250.000 → "1.25M")
+function fmtTon(v){
+  if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return (v/1e3).toFixed(0) + 'k';
+  return v.toFixed(0);
+}
+
+/* ====================================================================
+   DETAIL — Helper condiviso GF/BF per il pannello dettaglio stabilimento
+   Legge l'ultimo Engine.compute() della pagina e popola tutti i campi.
+   ==================================================================== */
+const Detail = {
+  // prefix: 'gf' o 'bf'
+  // result: this.lastResult (output di Engine.compute)
+  // plant: oggetto stabilimento (con .name, .lat, .lon)
+  // activeIdx: indice nello sub-array di stab. attivi (= indice nei campi di result)
+  show(prefix, result, plant, activeIdx){
+    const panel = document.getElementById(prefix + '-detail-panel');
+    if (!result || !plant || activeIdx < 0){ this.hide(prefix); return; }
+
+    panel.classList.add('show');
+    document.getElementById(prefix + '-detail-title').textContent =
+      `Dettaglio: ${plant.name}`;
+
+    // ---- Produzione ----
+    const ton      = result.tonPerPlant[activeIdx];
+    const prodUnit = result.prodUnitPerPlant[activeIdx];
+    const prodTot  = result.prodCostPerPlant[activeIdx];
+    document.getElementById(prefix + '-detail-volume').textContent =
+      fmt(ton, 0) + ' ton';
+    document.getElementById(prefix + '-detail-prod-unit').textContent =
+      fmt(prodUnit, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-prod-total').textContent =
+      fmt(prodTot/1e6, 3) + ' M€';
+
+    // ---- Approvvigionamento (porto) ----
+    const portIdx  = result.portAssign[activeIdx];
+    const port     = window.appData.ports[portIdx];
+    const portDist = result.portDist[activeIdx];
+    const appUnit  = result.appUnitPerPlant[activeIdx];
+    const appTot   = result.appCostPerPlant[activeIdx];
+    const ineffIn  = result.ineffIn || 1.0;
+    document.getElementById(prefix + '-detail-port').textContent =
+      port ? port.name : '—';
+    document.getElementById(prefix + '-detail-port-dist').textContent =
+      `${portDist.toFixed(0)} → ${(portDist*ineffIn).toFixed(0)} km`;
+    document.getElementById(prefix + '-detail-app-unit').textContent =
+      fmt(appUnit, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-app-total').textContent =
+      fmt(appTot/1e6, 3) + ' M€';
+
+    // ---- Distribuzione (province servite) ----
+    const ineffOut = result.ineffOut || 1.0;
+    const PROV     = window.appData.provinces;
+    const served   = [];
+    for (let i = 0; i < PROV.length; i++){
+      if (result.provAssign[i] === activeIdx && result.provDemand[i] > 0){
+        const km   = result.provDist[i];
+        const kmEff = km * ineffOut;
+        const cost = Engine.unitCostDistr(kmEff);    // coerente con il modello
+        served.push({
+          name: PROV[i].name,
+          ton:  result.provDemand[i],
+          km, kmEff, cost
+        });
+      }
+    }
+    served.sort((a, b) => b.ton - a.ton);
+
+    // Media pesata distanza e costo (sui ton di domanda effettiva)
+    let totTon = 0, kmW = 0, costW = 0;
+    for (const p of served){
+      totTon += p.ton;
+      kmW    += p.ton * p.km;
+      costW  += p.ton * p.cost;
+    }
+    const avgKm   = totTon > 0 ? kmW   / totTon : 0;
+    const avgCost = totTon > 0 ? costW / totTon : 0;
+    document.getElementById(prefix + '-detail-nprov').textContent = served.length.toString();
+    document.getElementById(prefix + '-detail-dist-avg').textContent =
+      `${avgKm.toFixed(0)} → ${(avgKm*ineffOut).toFixed(0)} km`;
+    document.getElementById(prefix + '-detail-distr-unit').textContent =
+      fmt(avgCost, 2) + ' €/ton';
+    document.getElementById(prefix + '-detail-distr-total').textContent =
+      fmt(result.distrPerPlant[activeIdx]/1e6, 3) + ' M€';
+
+    // Tabella province (tutte, ma scrollabile dopo le prime 10)
+    const tbody = document.getElementById(prefix + '-detail-prov-tbody');
+    tbody.innerHTML = '';
+    served.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="rank">${i+1}</td>
+        <td title="${p.name}">${p.name}</td>
+        <td>${fmtTon(p.ton)}</td>
+        <td>${p.km.toFixed(0)}</td>
+        <td>${p.cost.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Totale stabilimento (App + Prod + Distr)
+    const total = appTot + prodTot + result.distrPerPlant[activeIdx];
+    document.getElementById(prefix + '-detail-total').textContent =
+      fmt(total/1e6, 3) + ' M€';
+  },
+  hide(prefix){
+    const panel = document.getElementById(prefix + '-detail-panel');
+    if (panel) panel.classList.remove('show');
+  }
+};
+
 /* ====================================================================
    NAV — gestione delle pagine
    ==================================================================== */
@@ -1199,8 +1449,20 @@ const Greenfield = {
     });
     this.map.on('click', ()=>{
       if (this.state.sel >= 0){
-        this.state.sel = -1; this.drawPlants(); this.layers.links.clearLayers(); this.resetProvinceStyles();
+        this.state.sel = -1;
+        this.drawPlants();
+        this.layers.links.clearLayers();
+        this.resetProvinceStyles();
+        Detail.hide('gf');
       }
+    });
+    // Pulsante chiudi pannello dettaglio
+    document.getElementById('gf-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('gf');
     });
   },
   // sync slider con appData (viene chiamato in onShow)
@@ -1262,6 +1524,11 @@ const Greenfield = {
       m.on('click', ()=>{
         this.state.sel = (this.state.sel===idx) ? -1 : idx;
         this.drawPlants(); this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          Detail.show('gf', this.lastResult, this.state.plants[this.state.sel], this.state.sel);
+        } else {
+          Detail.hide('gf');
+        }
       });
       m.bindTooltip(p.name, {direction:'top', offset:[0,-14]});
       m.addTo(this.layers.plants);
@@ -1343,9 +1610,16 @@ const Greenfield = {
     });
     this.charts.line.data.datasets[1].data = pts;
     this.charts.line.update('none');
-    // links update
-    if (this.state.sel >= 0) this.drawLinks();
-    else { this.layers.links.clearLayers(); this.resetProvinceStyles(); }
+    // links + pannello dettaglio
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      // In Greenfield activeIdx == sel (tutti gli stab. sono "attivi")
+      Detail.show('gf', r, this.state.plants[this.state.sel], this.state.sel);
+    } else {
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('gf');
+    }
   },
   // chiamato quando i dati globali cambiano (Data page)
   onDataChange(){
@@ -1406,7 +1680,16 @@ const Brownfield = {
         this.drawPlants();
         this.layers.links.clearLayers();
         this.resetProvinceStyles();
+        Detail.hide('bf');
       }
+    });
+    // Pulsante chiudi pannello dettaglio
+    document.getElementById('bf-detail-close').addEventListener('click', ()=>{
+      this.state.sel = -1;
+      this.drawPlants();
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('bf');
     });
     // ---------- charts ----------
     this.charts.bar = new Chart(document.getElementById('bf-chart-bar').getContext('2d'), {
@@ -1571,6 +1854,14 @@ const Brownfield = {
         this.state.sel = (this.state.sel === idx) ? -1 : idx;
         this.drawPlants();
         this.drawLinks();
+        if (this.state.sel >= 0 && this.lastResult){
+          // lastResult è calcolato sugli stab. attivi → traduco l'indice
+          const active = this.state.plants.filter(x => x.active);
+          const activeIdx = active.indexOf(p);
+          Detail.show('bf', this.lastResult, p, activeIdx);
+        } else {
+          Detail.hide('bf');
+        }
       });
       m.bindTooltip(p.name + (p.active?'':' (disattivato)'), {direction:'top', offset:[0,-14]});
       m.addTo(this.layers.plants);
@@ -1746,9 +2037,22 @@ const Brownfield = {
     });
     this.charts.line.data.datasets[1].data = pts;
     this.charts.line.update('none');
-    // Aggiorna linee di highlight (province servite + porto) per lo stab. selezionato
-    if (this.state.sel >= 0) this.drawLinks();
-    else { this.layers.links.clearLayers(); this.resetProvinceStyles(); }
+    // Aggiorna linee di highlight + pannello dettaglio per lo stab. selezionato
+    if (this.state.sel >= 0){
+      this.drawLinks();
+      const sel = this.state.plants[this.state.sel];
+      // Brownfield: lastResult è calcolato sugli stab. ATTIVI → traduco l'indice
+      if (sel && sel.active){
+        const activeIdx = active.indexOf(sel);
+        Detail.show('bf', r, sel, activeIdx);
+      } else {
+        Detail.hide('bf');
+      }
+    } else {
+      this.layers.links.clearLayers();
+      this.resetProvinceStyles();
+      Detail.hide('bf');
+    }
   },
   onDataChange(){
     if (this.initialized){
