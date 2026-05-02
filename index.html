@@ -119,6 +119,25 @@ body{
   border-left:1px solid var(--bg-3);
   overflow-y:auto;
   padding:16px;
+  display:flex;
+  flex-direction:column;
+}
+.control-panel > .panel-section{order:99;}
+/* Ordine pannelli: 1=Parametri, 2=KPI, 3=Detail, 4=Scenario, 5=Lista stab, 6=Ottimizzazione, 7=Charts, 8=Legenda */
+.panel-section[data-order="1"]{order:1;}
+.panel-section[data-order="2"]{order:2;}
+.panel-section[data-order="3"]{order:3;}
+.panel-section[data-order="4"]{order:4;}
+.panel-section[data-order="5"]{order:5;}
+.panel-section[data-order="6"]{order:6;}
+.panel-section[data-order="7"]{order:7;}
+.panel-section[data-order="8"]{order:8;}
+/* Note text — più leggibile di text-muted su sfondo scuro */
+.note-text{
+  color:#c9d1d9;
+  opacity:0.9;
+  font-size:11px;
+  line-height:1.5;
 }
 .panel-section{
   background:var(--bg-2);
@@ -444,7 +463,7 @@ body{
   <div class="scenario-layout">
     <div class="map" id="map-gf"></div>
     <aside class="control-panel">
-      <div class="panel-section">
+      <div class="panel-section" data-order="2">
         <h6>KPI in tempo reale</h6>
         <div class="kpi-grid" id="gf-kpis">
           <div class="kpi full">
@@ -468,7 +487,7 @@ body{
       </div>
 
       <!-- Pannello dettaglio stabilimento (visibile su click) -->
-      <div class="panel-section detail-panel" id="gf-detail-panel">
+      <div class="panel-section detail-panel" data-order="3" id="gf-detail-panel">
         <h6>
           <span id="gf-detail-title">Dettaglio stabilimento</span>
           <button class="close-btn" id="gf-detail-close" title="Chiudi">✕</button>
@@ -511,7 +530,7 @@ body{
         </div>
       </div>
 
-      <div class="panel-section">
+      <div class="panel-section" data-order="1">
         <h6>Parametri</h6>
         <div class="slider-row mb-2">
           <label for="gf-sld-n">N° stabilimenti</label>
@@ -533,24 +552,7 @@ body{
           <label class="form-check-label small text-muted" for="gf-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
-      <div class="panel-section">
-        <h6>Inefficienza routing</h6>
-        <div class="slider-row mb-2">
-          <label for="gf-sld-iout">OUT (× km distr.)</label>
-          <input type="range" class="form-range" id="gf-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
-          <span class="val" id="gf-sld-iout-val">1.8</span>
-        </div>
-        <div class="slider-row">
-          <label for="gf-sld-iin">IN (× km approv.)</label>
-          <input type="range" class="form-range" id="gf-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
-          <span class="val" id="gf-sld-iin-val">1.4</span>
-        </div>
-        <div class="text-muted mt-2" style="font-size:10px;line-height:1.4;">
-          Default <b>1.8 OUT / 1.4 IN</b> calibrato sui dati Veronesi (gap ~50% vs assegnazione nearest‑neighbor).
-          Imposta <b>1.0</b> per vedere il lower bound teorico.
-        </div>
-      </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="7">
         <h6>Analisi grafica</h6>
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento (barre impilate)</div><canvas id="gf-chart-stack"></canvas></div>
@@ -558,7 +560,7 @@ body{
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione (€/ton vs ton)</div><canvas id="gf-chart-line"></canvas></div>
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="8">
         <h6>Legenda</h6>
         <div class="legend">
           <div><i style="background:var(--province);border-radius:50%;"></i>Provincia (raggio ∝ domanda)</div>
@@ -576,7 +578,7 @@ body{
   <div class="scenario-layout">
     <div class="map" id="map-bf"></div>
     <aside class="control-panel">
-      <div class="panel-section">
+      <div class="panel-section" data-order="2">
         <h6>Scenario corrente vs Baseline AS‑IS</h6>
         <div class="kpi-grid" id="bf-kpis">
           <div class="kpi full">
@@ -610,7 +612,7 @@ body{
       </div>
 
       <!-- Pannello dettaglio stabilimento (visibile su click) -->
-      <div class="panel-section detail-panel" id="bf-detail-panel">
+      <div class="panel-section detail-panel" data-order="3" id="bf-detail-panel">
         <h6>
           <span id="bf-detail-title">Dettaglio stabilimento</span>
           <button class="close-btn" id="bf-detail-close" title="Chiudi">✕</button>
@@ -653,7 +655,7 @@ body{
         </div>
       </div>
 
-      <div class="panel-section">
+      <div class="panel-section" data-order="1">
         <h6>Parametri</h6>
         <div class="slider-row mb-3">
           <label for="bf-sld-d">Fattore domanda</label>
@@ -662,6 +664,7 @@ body{
         </div>
         <div class="d-grid gap-2">
           <button id="bf-btn-add" class="btn btn-warning btn-sm">➕ Aggiungi stabilimento (greedy)</button>
+          <button id="bf-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza posizioni nuovi stab.</button>
           <button id="bf-btn-reset" class="btn btn-secondary btn-sm">↺ Ripristina 7 Veronesi</button>
         </div>
         <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
@@ -670,25 +673,8 @@ body{
           <label class="form-check-label small text-muted" for="bf-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
-      <div class="panel-section">
-        <h6>Inefficienza routing</h6>
-        <div class="slider-row mb-2">
-          <label for="bf-sld-iout">OUT (× km distr.)</label>
-          <input type="range" class="form-range" id="bf-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
-          <span class="val" id="bf-sld-iout-val">1.8</span>
-        </div>
-        <div class="slider-row">
-          <label for="bf-sld-iin">IN (× km approv.)</label>
-          <input type="range" class="form-range" id="bf-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
-          <span class="val" id="bf-sld-iin-val">1.4</span>
-        </div>
-        <div class="text-muted mt-2" style="font-size:10px;line-height:1.4;">
-          Default <b>1.8 OUT / 1.4 IN</b> calibrato sui dati Veronesi.
-          Imposta <b>1.0</b> per il lower bound teorico (nearest‑neighbor puro).
-        </div>
-      </div>
-      <div class="panel-section">
-        <h6>Scenario capacità Veronesi <span class="text-muted small" style="font-size:9px;">(informativo)</span></h6>
+      <div class="panel-section" data-order="4">
+        <h6>Scenario capacità Veronesi <span class="note-text small" style="font-size:9px;">(informativo)</span></h6>
         <div class="btn-group btn-group-sm w-100" role="group" id="bf-scenario">
           <button type="button" class="btn btn-secondary active" data-scenario="manual">Manuale</button>
           <button type="button" class="btn btn-secondary" data-scenario="plus10">+10%</button>
@@ -698,11 +684,11 @@ body{
           Mostra nel <b>dettaglio stab.</b> il valore di capacità per ogni Veronesi nello scenario selezionato. In Brownfield classico le capacità non vincolano i calcoli (vai a BF Convex per vedere l'impatto sulla rete).
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="5">
         <h6>Stabilimenti (max 9)</h6>
         <div id="bf-plant-list"></div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="7">
         <h6>Analisi grafica</h6>
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Scenario vs Baseline (per voce)</div><canvas id="bf-chart-bar"></canvas></div>
@@ -710,7 +696,7 @@ body{
           <div class="chart-box"><div class="chart-title">Curva costo unitario produzione</div><canvas id="bf-chart-line"></canvas></div>
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="8">
         <h6>Legenda</h6>
         <div class="legend">
           <div><i style="background:var(--plant);"></i>Stab. Veronesi 🔒 (fisso)</div>
@@ -728,7 +714,7 @@ body{
   <div class="scenario-layout">
     <div class="map" id="map-gfc"></div>
     <aside class="control-panel">
-      <div class="panel-section">
+      <div class="panel-section" data-order="2">
         <h6>KPI in tempo reale</h6>
         <div class="kpi-grid">
           <div class="kpi full">
@@ -745,7 +731,7 @@ body{
       </div>
 
       <!-- Pannello dettaglio stabilimento (visibile su click) -->
-      <div class="panel-section detail-panel" id="gfc-detail-panel">
+      <div class="panel-section detail-panel" data-order="3" id="gfc-detail-panel">
         <h6>
           <span id="gfc-detail-title">Dettaglio stabilimento</span>
           <button class="close-btn" id="gfc-detail-close" title="Chiudi">✕</button>
@@ -788,7 +774,7 @@ body{
         </div>
       </div>
 
-      <div class="panel-section">
+      <div class="panel-section" data-order="1">
         <h6>Parametri</h6>
         <div class="slider-row mb-2">
           <label for="gfc-sld-n">N° stabilimenti</label>
@@ -810,7 +796,7 @@ body{
           <label class="form-check-label small text-muted" for="gfc-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="6">
         <h6>Ottimizzazione convessa</h6>
         <div class="form-check form-switch mb-2">
           <input class="form-check-input" type="checkbox" role="switch" id="gfc-tgl-cap">
@@ -826,20 +812,7 @@ body{
         </div>
         <div class="opt-progress" id="gfc-progress"></div>
       </div>
-      <div class="panel-section">
-        <h6>Inefficienza routing</h6>
-        <div class="slider-row mb-2">
-          <label for="gfc-sld-iout">OUT (× km distr.)</label>
-          <input type="range" class="form-range" id="gfc-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
-          <span class="val" id="gfc-sld-iout-val">1.8</span>
-        </div>
-        <div class="slider-row">
-          <label for="gfc-sld-iin">IN (× km approv.)</label>
-          <input type="range" class="form-range" id="gfc-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
-          <span class="val" id="gfc-sld-iin-val">1.4</span>
-        </div>
-      </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="7">
         <h6>Analisi grafica</h6>
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento</div><canvas id="gfc-chart-stack"></canvas></div>
@@ -856,7 +829,7 @@ body{
   <div class="scenario-layout">
     <div class="map" id="map-bfc"></div>
     <aside class="control-panel">
-      <div class="panel-section">
+      <div class="panel-section" data-order="2">
         <h6>KPI in tempo reale</h6>
         <div class="kpi-grid">
           <div class="kpi full">
@@ -873,7 +846,7 @@ body{
       </div>
 
       <!-- Pannello dettaglio stabilimento (visibile su click) -->
-      <div class="panel-section detail-panel" id="bfc-detail-panel">
+      <div class="panel-section detail-panel" data-order="3" id="bfc-detail-panel">
         <h6>
           <span id="bfc-detail-title">Dettaglio stabilimento</span>
           <button class="close-btn" id="bfc-detail-close" title="Chiudi">✕</button>
@@ -916,7 +889,7 @@ body{
         </div>
       </div>
 
-      <div class="panel-section">
+      <div class="panel-section" data-order="1">
         <h6>Parametri</h6>
         <div class="slider-row mb-3">
           <label for="bfc-sld-d">Fattore domanda</label>
@@ -933,7 +906,7 @@ body{
           <label class="form-check-label small text-muted" for="bfc-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="4">
         <h6>Scenario capacità Veronesi</h6>
         <div class="btn-group btn-group-sm w-100" role="group" id="bfc-scenario">
           <button type="button" class="btn btn-secondary active" data-scenario="manual">Manuale</button>
@@ -944,32 +917,19 @@ body{
           Applica capacità calcolate sui max storici 2017‑2025. <b>+10%</b> = margine sicurezza (×1,1); <b>7/7</b> = capacità su 7gg/7 (×7/6 ≈ 1,167). Riga "Manuale" = valori inseriti dall'utente.
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="5">
         <h6>Stabilimenti (max 9, capacità per riga)</h6>
         <div id="bfc-plant-list"></div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="6">
         <h6>Ottimizzazione convessa</h6>
-        <p class="text-muted small mb-2" style="font-size:10px;">L'ottimizzazione muove solo i nuovi stab. (Veronesi fissi). Le capacità per riga vengono rispettate.</p>
+        <p class="note-text mb-2">L'ottimizzazione muove solo i nuovi stab. (Veronesi fissi). Le capacità per riga vengono rispettate.</p>
         <div class="d-grid gap-2">
           <button id="bfc-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza costo totale</button>
         </div>
         <div class="opt-progress" id="bfc-progress"></div>
       </div>
-      <div class="panel-section">
-        <h6>Inefficienza routing</h6>
-        <div class="slider-row mb-2">
-          <label for="bfc-sld-iout">OUT (× km distr.)</label>
-          <input type="range" class="form-range" id="bfc-sld-iout" min="1.0" max="3.0" step="0.1" value="1.8">
-          <span class="val" id="bfc-sld-iout-val">1.8</span>
-        </div>
-        <div class="slider-row">
-          <label for="bfc-sld-iin">IN (× km approv.)</label>
-          <input type="range" class="form-range" id="bfc-sld-iin" min="1.0" max="3.0" step="0.1" value="1.4">
-          <span class="val" id="bfc-sld-iin-val">1.4</span>
-        </div>
-      </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="7">
         <h6>Analisi grafica</h6>
         <div class="charts-row">
           <div class="chart-box"><div class="chart-title">Costi per stabilimento</div><canvas id="bfc-chart-stack"></canvas></div>
@@ -977,7 +937,7 @@ body{
           <div class="chart-box"><div class="chart-title">Convergenza ottimizzazione (M€)</div><canvas id="bfc-chart-conv"></canvas></div>
         </div>
       </div>
-      <div class="panel-section">
+      <div class="panel-section" data-order="8">
         <h6>Legenda</h6>
         <div class="legend">
           <div><i style="background:var(--plant);"></i>Stab. Veronesi 🔒 (fisso)</div>
@@ -1098,7 +1058,24 @@ body{
     </div>
 
     <div class="data-section">
-      <h3>💾 4.6 — Esporta / Importa</h3>
+      <h3>⚙️ 4.6 — Inefficienza routing</h3>
+      <p class="note-text mb-2">Moltiplicatori applicati ai km Haversine prima del lookup tariffario per riprodurre il gap della rete reale (specializzazioni, multi‑stop, ritorni a vuoto). Default <b>1,8 OUT / 1,4 IN</b> calibrati sui dati Veronesi. <b>1,0</b> = lower bound teorico nearest‑neighbor.</p>
+      <div class="toolbar" style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div class="slider-row" style="min-width:340px;flex:1;">
+          <label>OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="dp-iout" min="1.0" max="3.0" step="0.1" value="1.8" style="flex:1;">
+          <span class="val" id="dp-iout-val">1.8</span>
+        </div>
+        <div class="slider-row" style="min-width:340px;flex:1;">
+          <label>IN (× km approv.)</label>
+          <input type="range" class="form-range" id="dp-iin" min="1.0" max="3.0" step="0.1" value="1.4" style="flex:1;">
+          <span class="val" id="dp-iin-val">1.4</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="data-section">
+      <h3>💾 4.7 — Esporta / Importa</h3>
       <div class="toolbar">
         <button id="json-export" class="btn btn-primary btn-sm">📥 Esporta dati (JSON)</button>
         <input type="file" id="json-import-file" accept=".json" style="display:none;">
@@ -1154,18 +1131,37 @@ costo_app_stab = T_s · u_app</div>
     <p>Il modello assegna ogni provincia allo stab. <b>più vicino in linea d'aria</b>: questo produce il <b>lower bound</b> teorico dei costi. Nella realtà le tratte sono più lunghe per: specializzazione di sito (avicoli/suini), capacità installata, vincoli commerciali (cliente↔stab.), routing multi‑stop, ritorni a vuoto.</p>
     <p>I due slider <code>Inefficienza OUT</code> (default <b>1.8×</b>) e <code>Inefficienza IN</code> (default <b>1.4×</b>) moltiplicano i km Haversine prima del lookup tariffario. Default calibrato sui dati Veronesi: la rete reale ha tratta media OUT ~110 km e IN ~135 km, mentre la nearest‑neighbor produce ~48 e ~92 km rispettivamente. Imposta i due slider a <b>1.0</b> per vedere il puro lower bound teorico.</p>
 
-    <h2>3. Come usare le pagine</h2>
-    <h3>🏗️ Greenfield</h3>
-    <p>Per progettare una nuova rete da zero. Trascina i marker fabbrica per spostarli (vincolo terraferma a 80 km), usa K‑Means++ pesato sulla domanda
-    per trovare automaticamente le posizioni che minimizzano la distanza media pesata.</p>
+    <h2>3. Come usare le pagine — Golden Circle (WHY · HOW · WHAT)</h2>
 
-    <h3>🏭 Brownfield</h3>
-    <p>Per simulare modifiche alla rete reale Veronesi (7 stabilimenti). Puoi disattivare singolarmente uno qualunque dei 7 e/o aggiungere fino a 2 nuovi
-    siti, posizionati inizialmente con ricerca greedy che minimizza il costo totale. Tutti i KPI mostrano sia il valore corrente che il delta vs la baseline AS‑IS
-    (7 Veronesi attivi, stesso fattore di domanda).</p>
+    <h3>🏗️ Greenfield Design</h3>
+    <p><b>WHY</b> — Progettare una rete <i>ex‑novo</i> in territorio italiano: scegliere il numero di hub e la loro posizione strategica per minimizzare il <i>cost‑to‑serve</i> dell'intera rete.</p>
+    <p><b>HOW</b> — Slider N° stab (1–10) e fattore domanda (0,5–2,0); marker trascinabili con vincolo terraferma 80 km; pulsante <code>K‑Means++</code> per inizializzazione con clustering pesato sulla domanda.</p>
+    <p><b>WHAT</b> — KPI di rete in tempo reale (totale, App, Prod, Distr, €/ton medio, tratta media), grafici a barre per stab. e ripartizione percentuale costi, dettaglio per singolo plant al click sul marker.</p>
+
+    <h3>🏭 Brownfield Re‑Design</h3>
+    <p><b>WHY</b> — Valutare modifiche all'assetto reale Veronesi (7 siti fissi): disattivare siti, aggiungere nuovi siti, simulare l'impatto sul costo totale rispetto al benchmark AS‑IS.</p>
+    <p><b>HOW</b> — Toggle <i>attivo/disattivo</i> per ognuno dei 7 Veronesi; pulsante <code>Aggiungi stabilimento</code> con greedy initial placement; nuovo pulsante <code>🎯 Ottimizza posizioni nuovi stab.</code> che muove SOLO i siti aggiunti tramite Engine.optimizeConvex (i 7 Veronesi restano congelati). Toggle scenario capacità Veronesi (informativo).</p>
+    <p><b>WHAT</b> — KPI con delta vs baseline AS‑IS (€ e %) per ogni voce di costo, grafico Scenario vs Baseline, dettaglio stab. con confronto capacità storica/scenario al click.</p>
+
+    <h3>🎯 Greenfield Convex Optimization</h3>
+    <p><b>WHY</b> — Minimizzare analiticamente il <i>Total Cost</i> di rete con un solver convesso: trovare il design ottimo nel rispetto di vincoli di capacità (infinita o finita uniforme).</p>
+    <p><b>HOW</b> — Toggle <i>Capacità finita</i> + slider 50–500 kton; pulsante <code>Ottimizza costo totale</code> che combina K‑Means++ (init) + allocazione marginale + ricerca locale (max 30 iter, ε 0,01%); toggle <i>Manuale</i> per partire da posizioni utente.</p>
+    <p><b>WHAT</b> — Convergenza tracciata su grafico iter→costo, KPI finali, eventuale <i>Domanda NON servita</i> in giallo se la capacità totale è inferiore al fabbisogno.</p>
+
+    <h3>🎯 Brownfield Convex Optimization</h3>
+    <p><b>WHY</b> — Ottimizzare le posizioni dei nuovi siti aggiunti alla rete Veronesi <b>vincolando le capacità per singolo stabilimento</b>; valutare scenari di upgrade strategico (+10% margine sicurezza, 7/7 saturazione turni).</p>
+    <p><b>HOW</b> — Lista stab. con input <i>Cap max (kton)</i> editabile per riga; switch scenario (Manuale = max storici, +10%, 7/7); pulsante <code>Ottimizza costo totale</code> che muove solo i nuovi siti rispettando i vincoli capacitivi di tutti i 9 (max).</p>
+    <p><b>WHAT</b> — KPI di rete vincolati, saturazione live per ogni stab. (es. <code>423/465 kt 91%</code>), domanda non servita se le capacità sono insufficienti, grafico convergenza.</p>
 
     <h3>📊 Dati &amp; Input</h3>
-    <p>Per modificare i dati di partenza: domanda per provincia (slider o cella per cella, in % o in ton), porti, tabella scaglioni di produzione. Le modifiche si propagano in tempo reale alle pagine Greenfield e Brownfield. Dati importabili/esportabili in JSON.</p>
+    <p><b>WHY</b> — Rendere il modello completamente parametrico: ogni dataset esposto e modificabile, propagazione in tempo reale.</p>
+    <p><b>HOW</b> — Sezioni: domanda provinciale (slider scala lineare, edit % o ton), porti (lat, lon, maggiorazione), tabella scaglioni produzione, capacità storiche Veronesi (max + moltiplicatori +10% e 7/7), tariffe trasporto (sola lettura), <b>inefficienza routing</b> (slider OUT 1,8 / IN 1,4), export/import JSON completo.</p>
+    <p><b>WHAT</b> — Le 4 pagine scenario reagiscono istantaneamente via <code>broadcast()</code>: cambiando un valore qui, tutti i KPI e i grafici si aggiornano.</p>
+
+    <h3>🔄 Sincronizzazione cross‑pagina</h3>
+    <p><b>WHY</b> — Lavorare in modo continuo su uno stesso scenario passando da una vista (es. Greenfield "manuale") all'altra (es. Greenfield Convex "convesso") senza perdere il contesto.</p>
+    <p><b>HOW</b> — Lo stato è memorizzato in <code>window.appData</code>: <code>gfFactor</code>, <code>gfPlants</code> (condivisi GF↔GFC) e <code>bfFactor</code>, <code>bfPlants</code> (condivisi BF↔BFC). Ogni modifica scatena <code>syncToGlobal()</code>; ogni <code>onShow()</code> chiama <code>syncFromGlobal()</code>.</p>
+    <p><b>WHAT</b> — Modifica il fattore domanda in GF, vai su GF Convex: trovi lo stesso valore. Aggiungi un nuovo stab. in BF, vai su BF Convex: il nuovo stab. è già lì con la stessa posizione e stato attivo. La capacità per riga viene mantenuta in BFC (BF non la modifica).</p>
 
     <h2>4. Glossario</h2>
     <div class="gloss-row"><b>KPI</b><span>Key Performance Indicator. Le 6 metriche di rete: costo totale, App, Prod, Distr, volume ton, €/ton medio.</span></div>
@@ -1212,7 +1208,13 @@ costo_app_stab = T_s · u_app</div>
     <p>La torta visualizza la <b>ripartizione percentuale</b> dei costi di rete (App / Prod / Distr). Le percentuali sono <b>identiche</b> sia in modalità "valori assoluti (M€)" sia in modalità "valori unitari (€/ton)" — perché dividere ogni voce per lo stesso volume totale non altera le proporzioni. Manteniamo la torta sui dati assoluti (M€) per leggibilità: il tooltip mostra direttamente l'impatto economico in milioni di euro, evitando ambiguità tra "% di un costo/ton" e "% di un totale".</p>
 
     <h3>Tariffe inbound/outbound fisse</h3>
-    <p>I tariffari di trasporto (29 scaglioni inbound + 29 scaglioni outbound) sono <b>basati sui dati reali Veronesi</b> e <b>non sono modificabili dall'UI</b> per mantenere la coerenza del modello con il benchmark industriale. Sono visualizzati nella pagina <code>Dati &amp; Input</code> sezione 4.5 (sola lettura) per trasparenza. Gli unici parametri logistici modificabili sono: <i>maggiorazione €/ton per porto</i> (nei porti) e <i>fattori di inefficienza routing</i> (nei pannelli scenario, default 1.4 IN / 1.8 OUT).</p>
+    <p>I tariffari di trasporto (29 scaglioni inbound + 29 scaglioni outbound) sono <b>basati sui dati reali Veronesi</b> e <b>non sono modificabili dall'UI</b> per mantenere la coerenza del modello con il benchmark industriale. Sono visualizzati nella pagina <code>Dati &amp; Input</code> sezione 4.5 (sola lettura) per trasparenza. Gli unici parametri logistici modificabili sono: <i>maggiorazione €/ton per porto</i> (nei porti) e <i>fattori di inefficienza routing</i> (sezione 4.6 di <code>Dati &amp; Input</code>, default 1,4 IN / 1,8 OUT).</p>
+
+    <h3>Format dei costi (M€ con virgola decimale)</h3>
+    <p>Tutti i costi totali nei KPI, tooltip e dettaglio stab. usano il formato unificato <code>1.234.567,89 M€</code> (punto come separatore migliaia, virgola per decimali) tramite la funzione <code>fmtMillion()</code>.</p>
+
+    <h3>Capacità Veronesi: default = max storici</h3>
+    <p>In Brownfield Convex il valore <code>capKt</code> di ogni Veronesi parte dal max storico arrotondato (es. Quinto VR → 465 kton). Lo scenario <code>Manuale</code> resetta sempre a questi valori; <code>+10%</code> applica × 1,1; <code>7/7</code> applica × 7/6 ≈ 1,167.</p>
 
     <h3>Parametri modificabili e propagazione</h3>
     <p>Tutti i parametri seguenti sono modificabili dalla pagina <code>Dati &amp; Input</code> e vengono propagati istantaneamente alle pagine Greenfield, Brownfield, GF Convex e BF Convex tramite il meccanismo <code>broadcast()</code>:</p>
@@ -1406,7 +1408,13 @@ window.appData = {
   veronesiCapacityData: JSON.parse(JSON.stringify(VERONESI_CAP_ORIG)),
   capacityMultiplier:   1.1,        // moltiplicatore scenario "+10%"
   capacity7days:        7/6,        // moltiplicatore scenario "7gg/7" ≈ 1.1667
-  capacityScenario:     'manual'    // 'manual' | 'plus10' | '7days'
+  capacityScenario:     'manual',   // 'manual' | 'plus10' | '7days'
+  // Stato condiviso GF ↔ GF Convex
+  gfFactor: 1.0,
+  gfPlants: DEFAULT_PLANTS_GF.map(p => ({...p})),
+  // Stato condiviso BF ↔ BF Convex (popolato lazily al primo onShow)
+  bfFactor: 1.0,
+  bfPlants: null
 };
 
 /* Helper capacità Veronesi */
@@ -1904,6 +1912,11 @@ const Engine = {
    UTILITY
    ==================================================================== */
 const fmt = (v, dec=0) => v.toLocaleString('it-IT', {maximumFractionDigits:dec, minimumFractionDigits:dec});
+// Formato uniforme per costi in M€: "1.234.567,89 M€"
+// Accetta euro grezzi e divide internamente per 1e6
+function fmtMillion(rawEur){
+  return (rawEur/1e6).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' M€';
+}
 function flashStatus(msg, ms=4000){
   const el = document.getElementById('status-msg');
   el.textContent = msg;
@@ -1960,7 +1973,7 @@ const Detail = {
     document.getElementById(prefix + '-detail-prod-unit').textContent =
       fmt(prodUnit, 2) + ' €/ton';
     document.getElementById(prefix + '-detail-prod-total').textContent =
-      fmt(prodTot/1e6, 3) + ' M€';
+      fmtMillion(prodTot);
 
     // ---- Approvvigionamento (porto) — base + markup ----
     const portIdx  = result.portAssign[activeIdx];
@@ -1982,7 +1995,7 @@ const Detail = {
     document.getElementById(prefix + '-detail-app-unit').textContent =
       fmt(appUnit, 2) + ' €/ton';
     document.getElementById(prefix + '-detail-app-total').textContent =
-      fmt(appTot/1e6, 3) + ' M€';
+      fmtMillion(appTot);
 
     // ---- Distribuzione (province servite) ----
     const ineffOut = result.ineffOut || 1.0;
@@ -2017,7 +2030,7 @@ const Detail = {
     document.getElementById(prefix + '-detail-distr-unit').textContent =
       fmt(avgCost, 2) + ' €/ton';
     document.getElementById(prefix + '-detail-distr-total').textContent =
-      fmt(result.distrPerPlant[activeIdx]/1e6, 3) + ' M€';
+      fmtMillion(result.distrPerPlant[activeIdx]);
 
     // Tabella province (tutte, ma scrollabile dopo le prime 10)
     const tbody = document.getElementById(prefix + '-detail-prov-tbody');
@@ -2066,7 +2079,7 @@ const Detail = {
     // Totale stabilimento (App + Prod + Distr)
     const total = appTot + prodTot + result.distrPerPlant[activeIdx];
     document.getElementById(prefix + '-detail-total').textContent =
-      fmt(total/1e6, 3) + ' M€';
+      fmtMillion(total);
   },
   hide(prefix){
     const panel = document.getElementById(prefix + '-detail-panel');
@@ -2105,7 +2118,27 @@ const Greenfield = {
     if (!this.initialized){ this.init(); this.initialized = true; }
     setTimeout(()=>{ this.map.invalidateSize(); }, 50);
     this.syncIneffSliders();
+    this.syncFromGlobal();
     this.render();
+  },
+  // Sync con stato condiviso GF (window.appData.gfFactor / gfPlants)
+  syncFromGlobal(){
+    if (window.appData.gfFactor != null) this.state.factor = window.appData.gfFactor;
+    if (window.appData.gfPlants && window.appData.gfPlants.length){
+      this.state.plants = window.appData.gfPlants.map(p=>({...p}));
+    }
+    // aggiorna sliders e mappa
+    const sN = document.getElementById('gf-sld-n');
+    const sD = document.getElementById('gf-sld-d');
+    if (sN){ sN.value = this.state.plants.length;
+      document.getElementById('gf-sld-n-val').textContent = this.state.plants.length; }
+    if (sD){ sD.value = this.state.factor;
+      document.getElementById('gf-sld-d-val').textContent = this.state.factor.toFixed(1); }
+    this.drawProvinces(); this.drawPlants();
+  },
+  syncToGlobal(){
+    window.appData.gfFactor = this.state.factor;
+    window.appData.gfPlants = this.state.plants.map(p=>({...p}));
   },
   init(){
     // ---------- mappa ----------
@@ -2143,7 +2176,7 @@ const Greenfield = {
       options:{
         maintainAspectRatio:false, responsive:true,
         plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
-          tooltip:{callbacks:{label:c=>`${c.label}: ${(c.parsed/1e6).toFixed(2)} M€ (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMillion(c.parsed)} (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
         cutout:'55%', layout:{padding:{top:14}}
       }
     });
@@ -2181,11 +2214,13 @@ const Greenfield = {
         if (this.state.sel >= N) this.state.sel = -1;
       }
       this.drawPlants(); this.render();
+      this.syncToGlobal();
     });
     sD.addEventListener('input', ()=>{
       document.getElementById('gf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
       this.state.factor = parseFloat(sD.value);
       this.drawProvinces(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('gf-btn-opt').addEventListener('click', ()=>{
       flashStatus('Ottimizzazione K‑Means++ in corso…', 8000);
@@ -2196,6 +2231,7 @@ const Greenfield = {
         this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
         this.state.sel = -1;
         this.drawPlants(); this.render();
+        this.syncToGlobal();
         flashStatus(snap===0
           ? `Ottimizzato: ${K} stab. al centroide pesato dei cluster.`
           : `Ottimizzato: ${K} stab. (${snap} centroidi agganciati a terra).`, 5000);
@@ -2207,27 +2243,13 @@ const Greenfield = {
       sD.value = 1.0; document.getElementById('gf-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0; this.state.sel = -1;
       this.drawProvinces(); this.drawPlants(); this.render();
+      this.syncToGlobal();
       flashStatus('Default ripristinato.');
     });
     document.getElementById('gf-tgl-unit').addEventListener('change', e=>{
       this.state.unit = e.target.checked;
       this.render();
       flashStatus(this.state.unit ? 'Modalità unitaria (€/ton).' : 'Modalità assoluta (€).');
-    });
-    // Inefficienza routing
-    const sIout = document.getElementById('gf-sld-iout');
-    const sIin  = document.getElementById('gf-sld-iin');
-    sIout.addEventListener('input', ()=>{
-      const v = parseFloat(sIout.value);
-      document.getElementById('gf-sld-iout-val').textContent = v.toFixed(1);
-      window.appData.routingIneffOut = v;
-      this.render();
-    });
-    sIin.addEventListener('input', ()=>{
-      const v = parseFloat(sIin.value);
-      document.getElementById('gf-sld-iin-val').textContent = v.toFixed(1);
-      window.appData.routingIneffIn = v;
-      this.render();
     });
     this.map.on('click', ()=>{
       if (this.state.sel >= 0){
@@ -2247,15 +2269,7 @@ const Greenfield = {
       Detail.hide('gf');
     });
   },
-  // sync slider con appData (viene chiamato in onShow)
-  syncIneffSliders(){
-    const sIout = document.getElementById('gf-sld-iout');
-    const sIin  = document.getElementById('gf-sld-iin');
-    sIout.value = window.appData.routingIneffOut;
-    sIin.value  = window.appData.routingIneffIn;
-    document.getElementById('gf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
-    document.getElementById('gf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
-  },
+  syncIneffSliders(){ /* noop — slider in pagina Dati & Input */ },
   // Re-renderer mappa province
   drawProvinces(){
     this.layers.provinces.clearLayers();
@@ -2302,6 +2316,7 @@ const Greenfield = {
           flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
         }
         this.render();
+        this.syncToGlobal();
       });
       m.on('click', ()=>{
         this.state.sel = (this.state.sel===idx) ? -1 : idx;
@@ -2344,7 +2359,7 @@ const Greenfield = {
     const r = Engine.compute(this.state.plants, this.state.factor);
     this.lastResult = r;
     // KPIs
-    document.getElementById('gf-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gf-kpi-total').textContent = fmtMillion(r.totalCost);
     document.getElementById('gf-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
     const V = r.totalVol > 0 ? r.totalVol : 1;
     if (this.state.unit){
@@ -2352,9 +2367,9 @@ const Greenfield = {
       document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
       document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
     } else {
-      document.getElementById('gf-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
-      document.getElementById('gf-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
-      document.getElementById('gf-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+      document.getElementById('gf-kpi-app').textContent   = fmtMillion(r.totalApp);
+      document.getElementById('gf-kpi-prod').textContent  = fmtMillion(r.totalProd);
+      document.getElementById('gf-kpi-distr').textContent = fmtMillion(r.totalDistr);
     }
     document.getElementById('gf-kpi-vol').textContent = fmt(r.totalVol);
     // Charts
@@ -2435,12 +2450,35 @@ const Brownfield = {
     this.syncIneffSliders();
     this.syncScenarioButtons();
     updateScenarioLegend();
+    this.syncFromGlobal();
     this.render();
   },
   syncScenarioButtons(){
     const sc = window.appData.capacityScenario || 'manual';
     document.querySelectorAll('#bf-scenario button').forEach(b =>
       b.classList.toggle('active', b.dataset.scenario === sc));
+  },
+  // Sync con stato condiviso BF (factor + plants list incl. nuovi e active)
+  syncFromGlobal(){
+    if (window.appData.bfFactor != null) this.state.factor = window.appData.bfFactor;
+    if (window.appData.bfPlants && window.appData.bfPlants.length){
+      // Conserva struttura BF (no capKt). I nuovi stab. dal BFC non hanno bisogno di capKt qui.
+      this.state.plants = window.appData.bfPlants.map(p => ({
+        id:p.id, name:p.name, lat:p.lat, lon:p.lon, fixed:p.fixed, active:p.active
+      }));
+      this.state.nextId = Math.max(this.state.nextId, ...this.state.plants.map(p => p.id || 0)) + 1;
+    }
+    const sD = document.getElementById('bf-sld-d');
+    if (sD){ sD.value = this.state.factor;
+      document.getElementById('bf-sld-d-val').textContent = this.state.factor.toFixed(1); }
+    this.drawProvinces(); this.drawPlants();
+  },
+  syncToGlobal(){
+    window.appData.bfFactor = this.state.factor;
+    // Salva campi minimi (BFC aggiungerà capKt)
+    window.appData.bfPlants = this.state.plants.map(p => ({
+      id:p.id, name:p.name, lat:p.lat, lon:p.lon, fixed:p.fixed, active:p.active
+    }));
   },
   buildVeronesiPlants(){
     return window.appData.veronesi.map((v,i)=>({
@@ -2499,7 +2537,8 @@ const Brownfield = {
         backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
       options:{
         maintainAspectRatio:false, responsive:true,
-        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMillion(c.parsed)} (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
         cutout:'55%', layout:{padding:{top:14}}
       }
     });
@@ -2527,6 +2566,7 @@ const Brownfield = {
       document.getElementById('bf-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
       this.state.factor = parseFloat(sD.value);
       this.drawProvinces(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('bf-btn-add').addEventListener('click', ()=>{
       if (this.state.plants.length >= 9){
@@ -2541,6 +2581,7 @@ const Brownfield = {
         const idx = this.state.plants.filter(p=>!p.fixed).length + 1;
         this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`, lat:best.lat, lon:best.lon, fixed:false, active:true});
         this.drawPlants(); this.render();
+        this.syncToGlobal();
         flashStatus(`Aggiunto stabilimento "Nuovo ${idx}" a ${best.name}.`, 5000);
       }, 30);
     });
@@ -2551,7 +2592,38 @@ const Brownfield = {
       sD.value = 1.0; document.getElementById('bf-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0;
       this.drawPlants(); this.render();
+      this.syncToGlobal();
       flashStatus('7 Veronesi ripristinati (baseline AS‑IS).');
+    });
+    // Ottimizza posizioni dei nuovi stab. (i Veronesi restano fissi; capacities=null)
+    document.getElementById('bf-btn-optimize').addEventListener('click', ()=>{
+      const newPlants = this.state.plants.filter(p => !p.fixed && p.active);
+      if (newPlants.length === 0){
+        flashStatus('Nessun nuovo stabilimento da ottimizzare. Aggiungine almeno uno.', 4000);
+        return;
+      }
+      const btn = document.getElementById('bf-btn-optimize');
+      btn.disabled = true; btn.textContent = '⏳ Ottimizzazione…';
+      flashStatus('Ottimizzazione in corso…', 8000);
+      setTimeout(()=>{
+        const active = this.state.plants.filter(p => p.active);
+        const fixed  = active.map(p => p.fixed);
+        const t0 = performance.now();
+        const out = Engine.optimizeConvex(active, this.state.factor, null, {
+          maxIter: 30, tolerance: 0.0001, fixed
+        });
+        const dt = performance.now() - t0;
+        // applica solo alle posizioni dei nuovi stab. (gli active[i] sono per riferimento allo state.plants)
+        out.plants.forEach((p, i) => {
+          const orig = active[i];
+          if (!orig.fixed){ orig.lat = p.lat; orig.lon = p.lon; }
+        });
+        this.drawPlants(); this.render();
+        this.syncToGlobal();
+        const reduction = (out.history[0]-out.history[out.history.length-1])/out.history[0]*100;
+        flashStatus(`Ottimizzazione: ${out.history.length-1} iter (${dt.toFixed(0)} ms) · costo ridotto del ${reduction.toFixed(1)}%`, 6000);
+        btn.disabled = false; btn.textContent = '🎯 Ottimizza posizioni nuovi stab.';
+      }, 30);
     });
     document.getElementById('bf-tgl-unit').addEventListener('change', e=>{
       this.state.unit = e.target.checked;
@@ -2571,30 +2643,8 @@ const Brownfield = {
         this.render();   // refresh detail panel se aperto
       });
     });
-    // Inefficienza routing
-    const sIout = document.getElementById('bf-sld-iout');
-    const sIin  = document.getElementById('bf-sld-iin');
-    sIout.addEventListener('input', ()=>{
-      const v = parseFloat(sIout.value);
-      document.getElementById('bf-sld-iout-val').textContent = v.toFixed(1);
-      window.appData.routingIneffOut = v;
-      this.render();
-    });
-    sIin.addEventListener('input', ()=>{
-      const v = parseFloat(sIin.value);
-      document.getElementById('bf-sld-iin-val').textContent = v.toFixed(1);
-      window.appData.routingIneffIn = v;
-      this.render();
-    });
   },
-  syncIneffSliders(){
-    const sIout = document.getElementById('bf-sld-iout');
-    const sIin  = document.getElementById('bf-sld-iin');
-    sIout.value = window.appData.routingIneffOut;
-    sIin.value  = window.appData.routingIneffIn;
-    document.getElementById('bf-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
-    document.getElementById('bf-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
-  },
+  syncIneffSliders(){ /* noop — slider in pagina Dati & Input */ },
   drawProvinces(){
     this.layers.provinces.clearLayers();
     this.markers.circles = [];
@@ -2645,6 +2695,7 @@ const Brownfield = {
             flashStatus(`Posizione corretta sul punto di terra più vicino: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
           }
           this.render();
+          this.syncToGlobal();
         });
       }
       // Click su uno stab. → seleziona/deseleziona (anche su Veronesi fissi)
@@ -2736,6 +2787,7 @@ const Brownfield = {
         // Se disattivo lo stab. selezionato, deseleziono
         if (!p.active && idx === this.state.sel) this.state.sel = -1;
         this.drawPlants(); this.render();
+        this.syncToGlobal();
       };
       row.appendChild(btnTog);
       if (!p.fixed){
@@ -2747,6 +2799,7 @@ const Brownfield = {
           this.state.plants = this.state.plants.filter(x=>x!==p);
           this.state.sel = -1;     // reset highlight per evitare indici sfasati
           this.drawPlants(); this.render();
+          this.syncToGlobal();
         };
         row.appendChild(btnRm);
       }
@@ -2769,7 +2822,7 @@ const Brownfield = {
         txt = fmt(val,2) + ' €/ton';
       } else {
         if (this.state.unit) txt = fmt(val,2) + ' €/ton';
-        else txt = fmt(val/1e6,2) + ' M€';
+        else txt = fmtMillion(val);
       }
       el.textContent = txt;
       if (base !== undefined && elD){
@@ -2781,7 +2834,7 @@ const Brownfield = {
           ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
           : (this.state.unit
               ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
-              : `${sign}${fmt(delta/1e6,2)} M€ (${sign}${pct.toFixed(1)}%)`);
+              : `${sign}${fmtMillion(delta)} (${sign}${pct.toFixed(1)}%)`);
         elD.textContent = dtxt;
         elD.className = 'delta ' + dir;
       }
@@ -2882,7 +2935,25 @@ const GreenfieldConvex = {
     if (!this.initialized){ this.init(); this.initialized = true; }
     setTimeout(()=>{ this.map.invalidateSize(); }, 50);
     this.syncIneffSliders();
+    this.syncFromGlobal();
     this.render();
+  },
+  syncFromGlobal(){
+    if (window.appData.gfFactor != null) this.state.factor = window.appData.gfFactor;
+    if (window.appData.gfPlants && window.appData.gfPlants.length){
+      this.state.plants = window.appData.gfPlants.map(p=>({...p}));
+    }
+    const sN = document.getElementById('gfc-sld-n');
+    const sD = document.getElementById('gfc-sld-d');
+    if (sN){ sN.value = this.state.plants.length;
+      document.getElementById('gfc-sld-n-val').textContent = this.state.plants.length; }
+    if (sD){ sD.value = this.state.factor;
+      document.getElementById('gfc-sld-d-val').textContent = this.state.factor.toFixed(1); }
+    this.drawProvinces(); this.drawPlants();
+  },
+  syncToGlobal(){
+    window.appData.gfFactor = this.state.factor;
+    window.appData.gfPlants = this.state.plants.map(p=>({...p}));
   },
 
   init(){
@@ -2926,7 +2997,8 @@ const GreenfieldConvex = {
       data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
         backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
       options:{maintainAspectRatio:false, responsive:true,
-        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMillion(c.parsed)} (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
         cutout:'55%', layout:{padding:{top:14}}}
     });
     this.charts.conv = new Chart(document.getElementById('gfc-chart-conv').getContext('2d'), {
@@ -2956,17 +3028,20 @@ const GreenfieldConvex = {
         this.state.plants = this.state.plants.slice(0, N);
       }
       this.drawPlants(); this.render();
+      this.syncToGlobal();
     });
     sD.addEventListener('input', ()=>{
       document.getElementById('gfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
       this.state.factor = parseFloat(sD.value);
       this.drawProvinces(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('gfc-btn-kmeans').addEventListener('click', ()=>{
       const K = this.state.plants.length;
       const cs = Engine.kmeansPlusPlusWeighted(K, this.state.factor);
       this.state.plants = cs.map((c,i)=>({name:`Stab ${i+1}`, lat:c.lat, lon:c.lon}));
       this.drawPlants(); this.render();
+      this.syncToGlobal();
       flashStatus(`Inizializzato con K‑Means++: ${K} centroidi pesati sulla domanda.`);
     });
     document.getElementById('gfc-btn-reset').addEventListener('click', ()=>{
@@ -2975,6 +3050,7 @@ const GreenfieldConvex = {
       sD.value = 1.0; document.getElementById('gfc-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0;
       this.drawProvinces(); this.drawPlants(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('gfc-tgl-unit').addEventListener('change', e=>{
       this.state.unit = e.target.checked;
@@ -2997,19 +3073,7 @@ const GreenfieldConvex = {
     document.getElementById('gfc-btn-optimize').addEventListener('click', ()=>{
       this.runOptimization();
     });
-    // Inefficienza
-    const sIout = document.getElementById('gfc-sld-iout');
-    const sIin  = document.getElementById('gfc-sld-iin');
-    sIout.addEventListener('input', ()=>{
-      const v = parseFloat(sIout.value);
-      document.getElementById('gfc-sld-iout-val').textContent = v.toFixed(1);
-      window.appData.routingIneffOut = v; this.render();
-    });
-    sIin.addEventListener('input', ()=>{
-      const v = parseFloat(sIin.value);
-      document.getElementById('gfc-sld-iin-val').textContent = v.toFixed(1);
-      window.appData.routingIneffIn = v; this.render();
-    });
+    // (Slider inefficienza routing spostati in Dati & Input)
     // Close detail panel
     document.getElementById('gfc-detail-close').addEventListener('click', ()=>{
       this.state.sel = -1;
@@ -3020,12 +3084,7 @@ const GreenfieldConvex = {
     });
   },
 
-  syncIneffSliders(){
-    document.getElementById('gfc-sld-iout').value = window.appData.routingIneffOut;
-    document.getElementById('gfc-sld-iin').value  = window.appData.routingIneffIn;
-    document.getElementById('gfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
-    document.getElementById('gfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
-  },
+  syncIneffSliders(){ /* noop — slider in pagina Dati & Input */ },
 
   drawProvinces(){
     this.layers.provinces.clearLayers();
@@ -3071,6 +3130,7 @@ const GreenfieldConvex = {
           flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
         }
         this.render();
+        this.syncToGlobal();
       });
       m.on('click', (ev)=>{
         L.DomEvent.stopPropagation(ev);
@@ -3141,6 +3201,7 @@ const GreenfieldConvex = {
       this.state.plants = out.plants.map((p,i)=>({name:`Stab ${i+1}`, lat:p.lat, lon:p.lon}));
       this.drawPlants();
       this.render();
+      this.syncToGlobal();
       // Aggiorna chart convergenza
       this.charts.conv.data.labels = out.history.map((_,i)=>i);
       this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
@@ -3165,7 +3226,7 @@ const GreenfieldConvex = {
     }
     this.lastResult = r;
     // KPI
-    document.getElementById('gfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('gfc-kpi-total').textContent = fmtMillion(r.totalCost);
     document.getElementById('gfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
     const V = r.totalVol > 0 ? r.totalVol : 1;
     if (this.state.unit){
@@ -3173,9 +3234,9 @@ const GreenfieldConvex = {
       document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
       document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
     } else {
-      document.getElementById('gfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
-      document.getElementById('gfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
-      document.getElementById('gfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+      document.getElementById('gfc-kpi-app').textContent   = fmtMillion(r.totalApp);
+      document.getElementById('gfc-kpi-prod').textContent  = fmtMillion(r.totalProd);
+      document.getElementById('gfc-kpi-distr').textContent = fmtMillion(r.totalDistr);
     }
     document.getElementById('gfc-kpi-vol').textContent = fmt(r.totalVol);
     // Domanda non servita
@@ -3242,17 +3303,58 @@ const BrownfieldConvex = {
     this.syncIneffSliders();
     this.syncScenarioButtons();
     updateScenarioLegend();
+    this.syncFromGlobal();
     this.render();
+  },
+  // Sync con stato condiviso BF (factor + plants list)
+  syncFromGlobal(){
+    if (window.appData.bfFactor != null) this.state.factor = window.appData.bfFactor;
+    if (window.appData.bfPlants && window.appData.bfPlants.length){
+      // Mantieni capKt precedente se lo stesso plant esiste già in this.state.plants
+      const oldByKey = new Map(this.state.plants.map(p => [p.id, p]));
+      this.state.plants = window.appData.bfPlants.map(p => {
+        const old = oldByKey.get(p.id);
+        let capKt;
+        if (old && old.capKt != null) capKt = old.capKt;
+        else if (p.fixed && p.id != null) capKt = Math.round(vCapMax(p.id)/1000);
+        else capKt = this.defaultCapNew;
+        return {
+          id:p.id, name:p.name, lat:p.lat, lon:p.lon,
+          fixed:p.fixed, active:p.active, capKt
+        };
+      });
+      this.state.nextId = Math.max(this.state.nextId, ...this.state.plants.map(p => p.id || 0)) + 1;
+    }
+    const sD = document.getElementById('bfc-sld-d');
+    if (sD){ sD.value = this.state.factor;
+      document.getElementById('bfc-sld-d-val').textContent = this.state.factor.toFixed(1); }
+    this.drawProvinces(); this.drawPlants();
+  },
+  syncToGlobal(){
+    window.appData.bfFactor = this.state.factor;
+    window.appData.bfPlants = this.state.plants.map(p => ({
+      id:p.id, name:p.name, lat:p.lat, lon:p.lon, fixed:p.fixed, active:p.active
+    }));
   },
 
   buildVeronesiPlants(){
+    // Default capKt = max storici (scenario "Manuale"), in kton arrotondati
     const sc = window.appData.capacityScenario;
     return window.appData.veronesi.map((v,i)=>{
-      let capKt = this.defaultCapVeronesi;
-      if (sc === 'plus10') capKt = Math.round(vCapPlus10(i)/1000);
-      else if (sc === '7days') capKt = Math.round(vCap7days(i)/1000);
+      let capKt;
+      if (sc === 'plus10')      capKt = Math.round(vCapPlus10(i)/1000);
+      else if (sc === '7days')  capKt = Math.round(vCap7days(i)/1000);
+      else                      capKt = Math.round(vCapMax(i)/1000);    // Manuale = max storico
       return {id:i, name:v.name, lat:v.lat, lon:v.lon, fixed:true, active:true, capKt};
     });
+  },
+  // Resetta capKt dei Veronesi ai max storici (scenario Manuale)
+  resetVeronesiCapToMax(){
+    for (const p of this.state.plants){
+      if (p.fixed && p.id != null){
+        p.capKt = Math.round(vCapMax(p.id)/1000);
+      }
+    }
   },
 
   init(){
@@ -3296,7 +3398,8 @@ const BrownfieldConvex = {
       data:{labels:['App.','Prod.','Distr.'], datasets:[{data:[0,0,0],
         backgroundColor:['#ff9900','#3fb950','#3aa0ff'], borderColor:'#161b22', borderWidth:2}]},
       options:{maintainAspectRatio:false, responsive:true,
-        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}}},
+        plugins:{legend:{position:'right', labels:{boxWidth:8,font:{size:9}}},
+          tooltip:{callbacks:{label:c=>`${c.label}: ${fmtMillion(c.parsed)} (${(c.parsed*100/c.dataset.data.reduce((s,x)=>s+x,0)).toFixed(1)}%)`}}},
         cutout:'55%', layout:{padding:{top:14}}}
     });
     this.charts.conv = new Chart(document.getElementById('bfc-chart-conv').getContext('2d'), {
@@ -3315,6 +3418,7 @@ const BrownfieldConvex = {
       document.getElementById('bfc-sld-d-val').textContent = parseFloat(sD.value).toFixed(1);
       this.state.factor = parseFloat(sD.value);
       this.drawProvinces(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('bfc-btn-add').addEventListener('click', ()=>{
       if (this.state.plants.length >= 9){ flashStatus('Limite max 9 stab.'); return; }
@@ -3328,6 +3432,7 @@ const BrownfieldConvex = {
         this.state.plants.push({id, name:`Nuovo ${idx} (${best.name})`,
           lat:best.lat, lon:best.lon, fixed:false, active:true, capKt:this.defaultCapNew});
         this.drawPlants(); this.render();
+        this.syncToGlobal();
         flashStatus(`Aggiunto Nuovo ${idx} a ${best.name}.`);
       }, 30);
     });
@@ -3338,6 +3443,7 @@ const BrownfieldConvex = {
       sD.value = 1.0; document.getElementById('bfc-sld-d-val').textContent = '1.0';
       this.state.factor = 1.0;
       this.drawPlants(); this.render();
+      this.syncToGlobal();
     });
     document.getElementById('bfc-tgl-unit').addEventListener('change', e=>{
       this.state.unit = e.target.checked; this.render();
@@ -3351,12 +3457,15 @@ const BrownfieldConvex = {
           b.classList.toggle('active', b.dataset.scenario === sc));
         document.querySelectorAll('#bf-scenario button').forEach(b =>
           b.classList.toggle('active', b.dataset.scenario === sc));
-        if (sc !== 'manual'){
+        if (sc === 'manual'){
+          this.resetVeronesiCapToMax();   // Manuale = reset capKt a max storici
+        } else {
           applyCapScenario(this.state.plants, sc);
         }
-        this.drawPlants(); this.render();
+        this.drawPlants(); this.render();   // render aggiorna anche renderPlantList → input cap visibili
+        this.syncToGlobal();
         updateScenarioLegend();
-        const lbl = sc === 'manual' ? 'Manuale (valori utente)' : (sc === 'plus10' ? '+10% (max × 1,1)' : '7gg/7 (max × 7/6)');
+        const lbl = sc === 'manual' ? 'Manuale (max storici)' : (sc === 'plus10' ? '+10% (max × 1,1)' : '7gg/7 (max × 7/6)');
         const uns = (this.lastResult && this.lastResult.unservedDemand > 0.5)
           ? ` · Domanda non servita: ${fmt(this.lastResult.unservedDemand)} ton`
           : '';
@@ -3367,19 +3476,7 @@ const BrownfieldConvex = {
     document.getElementById('bfc-btn-optimize').addEventListener('click', ()=>{
       this.runOptimization();
     });
-    // Inefficienza
-    const sIout = document.getElementById('bfc-sld-iout');
-    const sIin  = document.getElementById('bfc-sld-iin');
-    sIout.addEventListener('input', ()=>{
-      const v = parseFloat(sIout.value);
-      document.getElementById('bfc-sld-iout-val').textContent = v.toFixed(1);
-      window.appData.routingIneffOut = v; this.render();
-    });
-    sIin.addEventListener('input', ()=>{
-      const v = parseFloat(sIin.value);
-      document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1);
-      window.appData.routingIneffIn = v; this.render();
-    });
+    // (Slider inefficienza routing spostati in Dati & Input)
     // Close detail panel
     document.getElementById('bfc-detail-close').addEventListener('click', ()=>{
       this.state.sel = -1;
@@ -3390,12 +3487,7 @@ const BrownfieldConvex = {
     });
   },
 
-  syncIneffSliders(){
-    document.getElementById('bfc-sld-iout').value = window.appData.routingIneffOut;
-    document.getElementById('bfc-sld-iin').value  = window.appData.routingIneffIn;
-    document.getElementById('bfc-sld-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
-    document.getElementById('bfc-sld-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
-  },
+  syncIneffSliders(){ /* noop — slider in pagina Dati & Input */ },
 
   drawProvinces(){
     this.layers.provinces.clearLayers();
@@ -3447,6 +3539,7 @@ const BrownfieldConvex = {
             flashStatus(`Posizione corretta: ${snap.provName} (${snap.distance.toFixed(0)} km).`);
           }
           this.render();
+          this.syncToGlobal();
         });
       }
       m.on('click', (ev)=>{
@@ -3539,6 +3632,7 @@ const BrownfieldConvex = {
         p.active = !p.active;
         if (!p.active && idx === this.state.sel) this.state.sel = -1;
         this.drawPlants(); this.render();
+        this.syncToGlobal();
       };
       row.appendChild(btnTog);
       if (!p.fixed){
@@ -3551,6 +3645,7 @@ const BrownfieldConvex = {
           this.state.plants = this.state.plants.filter(x=>x!==p);
           this.state.sel = -1;
           this.drawPlants(); this.render();
+          this.syncToGlobal();
         };
         row.appendChild(btnRm);
       }
@@ -3601,6 +3696,7 @@ const BrownfieldConvex = {
       });
       this.drawPlants();
       this.render();
+      this.syncToGlobal();
       this.charts.conv.data.labels = out.history.map((_,i)=>i);
       this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
       this.charts.conv.update('none');
@@ -3617,7 +3713,7 @@ const BrownfieldConvex = {
     const a = Engine.marginalAllocate(active, this.state.factor, caps);
     const r = Engine.computeWithAssignment(active, this.state.factor, a);
     this.lastResult = r;
-    document.getElementById('bfc-kpi-total').textContent = fmt(r.totalCost) + ' €';
+    document.getElementById('bfc-kpi-total').textContent = fmtMillion(r.totalCost);
     document.getElementById('bfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
     const V = r.totalVol > 0 ? r.totalVol : 1;
     if (this.state.unit){
@@ -3625,9 +3721,9 @@ const BrownfieldConvex = {
       document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
       document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
     } else {
-      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/1e6,2)  + ' M€';
-      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/1e6,2) + ' M€';
-      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/1e6,2)+ ' M€';
+      document.getElementById('bfc-kpi-app').textContent   = fmtMillion(r.totalApp);
+      document.getElementById('bfc-kpi-prod').textContent  = fmtMillion(r.totalProd);
+      document.getElementById('bfc-kpi-distr').textContent = fmtMillion(r.totalDistr);
     }
     document.getElementById('bfc-kpi-vol').textContent = fmt(r.totalVol);
     const card = document.getElementById('bfc-kpi-unserved-card');
@@ -3705,6 +3801,11 @@ const DataPage = {
     this.renderProdTable();
     this.renderVeronesiCap();
     this.renderTariffs();
+    // sync slider inefficienza routing dai valori globali
+    document.getElementById('dp-iout').value = window.appData.routingIneffOut;
+    document.getElementById('dp-iin').value  = window.appData.routingIneffIn;
+    document.getElementById('dp-iout-val').textContent = window.appData.routingIneffOut.toFixed(1);
+    document.getElementById('dp-iin-val').textContent  = window.appData.routingIneffIn.toFixed(1);
   },
   init(){
     // ---------- province ----------
@@ -3771,6 +3872,19 @@ const DataPage = {
     document.getElementById('vc-mult-77').addEventListener('change', e=>{
       const v = parseFloat(e.target.value);
       if (v > 0){ window.appData.capacity7days = v; this.renderVeronesiCap(); this.broadcast(); }
+    });
+    // ---------- inefficienza routing ----------
+    document.getElementById('dp-iout').addEventListener('input', e=>{
+      const v = parseFloat(e.target.value);
+      window.appData.routingIneffOut = v;
+      document.getElementById('dp-iout-val').textContent = v.toFixed(1);
+      this.broadcast();
+    });
+    document.getElementById('dp-iin').addEventListener('input', e=>{
+      const v = parseFloat(e.target.value);
+      window.appData.routingIneffIn = v;
+      document.getElementById('dp-iin-val').textContent = v.toFixed(1);
+      this.broadcast();
     });
     // ---------- import / export ----------
     document.getElementById('json-export').addEventListener('click', ()=>{
