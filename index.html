@@ -1907,13 +1907,10 @@ const Engine = {
     }
 
     // PHASE 2: farthest-first reallocation
-    // Per ogni stab S → trova provincia P con costo MAX → cerca T con
-    // capacità residua e costo MINORE → sposta P da S a T se trovato.
     const MAX_ITER = 30;
     for (let iter = 0; iter < MAX_ITER; iter++){
       let improved = false;
       for (let j = 0; j < N; j++){
-        // Trova la provincia "più lontana" (costo max) assegnata a j
         let farI = -1, farCost = -1;
         for (let i = 0; i < M; i++){
           if (provAssign[i] === j && cost[i][j] > farCost){
@@ -1922,7 +1919,6 @@ const Engine = {
         }
         if (farI < 0) continue;
         const dem = PROV[farI].demand * F;
-        // Cerca un alternativo T con capacità + costo minore
         let bestT = -1, bestC = farCost;
         for (let t = 0; t < N; t++){
           if (t === j) continue;
@@ -1940,6 +1936,35 @@ const Engine = {
         }
       }
       if (!improved) break;
+    }
+
+    // ========== PHASE 3: FORZA ASSEGNAZIONE DELLE PROVINCE NON SERVIRE ==========
+    // Calcola capacità totale (finito? infinito?)
+    let totalCap = Infinity;
+    if (capacities && capacities.length === N){
+      totalCap = capacities.reduce((s,cap) => s + (cap == null ? 0 : cap), 0);
+      const totalDemand = PROV.reduce((s,p,i) => s + (provAssign[i] === -1 ? p.demand * F : 0), 0);
+      // Solo se la capacità totale è sufficiente, forza l'assegnazione
+      if (totalCap >= totalDemand){
+        for (let i = 0; i < M; i++){
+          if (provAssign[i] !== -1) continue;
+          const dem = PROV[i].demand * F;
+          if (dem <= 0) continue;
+          let bestJ = -1, bestCost = Infinity;
+          for (let j = 0; j < N; j++){
+            const cap = capacities ? capacities[j] : null;
+            if (cap != null && cap > 0 && tonPerPlant[j] + dem > cap) continue;
+            if (cost[i][j] < bestCost){
+              bestCost = cost[i][j];
+              bestJ = j;
+            }
+          }
+          if (bestJ >= 0){
+            provAssign[i] = bestJ;
+            tonPerPlant[bestJ] += dem;
+          }
+        }
+      }
     }
 
     return provAssign;
