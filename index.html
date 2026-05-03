@@ -1837,6 +1837,114 @@ const Engine = {
     return provAssign;
   },
 
+  /* ==================================================================
+     FARTHEST-FIRST REALLOCATION — algoritmo di assegnazione realistico
+     per scenari con capacità finita. Produce service area NON
+     concentriche risolvendo casi tipo "Siracusa→Acquanegra" (CR satura
+     una provincia molto lontana mentre lo stab più vicino è saturato
+     da una provincia ancora più lontana).
+
+     Fasi:
+       1) Greedy iniziale: ordina TUTTE le coppie (provincia, stab) per
+          costo trasporto unitario crescente (out + in con markup);
+          assegna la provincia al primo stab con capacità residua.
+       2) Reallocation iterativa: per ogni stab S, prendi la provincia
+          ASSEGNATA con costo MAX e prova a spostarla su un altro T che
+          (a) abbia capacità residua e (b) costi MENO per quella
+          provincia. Itera finché c'è un miglioramento (max 30 iter).
+
+     LIMITAZIONE: il costo di produzione (volume-dependent, scaglioni)
+     è IGNORATO nella decisione di assegnazione. Il calcolo finale dei
+     KPI rimane corretto perché passa attraverso computeWithAssignment
+     che applica la curva di produzione completa.
+     ================================================================== */
+  farthestFirstAllocate(plants, factor, capacities){
+    const PROV  = window.appData.provinces;
+    const PORTS = window.appData.ports;
+    const N = plants.length, M = PROV.length, F = factor;
+    const ineffIn  = window.appData.routingIneffIn;
+    const ineffOut = window.appData.routingIneffOut;
+    if (N === 0) return new Array(M).fill(-1);
+
+    // Pre-compute costo unitario inbound per stab (con markup specifico)
+    const plantAppUnit = new Array(N);
+    for (let j = 0; j < N; j++){
+      let bk = 0, bd = Infinity;
+      for (let k = 0; k < PORTS.length; k++){
+        const d = Engine.haversine(plants[j].lat, plants[j].lon, PORTS[k].lat, PORTS[k].lon);
+        if (d < bd){ bd = d; bk = k; }
+      }
+      plantAppUnit[j] = Engine.unitCostApp(bd * ineffIn, PORTS[bk].markup || 0);
+    }
+
+    // Matrice costo unitario trasporto €/ton (out + in) per ogni coppia
+    const cost = new Array(M);
+    for (let i = 0; i < M; i++){
+      cost[i] = new Array(N);
+      for (let j = 0; j < N; j++){
+        const km = Engine.haversine(PROV[i].lat, PROV[i].lon, plants[j].lat, plants[j].lon);
+        cost[i][j] = Engine.unitCostDistr(km * ineffOut) + plantAppUnit[j];
+      }
+    }
+
+    // PHASE 1: greedy by min cost — sort all pairs ascending
+    const provAssign  = new Array(M).fill(-1);
+    const tonPerPlant = new Array(N).fill(0);
+    const pairs = [];
+    for (let i = 0; i < M; i++){
+      if (PROV[i].demand * F <= 0) continue;
+      for (let j = 0; j < N; j++) pairs.push([cost[i][j], i, j]);
+    }
+    pairs.sort((a, b) => a[0] - b[0]);
+    for (let p = 0; p < pairs.length; p++){
+      const [_, i, j] = pairs[p];
+      if (provAssign[i] !== -1) continue;
+      const dem = PROV[i].demand * F;
+      const cap = capacities ? capacities[j] : null;
+      if (cap != null && cap > 0 && tonPerPlant[j] + dem > cap) continue;
+      provAssign[i]   = j;
+      tonPerPlant[j] += dem;
+    }
+
+    // PHASE 2: farthest-first reallocation
+    // Per ogni stab S → trova provincia P con costo MAX → cerca T con
+    // capacità residua e costo MINORE → sposta P da S a T se trovato.
+    const MAX_ITER = 30;
+    for (let iter = 0; iter < MAX_ITER; iter++){
+      let improved = false;
+      for (let j = 0; j < N; j++){
+        // Trova la provincia "più lontana" (costo max) assegnata a j
+        let farI = -1, farCost = -1;
+        for (let i = 0; i < M; i++){
+          if (provAssign[i] === j && cost[i][j] > farCost){
+            farCost = cost[i][j]; farI = i;
+          }
+        }
+        if (farI < 0) continue;
+        const dem = PROV[farI].demand * F;
+        // Cerca un alternativo T con capacità + costo minore
+        let bestT = -1, bestC = farCost;
+        for (let t = 0; t < N; t++){
+          if (t === j) continue;
+          if (cost[farI][t] >= bestC) continue;
+          const cap = capacities ? capacities[t] : null;
+          if (cap != null && cap > 0 && tonPerPlant[t] + dem > cap) continue;
+          bestC = cost[farI][t];
+          bestT = t;
+        }
+        if (bestT >= 0){
+          provAssign[farI]      = bestT;
+          tonPerPlant[j]       -= dem;
+          tonPerPlant[bestT]   += dem;
+          improved = true;
+        }
+      }
+      if (!improved) break;
+    }
+
+    return provAssign;
+  },
+
   // Optimizer principale: K-Means++ init + iterazioni di
   // (allocazione marginale + ricerca locale per ogni stab. non fissato).
   // capacities può essere null/undefined (infinita), un numero (uniforme)
@@ -1857,7 +1965,7 @@ const Engine = {
 
     let plants = initialPlants.map(p => ({...p}));
 
-    let assign  = Engine.marginalAllocate(plants, factor, caps);
+    let assign  = Engine.farthestFirstAllocate(plants, factor, caps);
     let result  = Engine.computeWithAssignment(plants, factor, assign);
     let bestCost = result.totalCost;
     const history = [bestCost];
@@ -1879,7 +1987,7 @@ const Engine = {
               const snap = Engine.snapToLand(newLat, newLon);
               const trial = plants.slice();
               trial[j] = {...orig, lat: snap.lat, lon: snap.lon};
-              const trialAssign = Engine.marginalAllocate(trial, factor, caps);
+              const trialAssign = Engine.farthestFirstAllocate(trial, factor, caps);
               const trialResult = Engine.computeWithAssignment(trial, factor, trialAssign);
               if (trialResult.totalCost < bestStepCost - 1){
                 bestStepCost = trialResult.totalCost;
@@ -1896,7 +2004,7 @@ const Engine = {
           iterImproved = true;
         }
       }
-      assign = Engine.marginalAllocate(plants, factor, caps);
+      assign = Engine.farthestFirstAllocate(plants, factor, caps);
       result = Engine.computeWithAssignment(plants, factor, assign);
       history.push(result.totalCost);
       if (onProgress) onProgress(iter, result.totalCost, plants);
@@ -3218,7 +3326,7 @@ const GreenfieldConvex = {
     const caps = this.buildCapacities();
     let r;
     if (caps){
-      const a = Engine.marginalAllocate(this.state.plants, this.state.factor, caps);
+      const a = Engine.farthestFirstAllocate(this.state.plants, this.state.factor, caps);
       r = Engine.computeWithAssignment(this.state.plants, this.state.factor, a);
     } else {
       r = Engine.compute(this.state.plants, this.state.factor);
@@ -3710,7 +3818,7 @@ const BrownfieldConvex = {
   render(){
     const active = this.state.plants.filter(p=>p.active);
     const caps = this.buildCapacities(active);
-    const a = Engine.marginalAllocate(active, this.state.factor, caps);
+    const a = Engine.farthestFirstAllocate(active, this.state.factor, caps);
     const r = Engine.computeWithAssignment(active, this.state.factor, a);
     this.lastResult = r;
     document.getElementById('bfc-kpi-total').textContent = fmtMillion(r.totalCost);
