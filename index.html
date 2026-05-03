@@ -1939,12 +1939,10 @@ const Engine = {
     }
 
     // ========== PHASE 3: FORZA ASSEGNAZIONE DELLE PROVINCE NON SERVIRE ==========
-    // Calcola capacità totale (finito? infinito?)
     let totalCap = Infinity;
     if (capacities && capacities.length === N){
       totalCap = capacities.reduce((s,cap) => s + (cap == null ? 0 : cap), 0);
       const totalDemand = PROV.reduce((s,p,i) => s + (provAssign[i] === -1 ? p.demand * F : 0), 0);
-      // Solo se la capacità totale è sufficiente, forza l'assegnazione
       if (totalCap >= totalDemand){
         for (let i = 0; i < M; i++){
           if (provAssign[i] !== -1) continue;
@@ -1969,7 +1967,7 @@ const Engine = {
 
     return provAssign;
   },
-
+  
   // Optimizer principale: K-Means++ init + iterazioni di
   // (allocazione marginale + ricerca locale per ogni stab. non fissato).
   // capacities può essere null/undefined (infinita), un numero (uniforme)
