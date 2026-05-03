@@ -1887,23 +1887,34 @@ const Engine = {
       }
     }
 
-    // PHASE 1: greedy by min cost — sort all pairs ascending
+    // PHASE 1: First-Fit Decreasing (FFD) — province sortate per domanda
+    // DESC, ognuna assegnata al suo stab. cheaper compatibile.
+    // Motivazione: il sort-by-cost-asc fallisce per province molto grandi
+    // (es. Verona 645kt) che non entrano in Quinto VR (cap 465kt) e per
+    // cui la seconda scelta (San Pietro 753kt) viene saturata da province
+    // piccole vicine prima che Verona venga processata. FFD garantisce
+    // che le grandi province trovino casa per prime.
     const provAssign  = new Array(M).fill(-1);
     const tonPerPlant = new Array(N).fill(0);
-    const pairs = [];
-    for (let i = 0; i < M; i++){
-      if (PROV[i].demand * F <= 0) continue;
-      for (let j = 0; j < N; j++) pairs.push([cost[i][j], i, j]);
-    }
-    pairs.sort((a, b) => a[0] - b[0]);
-    for (let p = 0; p < pairs.length; p++){
-      const [_, i, j] = pairs[p];
-      if (provAssign[i] !== -1) continue;
+    const provOrder = PROV.map((p, i) => ({i, d: p.demand * F}))
+      .filter(o => o.d > 0)
+      .sort((a, b) => b.d - a.d)        // demand DESC
+      .map(o => o.i);
+
+    for (const i of provOrder){
       const dem = PROV[i].demand * F;
-      const cap = capacities ? capacities[j] : null;
-      if (cap != null && cap > 0 && tonPerPlant[j] + dem > cap) continue;
-      provAssign[i]   = j;
-      tonPerPlant[j] += dem;
+      // ordina stab. per costo asc per QUESTA provincia
+      const plantOrder = [];
+      for (let j = 0; j < N; j++) plantOrder.push([cost[i][j], j]);
+      plantOrder.sort((a, b) => a[0] - b[0]);
+      for (let k = 0; k < plantOrder.length; k++){
+        const j = plantOrder[k][1];
+        const cap = capacities ? capacities[j] : null;
+        if (cap != null && cap > 0 && tonPerPlant[j] + dem > cap) continue;
+        provAssign[i]   = j;
+        tonPerPlant[j] += dem;
+        break;
+      }
     }
 
     // PHASE 2: farthest-first reallocation
@@ -1939,10 +1950,12 @@ const Engine = {
     }
 
     // ========== PHASE 3: FORZA ASSEGNAZIONE DELLE PROVINCE NON SERVIRE ==========
+    // Calcola capacità totale (finito? infinito?)
     let totalCap = Infinity;
     if (capacities && capacities.length === N){
       totalCap = capacities.reduce((s,cap) => s + (cap == null ? 0 : cap), 0);
       const totalDemand = PROV.reduce((s,p,i) => s + (provAssign[i] === -1 ? p.demand * F : 0), 0);
+      // Solo se la capacità totale è sufficiente, forza l'assegnazione
       if (totalCap >= totalDemand){
         for (let i = 0; i < M; i++){
           if (provAssign[i] !== -1) continue;
@@ -1967,7 +1980,6 @@ const Engine = {
 
     return provAssign;
   },
-  
   // Optimizer principale: K-Means++ init + iterazioni di
   // (allocazione marginale + ricerca locale per ogni stab. non fissato).
   // capacities può essere null/undefined (infinita), un numero (uniforme)
