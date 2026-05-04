@@ -139,6 +139,14 @@ body{
   font-size:11px;
   line-height:1.5;
 }
+/* Label toggle uniforme allo stile h6 PARAMETRI */
+.unit-toggle-label{
+  color:var(--txt-dim);
+  text-transform:uppercase;
+  font-size:11px;
+  letter-spacing:1px;
+  font-weight:600;
+}
 .panel-section{
   background:var(--bg-2);
   border:1px solid var(--bg-3);
@@ -549,7 +557,7 @@ body{
         <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="gf-tgl-unit">
-          <label class="form-check-label small text-muted" for="gf-tgl-unit">Mostra valori unitari (€/ton)</label>
+          <label class="form-check-label unit-toggle-label" for="gf-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
       <div class="panel-section" data-order="7">
@@ -670,7 +678,7 @@ body{
         <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="bf-tgl-unit">
-          <label class="form-check-label small text-muted" for="bf-tgl-unit">Mostra valori unitari (€/ton)</label>
+          <label class="form-check-label unit-toggle-label" for="bf-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
       <div class="panel-section" data-order="4">
@@ -793,14 +801,14 @@ body{
         <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="gfc-tgl-unit">
-          <label class="form-check-label small text-muted" for="gfc-tgl-unit">Mostra valori unitari (€/ton)</label>
+          <label class="form-check-label unit-toggle-label" for="gfc-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
       <div class="panel-section" data-order="6">
         <h6>Ottimizzazione convessa</h6>
         <div class="form-check form-switch mb-2">
           <input class="form-check-input" type="checkbox" role="switch" id="gfc-tgl-cap">
-          <label class="form-check-label small text-muted" for="gfc-tgl-cap">Capacità finita (uniforme)</label>
+          <label class="form-check-label unit-toggle-label" for="gfc-tgl-cap">Capacità finita (uniforme)</label>
         </div>
         <div class="slider-row mb-3" id="gfc-cap-row" style="opacity:0.4;pointer-events:none;">
           <label for="gfc-sld-cap">Capacità max</label>
@@ -830,16 +838,35 @@ body{
     <div class="map" id="map-bfc"></div>
     <aside class="control-panel">
       <div class="panel-section" data-order="2">
-        <h6>KPI in tempo reale</h6>
+        <h6>Scenario corrente vs Baseline AS‑IS</h6>
         <div class="kpi-grid">
           <div class="kpi full">
-            <div class="label">Costo Totale</div>
+            <div class="label">Costo Totale (scenario)</div>
             <div class="value" id="bfc-kpi-total">— €</div>
-            <div class="sub" id="bfc-kpi-unit" style="color:var(--txt-dim);font-size:10px;">— €/ton medio</div>
+            <div class="delta" id="bfc-kpi-total-delta">—</div>
           </div>
-          <div class="kpi"><div class="label">Approvvigionamento</div><div class="value" id="bfc-kpi-app">—</div><div class="kpi-meta" id="bfc-kpi-app-meta"></div></div>
-          <div class="kpi"><div class="label">Produzione</div><div class="value" id="bfc-kpi-prod">—</div></div>
-          <div class="kpi"><div class="label">Distribuzione</div><div class="value" id="bfc-kpi-distr">—</div><div class="kpi-meta" id="bfc-kpi-distr-meta"></div></div>
+          <div class="kpi">
+            <div class="label">Approvvigionamento</div>
+            <div class="value" id="bfc-kpi-app">—</div>
+            <div class="delta" id="bfc-kpi-app-delta">—</div>
+            <div class="kpi-meta" id="bfc-kpi-app-meta"></div>
+          </div>
+          <div class="kpi">
+            <div class="label">Produzione</div>
+            <div class="value" id="bfc-kpi-prod">—</div>
+            <div class="delta" id="bfc-kpi-prod-delta">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Distribuzione</div>
+            <div class="value" id="bfc-kpi-distr">—</div>
+            <div class="delta" id="bfc-kpi-distr-delta">—</div>
+            <div class="kpi-meta" id="bfc-kpi-distr-meta"></div>
+          </div>
+          <div class="kpi">
+            <div class="label">€/ton medio</div>
+            <div class="value" id="bfc-kpi-unit">—</div>
+            <div class="delta" id="bfc-kpi-unit-delta">—</div>
+          </div>
           <div class="kpi"><div class="label">Volume servito</div><div class="value" id="bfc-kpi-vol">—</div></div>
           <div class="kpi" id="bfc-kpi-unserved-card" style="display:none;"><div class="label">Domanda NON servita</div><div class="value" id="bfc-kpi-unserved">—</div></div>
         </div>
@@ -897,13 +924,15 @@ body{
           <span class="val" id="bfc-sld-d-val">1.0</span>
         </div>
         <div class="d-grid gap-2">
-          <button id="bfc-btn-add" class="btn btn-warning btn-sm">➕ Aggiungi stabilimento</button>
+          <button id="bfc-btn-add" class="btn btn-warning btn-sm">➕ Aggiungi stabilimento (greedy)</button>
+          <button id="bfc-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza posizioni nuovi stab.</button>
           <button id="bfc-btn-reset" class="btn btn-secondary btn-sm">↺ Ripristina 7 Veronesi</button>
         </div>
+        <div class="opt-progress" id="bfc-progress"></div>
         <hr style="border-color:var(--bg-3);margin:12px 0 8px;">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="bfc-tgl-unit">
-          <label class="form-check-label small text-muted" for="bfc-tgl-unit">Mostra valori unitari (€/ton)</label>
+          <label class="form-check-label unit-toggle-label" for="bfc-tgl-unit">Mostra valori unitari (€/ton)</label>
         </div>
       </div>
       <div class="panel-section" data-order="4">
@@ -922,12 +951,18 @@ body{
         <div id="bfc-plant-list"></div>
       </div>
       <div class="panel-section" data-order="6">
-        <h6>Ottimizzazione convessa</h6>
-        <p class="note-text mb-2">L'ottimizzazione muove solo i nuovi stab. (Veronesi fissi). Le capacità per riga vengono rispettate.</p>
-        <div class="d-grid gap-2">
-          <button id="bfc-btn-optimize" class="btn btn-primary btn-sm">🎯 Ottimizza costo totale</button>
+        <h6>Inefficienza routing (BF Convex)</h6>
+        <p class="note-text mb-2">Override locale dei moltiplicatori (default <b>1,3 OUT / 1,2 IN</b>); ripristinati al global quando esci dalla pagina.</p>
+        <div class="slider-row mb-2">
+          <label for="bfc-sld-iout">OUT (× km distr.)</label>
+          <input type="range" class="form-range" id="bfc-sld-iout" min="1.0" max="3.0" step="0.1" value="1.3">
+          <span class="val" id="bfc-sld-iout-val">1.3</span>
         </div>
-        <div class="opt-progress" id="bfc-progress"></div>
+        <div class="slider-row">
+          <label for="bfc-sld-iin">IN (× km approv.)</label>
+          <input type="range" class="form-range" id="bfc-sld-iin" min="1.0" max="3.0" step="0.1" value="1.2">
+          <span class="val" id="bfc-sld-iin-val">1.2</span>
+        </div>
       </div>
       <div class="panel-section" data-order="7">
         <h6>Analisi grafica</h6>
@@ -964,7 +999,7 @@ body{
         </div>
         <div class="form-check form-switch ms-3">
           <input class="form-check-input" type="checkbox" role="switch" id="dp-mode">
-          <label class="form-check-label small text-muted" for="dp-mode">Modifica in % (relativo all'originale)</label>
+          <label class="form-check-label unit-toggle-label" for="dp-mode">Modifica in % (relativo all'originale)</label>
         </div>
         <button id="dp-reset" class="btn btn-secondary btn-sm ms-auto">↺ Ripristina default</button>
       </div>
@@ -1414,7 +1449,10 @@ window.appData = {
   gfPlants: DEFAULT_PLANTS_GF.map(p => ({...p})),
   // Stato condiviso BF ↔ BF Convex (popolato lazily al primo onShow)
   bfFactor: 1.0,
-  bfPlants: null
+  bfPlants: null,
+  // Routing specifico BF Convex (override globali quando si entra nella pagina)
+  bfConvexRoutingIneffOut: 1.3,
+  bfConvexRoutingIneffIn:  1.2
 };
 
 /* Helper capacità Veronesi */
@@ -1610,58 +1648,124 @@ const Engine = {
               provName:province.name, distance};
     return {lat, lon, snapped:false, provName:province.name, distance};
   },
-  // K-Means++ pesato sulla domanda (max 100 iter, vincolo terraferma)
+  // K-Means++ pesato sulla domanda — versione robusta:
+  // • 5 restart con seed diversi, scelta della soluzione con TOTAL COST minore
+  // • Max 500 iterazioni Lloyd's con tolleranza 0.0001° (criterio convergenza)
+  // • Fine-tuning finale: ricerca locale ±0.05° per 10 iterazioni
+  // • Snap-to-land verificato dopo ogni spostamento (vincolo 80 km)
   kmeansPlusPlusWeighted(K, factor){
     const PROV = window.appData.provinces;
     const points = PROV.filter(p => p.demand > 0)
                        .map(p => ({lat:p.lat, lon:p.lon, w:p.demand*factor}));
     if (points.length === 0 || K <= 0) return [];
-    const wSum = a => a.reduce((s,x)=>s+x,0);
-    const pickW = (ws) => {
-      const tot = wSum(ws); if (tot <= 0) return Math.floor(Math.random()*ws.length);
-      let r = Math.random()*tot, c = 0;
-      for (let i = 0; i < ws.length; i++){ c += ws[i]; if (c >= r) return i; }
-      return ws.length - 1;
-    };
-    const centers = [];
-    centers.push({lat:points[pickW(points.map(p=>p.w))].lat, lon:points[pickW(points.map(p=>p.w))].lon});
-    while (centers.length < K){
-      const dists = points.map(p => {
-        let m = Infinity;
-        for (const c of centers){
-          const d = Engine.haversine(p.lat,p.lon,c.lat,c.lon);
-          if (d < m) m = d;
-        }
-        return m*m*p.w;
-      });
-      const idx = pickW(dists);
-      centers.push({lat:points[idx].lat, lon:points[idx].lon});
-    }
-    for (let it = 0; it < 100; it++){
-      const a = points.map(p => {
-        let bi=0, bd=Infinity;
-        for (let i = 0; i < K; i++){
-          const d = Engine.haversine(p.lat,p.lon,centers[i].lat,centers[i].lon);
-          if (d < bd){ bd = d; bi = i; }
-        }
-        return bi;
-      });
-      let changed = false;
-      for (let i = 0; i < K; i++){
-        const cl = points.filter((_, j) => a[j] === i);
-        if (cl.length === 0) continue;
-        const W = wSum(cl.map(p=>p.w));
-        const lat = cl.reduce((s,p)=>s+p.lat*p.w,0)/W;
-        const lon = cl.reduce((s,p)=>s+p.lon*p.w,0)/W;
-        if (Math.abs(lat-centers[i].lat)>0.001 || Math.abs(lon-centers[i].lon)>0.001){
-          centers[i] = {lat, lon}; changed = true;
-        }
+
+    const RESTARTS = 5;
+    const MAX_ITER = 500;
+    const TOL      = 0.0001;
+    const FINE_ITER = 10;
+    const FINE_STEP = 0.05;
+
+    let bestCenters = null, bestCost = Infinity;
+
+    for (let restart = 0; restart < RESTARTS; restart++){
+      // ---------- Phase 1: K-Means++ seeding ----------
+      const wSum = a => a.reduce((s,x)=>s+x,0);
+      const pickW = (ws) => {
+        const tot = wSum(ws);
+        if (tot <= 0) return Math.floor(Math.random()*ws.length);
+        let r = Math.random()*tot, c = 0;
+        for (let i = 0; i < ws.length; i++){ c += ws[i]; if (c >= r) return i; }
+        return ws.length - 1;
+      };
+      const centers = [];
+      centers.push({lat:points[pickW(points.map(p=>p.w))].lat, lon:points[pickW(points.map(p=>p.w))].lon});
+      while (centers.length < K){
+        const dists = points.map(p => {
+          let m = Infinity;
+          for (const c of centers){
+            const d = Engine.haversine(p.lat,p.lon,c.lat,c.lon);
+            if (d < m) m = d;
+          }
+          return m*m*p.w;
+        });
+        const idx = pickW(dists);
+        centers.push({lat:points[idx].lat, lon:points[idx].lon});
       }
-      if (!changed) break;
+
+      // ---------- Phase 2: Lloyd's iteration con tol 0.0001° ----------
+      for (let it = 0; it < MAX_ITER; it++){
+        const a = points.map(p => {
+          let bi=0, bd=Infinity;
+          for (let i = 0; i < K; i++){
+            const d = Engine.haversine(p.lat,p.lon,centers[i].lat,centers[i].lon);
+            if (d < bd){ bd = d; bi = i; }
+          }
+          return bi;
+        });
+        let maxMove = 0;
+        for (let i = 0; i < K; i++){
+          const cl = points.filter((_, j) => a[j] === i);
+          if (cl.length === 0) continue;
+          const W = wSum(cl.map(p=>p.w));
+          const lat = cl.reduce((s,p)=>s+p.lat*p.w,0)/W;
+          const lon = cl.reduce((s,p)=>s+p.lon*p.w,0)/W;
+          const move = Math.max(Math.abs(lat-centers[i].lat), Math.abs(lon-centers[i].lon));
+          if (move > maxMove) maxMove = move;
+          centers[i] = {lat, lon};
+        }
+        if (maxMove < TOL) break;
+      }
+
+      // ---------- Phase 3: Fine-tuning ricerca locale ±FINE_STEP ----------
+      // Per ogni centro, prova griglia 3×3 attorno alla posizione con snap-to-land.
+      // Tieni la posizione che riduce di più il TOTAL COST (App+Prod+Distr).
+      let snapApplied = centers.map(c => {
+        const s = Engine.snapToLand(c.lat, c.lon);
+        return {lat:s.lat, lon:s.lon};
+      });
+      const evalCenters = (cs) => {
+        const plants = cs.map((c, i) => ({name:`S${i}`, lat:c.lat, lon:c.lon}));
+        return Engine.compute(plants, factor).totalCost;
+      };
+      let curCost = evalCenters(snapApplied);
+      for (let it = 0; it < FINE_ITER; it++){
+        let improved = false;
+        for (let j = 0; j < K; j++){
+          const orig = snapApplied[j];
+          let bestPos = orig, bestC = curCost;
+          for (let di = -1; di <= 1; di++){
+            for (let dk = -1; dk <= 1; dk++){
+              if (di === 0 && dk === 0) continue;
+              const nl = orig.lat + di * FINE_STEP;
+              const no = orig.lon + dk * FINE_STEP;
+              const sn = Engine.snapToLand(nl, no);
+              const trial = snapApplied.slice();
+              trial[j] = {lat: sn.lat, lon: sn.lon};
+              const c = evalCenters(trial);
+              if (c < bestC - 1){ bestC = c; bestPos = trial[j]; }
+            }
+          }
+          if (bestPos !== orig){
+            snapApplied[j] = bestPos;
+            curCost = bestC;
+            improved = true;
+          }
+        }
+        if (!improved) break;
+      }
+
+      // ---------- Phase 4: valutazione globale e tracking del migliore ----------
+      const finalCost = evalCenters(snapApplied);
+      if (finalCost < bestCost){
+        bestCost = finalCost;
+        bestCenters = snapApplied.map(c => ({lat: c.lat, lon: c.lon}));
+      }
     }
-    return centers.map(c => {
+
+    // Restituisce i centri finali con snap (campo "snapped" mantenuto per compat.)
+    return bestCenters.map(c => {
       const s = Engine.snapToLand(c.lat, c.lon);
-      return {lat:s.lat, lon:s.lon, snapped:s.snapped};
+      return {lat: s.lat, lon: s.lon, snapped: s.snapped};
     });
   },
   // Greedy: posizionare un nuovo stab nella provincia (con domanda>0) che minimizza il costo totale
@@ -2236,6 +2340,9 @@ const Detail = {
 const Nav = {
   current:'home',
   show(page){
+    // Trigger onLeave per la pagina corrente (se l'ha definito)
+    const prev = Nav.current;
+    if (prev === 'bf-convex' && BrownfieldConvex.onLeave) BrownfieldConvex.onLeave();
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.page===page));
     document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+page));
     Nav.current = page;
@@ -3148,6 +3255,9 @@ const GreenfieldConvex = {
       type:'line', data:{labels:[], datasets:[{
         label:'Costo (M€)', data:[], borderColor:'#79c0ff',
         backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      },{
+        label:'Iniziale', data:[], borderColor:'#f78166',
+        borderDash:[6,4], pointRadius:0, fill:false
       }]},
       options:{maintainAspectRatio:false, responsive:true,
         plugins:{legend:{display:false}},
@@ -3348,6 +3458,9 @@ const GreenfieldConvex = {
       // Aggiorna chart convergenza
       this.charts.conv.data.labels = out.history.map((_,i)=>i);
       this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      // Linea baseline tratteggiata = costo iniziale (pre-ottimizzazione)
+      const init0 = out.history[0]/1e6;
+      this.charts.conv.data.datasets[1].data = out.history.map(()=>init0);
       this.charts.conv.update('none');
       const initCost = out.history[0], finCost = out.history[out.history.length-1];
       const reduction = (initCost - finCost) / initCost * 100;
@@ -3443,11 +3556,36 @@ const BrownfieldConvex = {
   onShow(){
     if (!this.initialized){ this.init(); this.initialized = true; }
     setTimeout(()=>{ this.map.invalidateSize(); }, 50);
+    // Override routing inefficienza con valori specifici BF Convex (back up i globali)
+    this._savedRoutingOut = window.appData.routingIneffOut;
+    this._savedRoutingIn  = window.appData.routingIneffIn;
+    window.appData.routingIneffOut = window.appData.bfConvexRoutingIneffOut;
+    window.appData.routingIneffIn  = window.appData.bfConvexRoutingIneffIn;
     this.syncIneffSliders();
     this.syncScenarioButtons();
     updateScenarioLegend();
     this.syncFromGlobal();
+    this.syncBfcIneffSliders();
     this.render();
+  },
+  // Chiamato quando si esce dalla pagina BF Convex → ripristina i valori globali
+  onLeave(){
+    if (this._savedRoutingOut != null){
+      window.appData.routingIneffOut = this._savedRoutingOut;
+      window.appData.routingIneffIn  = this._savedRoutingIn;
+    }
+  },
+  syncBfcIneffSliders(){
+    const sOut = document.getElementById('bfc-sld-iout');
+    const sIn  = document.getElementById('bfc-sld-iin');
+    if (sOut) {
+      sOut.value = window.appData.bfConvexRoutingIneffOut;
+      document.getElementById('bfc-sld-iout-val').textContent = window.appData.bfConvexRoutingIneffOut.toFixed(1);
+    }
+    if (sIn) {
+      sIn.value = window.appData.bfConvexRoutingIneffIn;
+      document.getElementById('bfc-sld-iin-val').textContent = window.appData.bfConvexRoutingIneffIn.toFixed(1);
+    }
   },
   // Sync con stato condiviso BF (factor + plants list)
   syncFromGlobal(){
@@ -3549,6 +3687,9 @@ const BrownfieldConvex = {
       type:'line', data:{labels:[], datasets:[{
         label:'Costo (M€)', data:[], borderColor:'#79c0ff',
         backgroundColor:'rgba(121,192,255,0.15)', fill:true, tension:0.25, pointRadius:3
+      },{
+        label:'Iniziale', data:[], borderColor:'#f78166',
+        borderDash:[6,4], pointRadius:0, fill:false
       }]},
       options:{maintainAspectRatio:false, responsive:true,
         plugins:{legend:{display:false}},
@@ -3595,6 +3736,12 @@ const BrownfieldConvex = {
     document.querySelectorAll('#bfc-scenario button').forEach(btn => {
       btn.addEventListener('click', ()=>{
         const sc = btn.dataset.scenario;
+        // Log diagnostico: capacità totali prima/dopo cambio scenario
+        const capsBefore = this.state.plants.filter(p=>p.active).map(p=>p.capKt*1000);
+        const sumBefore  = capsBefore.reduce((s,x)=>s+x,0);
+        console.log(`[BFC] Cambio scenario: ${window.appData.capacityScenario} → ${sc}`);
+        console.log(`[BFC] Capacità totale prima: ${sumBefore} ton`);
+
         window.appData.capacityScenario = sc;
         document.querySelectorAll('#bfc-scenario button').forEach(b =>
           b.classList.toggle('active', b.dataset.scenario === sc));
@@ -3605,7 +3752,14 @@ const BrownfieldConvex = {
         } else {
           applyCapScenario(this.state.plants, sc);
         }
-        this.drawPlants(); this.render();   // render aggiorna anche renderPlantList → input cap visibili
+        // Forza ricalcolo: invalido lastResult e re-render con nuove capacità
+        this.lastResult = null;
+        this.drawPlants();
+        const capsAfter = this.state.plants.filter(p=>p.active).map(p=>p.capKt*1000);
+        const sumAfter  = capsAfter.reduce((s,x)=>s+x,0);
+        console.log(`[BFC] Capacità totale dopo:  ${sumAfter} ton (Δ ${sumAfter-sumBefore} ton)`);
+        this.render();
+        console.log(`[BFC] Volume servito post-render: ${this.lastResult ? this.lastResult.totalVol : '—'} ton, unserved: ${this.lastResult ? this.lastResult.unservedDemand : '—'} ton`);
         this.syncToGlobal();
         updateScenarioLegend();
         const lbl = sc === 'manual' ? 'Manuale (max storici)' : (sc === 'plus10' ? '+10% (max × 1,1)' : '7gg/7 (max × 7/6)');
@@ -3619,7 +3773,23 @@ const BrownfieldConvex = {
     document.getElementById('bfc-btn-optimize').addEventListener('click', ()=>{
       this.runOptimization();
     });
-    // (Slider inefficienza routing spostati in Dati & Input)
+    // Slider inefficienza routing specifici per BF Convex
+    const bfcOut = document.getElementById('bfc-sld-iout');
+    const bfcIn  = document.getElementById('bfc-sld-iin');
+    if (bfcOut) bfcOut.addEventListener('input', ()=>{
+      const v = parseFloat(bfcOut.value);
+      window.appData.bfConvexRoutingIneffOut = v;
+      window.appData.routingIneffOut = v;       // override globale attivo
+      document.getElementById('bfc-sld-iout-val').textContent = v.toFixed(1);
+      this.render();
+    });
+    if (bfcIn) bfcIn.addEventListener('input', ()=>{
+      const v = parseFloat(bfcIn.value);
+      window.appData.bfConvexRoutingIneffIn = v;
+      window.appData.routingIneffIn = v;
+      document.getElementById('bfc-sld-iin-val').textContent = v.toFixed(1);
+      this.render();
+    });
     // Close detail panel
     document.getElementById('bfc-detail-close').addEventListener('click', ()=>{
       this.state.sel = -1;
@@ -3630,7 +3800,7 @@ const BrownfieldConvex = {
     });
   },
 
-  syncIneffSliders(){ /* noop — slider in pagina Dati & Input */ },
+  syncIneffSliders(){ /* noop — slider in pagina Dati & Input (per le altre pagine) */ },
 
   drawProvinces(){
     this.layers.provinces.clearLayers();
@@ -3842,6 +4012,9 @@ const BrownfieldConvex = {
       this.syncToGlobal();
       this.charts.conv.data.labels = out.history.map((_,i)=>i);
       this.charts.conv.data.datasets[0].data = out.history.map(c=>c/1e6);
+      // Linea baseline tratteggiata = costo iniziale (pre-ottimizzazione)
+      const init0 = out.history[0]/1e6;
+      this.charts.conv.data.datasets[1].data = out.history.map(()=>init0);
       this.charts.conv.update('none');
       const reduction = (out.history[0]-out.history[out.history.length-1])/out.history[0]*100;
       prog.textContent = `${out.history.length-1} iter (${dt.toFixed(0)} ms) · −${reduction.toFixed(2)}%`;
@@ -3853,21 +4026,68 @@ const BrownfieldConvex = {
   render(){
     const active = this.state.plants.filter(p=>p.active);
     const caps = this.buildCapacities(active);
+    console.log('[BFC] render — capacità totali:', caps ? caps.reduce((s,x)=>s+x,0) : null,
+                '· scenario:', window.appData.capacityScenario,
+                '· N stab attivi:', active.length);
     const a = Engine.farthestFirstAllocate(active, this.state.factor, caps);
     const r = Engine.computeWithAssignment(active, this.state.factor, a);
     this.lastResult = r;
-    document.getElementById('bfc-kpi-total').textContent = fmtMillion(r.totalCost);
-    document.getElementById('bfc-kpi-unit').textContent  = fmt(r.unitTotal,2) + ' €/ton medio';
-    const V = r.totalVol > 0 ? r.totalVol : 1;
+
+    // BASELINE AS-IS: 7 Veronesi tutti attivi a max storici, stesso fattore domanda
+    const baselineVero = window.appData.veronesi.map((v,i) => ({
+      id:i, name:v.name, lat:v.lat, lon:v.lon,
+      fixed:true, active:true, capKt: Math.round(vCapMax(i)/1000)
+    }));
+    const baselineCaps = baselineVero.map(p => p.capKt * 1000);
+    const baselineAssign = Engine.farthestFirstAllocate(baselineVero, this.state.factor, baselineCaps);
+    const b = Engine.computeWithAssignment(baselineVero, this.state.factor, baselineAssign);
+    this.baseline = b;
+
+    // KPIs con delta vs baseline (come Brownfield classico)
+    const setKpi = (id, val, base, isUnit=false) => {
+      const el = document.getElementById(id);
+      const elD = document.getElementById(id+'-delta');
+      let txt;
+      if (isUnit){
+        txt = fmt(val,2) + ' €/ton';
+      } else {
+        if (this.state.unit) txt = fmt(val,2) + ' €/ton';
+        else txt = fmtMillion(val);
+      }
+      el.textContent = txt;
+      if (base !== undefined && elD){
+        const delta = val - base;
+        const pct = base !== 0 ? (delta/base*100) : 0;
+        const dir = delta > 0 ? 'up' : (delta < 0 ? 'down' : '');
+        const sign = delta >= 0 ? '+' : '';
+        const dtxt = isUnit
+          ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+          : (this.state.unit
+              ? `${sign}${fmt(delta,2)} €/ton (${sign}${pct.toFixed(1)}%)`
+              : `${sign}${fmtMillion(delta)} (${sign}${pct.toFixed(1)}%)`);
+        elD.textContent = dtxt;
+        elD.className = 'delta ' + dir;
+      }
+    };
+    const V  = r.totalVol > 0 ? r.totalVol : 1;
+    const VB = b.totalVol > 0 ? b.totalVol : 1;
     if (this.state.unit){
-      document.getElementById('bfc-kpi-app').textContent   = fmt(r.totalApp/V,2)  + ' €/ton';
-      document.getElementById('bfc-kpi-prod').textContent  = fmt(r.totalProd/V,2) + ' €/ton';
-      document.getElementById('bfc-kpi-distr').textContent = fmt(r.totalDistr/V,2)+ ' €/ton';
+      setKpi('bfc-kpi-total', r.totalCost/V,    b.totalCost/VB, true);
+      setKpi('bfc-kpi-app',   r.totalApp/V,     b.totalApp/VB);
+      setKpi('bfc-kpi-prod',  r.totalProd/V,    b.totalProd/VB);
+      setKpi('bfc-kpi-distr', r.totalDistr/V,   b.totalDistr/VB);
     } else {
-      document.getElementById('bfc-kpi-app').textContent   = fmtMillion(r.totalApp);
-      document.getElementById('bfc-kpi-prod').textContent  = fmtMillion(r.totalProd);
-      document.getElementById('bfc-kpi-distr').textContent = fmtMillion(r.totalDistr);
+      setKpi('bfc-kpi-total', r.totalCost,  b.totalCost);
+      setKpi('bfc-kpi-app',   r.totalApp,   b.totalApp);
+      setKpi('bfc-kpi-prod',  r.totalProd,  b.totalProd);
+      setKpi('bfc-kpi-distr', r.totalDistr, b.totalDistr);
     }
+    document.getElementById('bfc-kpi-unit').textContent = fmt(r.unitTotal,2) + ' €/ton';
+    const elDu = document.getElementById('bfc-kpi-unit-delta');
+    const dU = r.unitTotal - b.unitTotal;
+    const sign = dU >= 0 ? '+' : '';
+    elDu.textContent = `${sign}${fmt(dU,2)} €/ton`;
+    elDu.className = 'delta ' + (dU>0?'up':(dU<0?'down':''));
     document.getElementById('bfc-kpi-vol').textContent = fmt(r.totalVol);
     const card = document.getElementById('bfc-kpi-unserved-card');
     if (r.unservedDemand > 0.5){
